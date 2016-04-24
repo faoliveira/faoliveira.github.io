@@ -1,3 +1,47 @@
+### OS ###
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+src
+
+### Node ###
+logs
+*.log
+npm-debug.log*
+.grunt
+.lock-wscript
+build/Release
+node_modules
+jspm_packages
+.npm
+.node_repl_history
+
+
+### SublimeText ###
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+sftp-config.json
+
+
+### Jekyll ###
+_site/
+.jekyll-metadata
+.jekyll-assets-cache
+.asset-cache
+_asset_bundler_cache
+
+
+### Sass ###
+.sass-cache/
+*.css.map
+
+
+### Ruby ###
 *.gem
 *.rbc
 /.config
@@ -9,28 +53,21 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
-
-## Specific to RubyMotion:
 .dat*
 .repl_history
 build/
-
-## Documentation cache and generated files:
+*.bridgesupport
+build-iPhoneOS/
+build-iPhoneSimulator/
 /.yardoc/
 /_yardoc/
 /doc/
 /rdoc/
-
-## Environment normalization:
 /.bundle/
 /vendor/bundle
 /lib/bundler/man/
 
-# for a library or gem, you might want to ignore these files since the code is
-# intended to run in multiple environments; otherwise, check them in:
-# Gemfile.lock
-# .ruby-version
-# .ruby-gemset
 
-# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
-.rvmrc
+### grunt ###
+dist/
+.tmp/
