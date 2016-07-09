@@ -14,7 +14,10 @@ domain_name: 'http://faoliveira.me'
 
 markdown:    kramdown
 highlighter: rouge
-gems: [jekyll-paginate]
+gems: 
+    - jekyll-paginate
+    - jekyll-feed
+    - jekyll-sitemap
 kramdown:
   input: GFM
   auto_ids: true
