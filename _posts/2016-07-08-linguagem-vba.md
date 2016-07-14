@@ -31,8 +31,8 @@ A sintaxe do VBA Macro começa com a palavra-chave *Sub* e termina com *End Sub*
 
 ```vbscript
 Sub ola()
-'comentários no código
-MsgBox "Primeiro Hello World"
+    'comentários no código
+    MsgBox "Primeiro Hello World"
 End Sub
 ```
 
@@ -44,13 +44,13 @@ End Sub
   O tipo de dado  padrão. Pode armazenar qualquer tipo de valor.
   
 ```vbscript  
-  Sub Exemplo()
-	Dim NomesArray() As Variant
+Sub Exemplo()
+    Dim NomesArray() As Variant
 	Dim Familia As String
 	NomesArray = Array("Lisa", "Bart", "Homer", "Margie", "Maggie")
 	Familia = NomesArray(2)
 	MsgBox Familia
-  End Sub
+End Sub
 ```
 
 A mensagem retornará o nome de Homer, pois ele ocupa a segunda possição. Lembrar sempre que o valor inicial é 0, logo Lisa ocupa a posição 0.
@@ -88,14 +88,14 @@ No exemplo abaixo usamos não só uma atribuição (=) e a concatenação (&), m
 
 ```vbscript
 Sub condicional()
-Dim x, y As Integer
-x = 20
-y = 10
-If x > y Then
-MsgBox "O maior valor é " & x
-Else
-MsgBox "O maior valor é " & y
-End If
+    Dim x, y As Integer
+    x = 20
+    y = 10
+    If x > y Then
+    MsgBox "O maior valor é " & x
+    Else
+    MsgBox "O maior valor é " & y
+    End If
 End Sub
 ```
 
