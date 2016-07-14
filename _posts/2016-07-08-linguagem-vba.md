@@ -74,12 +74,12 @@ Existe vários sites onde pode consultar as funções do VBA, particularmente go
 ![Exemplos de funções](/assets/images/totn_example.JPG)
 
 Para terminar, uma lista de atalhos de teclados no editor:
-ALT+F11- Visualizar o VBA Editor
-ALT+F8- Mostra todos os Macros
-ALT+Q- Fecha o VBA Editor() e returna ao Excel
-F5- Roda o macro
-F2- Mostra Pesquisado de objeto
-F7- Mostra o editor de código
-Ctrl+G – Janela de verificação imediata
-F4 – Proprieades
-Ctrl+R – Project Explorer
+    ALT+F11- Visualizar o VBA Editor
+	ALT+F8- Mostra todos os Macros
+	ALT+Q- Fecha o VBA Editor() e returna ao Excel
+	F5- Roda o macro
+	F2- Mostra Pesquisado de objeto
+	F7- Mostra o editor de código
+	Ctrl+G – Janela de verificação imediata
+	F4 – Propriedades
+	Ctrl+R – Project Explorer
