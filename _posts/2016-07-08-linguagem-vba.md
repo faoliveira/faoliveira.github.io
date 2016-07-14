@@ -38,7 +38,7 @@ End Sub
 
 #### Tipos de dados
 
-É bastante similar a tipo de dados de outras linguagens, então quem já estudou algoritmos não terá dificuldades. Apenas um resumo com pequenos exemplos, no [site da Microsoft] (https://msdn.microsoft.com/en-us/library/47zceaw7.aspx) poderá encontrar a referência com todos os tipos.
+É bastante similar a tipo de dados de outras linguagens, então quem já estudou algoritmos não terá dificuldades. Apenas um resumo com pequenos exemplos, no site da [Microsoft](https://msdn.microsoft.com/en-us/library/47zceaw7.aspx) poderá encontrar a referência com todos os tipos.
 
 - Variant type
   O tipo de dado  padrão. Pode armazenar qualquer tipo de valor.
@@ -67,14 +67,14 @@ Sub Exemplo3()
 End Sub
 ``` 
 
-- ​Integer types
-  O valor padrão para todo número integral é 0
+- ​Integer types.
+   O valor padrão para todo número integral é 0
   
-- ​Boolean type
-  Usado para valores True e False. O valor padrão é False.
+- ​Boolean type.
+   Usado para valores True e False. O valor padrão é False.
   
-- ​Date type
-  O valor padrão é 12/30/1899 00:00:00
+- ​Date type.
+   O valor padrão é 12/30/1899 00:00:00
   
 ```vbscript 
 Sub Exemplo2()
