@@ -44,7 +44,7 @@ End Sub
   O tipo de dado  padrão. Pode armazenar qualquer tipo de valor.
   
 ```vbscript  
-  Sub Array()
+  Sub Exemplo()
 	Dim NomesArray() As Variant
 	Dim Familia As String
 	NomesArray = Array("Lisa", "Bart", "Homer", "Margie", "Maggie")
@@ -60,10 +60,10 @@ A mensagem retornará o nome de Homer, pois ele ocupa a segunda possição. Lemb
   Para caracteres não númericos.
   
 ```vbscript    
-Sub Variables()
+Sub Exemplo3()
     Dim Usuario As String
     Usuario = "Ford Prefect" 
-    ActiveCell.FormulaR1C1 = CustomerName
+    ActiveCell.FormulaR1C1 = Usuario
 End Sub
 ``` 
 
@@ -73,12 +73,18 @@ End Sub
 - ​Boolean type
   Usado para valores True e False. O valor padrão é False.
   
-- ​Floating-point types
-- Scaled types
 - ​Date type
   O valor padrão é 12/30/1899 00:00:00
   
+```vbscript 
+Sub Exemplo2()
+    Dim Aniversario As Date 
+    Aniversario = #7/7/2016#
+    ActiveCell.FormulaR1C1 = Aniversario
+End Sub
+```
 
+No exemplo abaixo usamos não só uma atribuição (=) e a concatenação (&), mas também operadores de lógica e comparação.
 
 ```vbscript
 Sub condicional()
@@ -92,8 +98,6 @@ MsgBox "O maior valor é " & y
 End If
 End Sub
 ```
-
-No exemplo acima usamos não só uma atribuição (=) e a concatenação (&), mas também operadores de lógica e comparação.
 
 Existe vários sites onde pode consultar as funções do VBA, particularmente gosto do [TechOnTheNet](http://www.techonthenet.com/excel/formulas/index_vba.php). Lá poderá ver as funções com exemplos.
 
