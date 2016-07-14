@@ -5,7 +5,6 @@ date: 2016-07-07 12:00:00
 disqus: true
 ---
 
-<br>
 Chegamos na terceira versão do faoliveira.me, voltando novamente para [Jekyll](https://jekyllrb.com), já que dessa forma o site fica hospedado no Github. Os antigos textos agora estão disponíveis no [Medium](https://medium.com/@faoliveira). 
 
 Já fazia um tempo que estava postergando o aprendizado de VBA, afim de ampliar meus conhecimentos no Excel. Quem já pegou um arquivo com milhares de linhas e fórmulas com vários SE sabe a dor de cabeça que pode ser analisar algo. Para isso essa nova versão do faoliveira.me irá servir, irei transmitir o que estou aprendendo, não só para difundir conhecimento, mas reforçar o meu próprio e me manter escrevendo. Não espere também uma série de tutoriais, a partir de simples fórmulas financeiras ou automatizadores de dados, irei explicar o que está por trás daquela planilha.

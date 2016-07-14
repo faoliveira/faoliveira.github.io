@@ -5,8 +5,6 @@ date: 2016-07-08 12:00:00
 disqus: true
 ---
 
-<br>
-
 Acredito que antes de trabalhar em algo na cozinha, você precisa estar familiarizado com os ingredientes antes de tentar cozinhar. O editor de VBA pode ser separado em 5 componentes.
 
 ![Editor](/assets/images/vba_editor.JPG)
