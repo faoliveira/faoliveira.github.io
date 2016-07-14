@@ -6,9 +6,10 @@ disqus: true
 ---
 
 <br>
+
 Acredito que antes de trabalhar em algo na cozinha, você precisa estar familiarizado com os ingredientes antes de tentar cozinhar. O editor de VBA pode ser separado em 5 componentes.
 
-![Editor](/assets/images/vba_editor.JPG)
+![Editor](/assets/images/vba_editor.jpg)
 
 #### Componentes
 
@@ -29,6 +30,7 @@ Está relacionado a interface do usuário. Aje como um módulo de classe.
 
 #### VBA Macro
 A sintaxe do VBA Macro começa com a palavra-chave *Sub* e termina com *End Sub*
+
 ```vbscript
 Sub ola()
 'comentários no código
@@ -71,15 +73,16 @@ No exemplo acima usamos não só uma atribuição (=) e a concatenação (&), ma
 
 Existe vários sites onde pode consultar as funções do VBA, particularmente gosto do [TechOnTheNet](http://www.techonthenet.com/excel/formulas/index_vba.php). Lá poderá ver as funções com exemplos.
 
-![Exemplos de funções](/assets/images/totn_example.JPG)
+![Exemplos de funções](/assets/images/totn_example.jpg)
 
 Para terminar, uma lista de atalhos de teclados no editor:
+
     ALT+F11- Visualizar o VBA Editor
-	ALT+F8- Mostra todos os Macros
-	ALT+Q- Fecha o VBA Editor() e returna ao Excel
-	F5- Roda o macro
-	F2- Mostra Pesquisado de objeto
-	F7- Mostra o editor de código
-	Ctrl+G – Janela de verificação imediata
-	F4 – Propriedades
-	Ctrl+R – Project Explorer
+    ALT+F8- Mostra todos os Macros
+    ALT+Q- Fecha o VBA Editor() e returna ao Excel
+    F5- Roda o macro
+    F2- Mostra Pesquisado de objeto
+    F7- Mostra o editor de código
+    Ctrl+G – Janela de verificação imediata
+    F4 – Propriedades
+    Ctrl+R – Project Explorer
