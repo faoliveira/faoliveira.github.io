@@ -11,8 +11,12 @@ Já fazia um tempo que estava postergando o aprendizado de VBA, afim de ampliar 
 
 <iframe src="//giphy.com/embed/1EzbweBp6XRv2?html5=true" width="480" height="269" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/cat-wait-1EzbweBp6XRv2"></a></p>
 
-Podemos resumir BEM VBA em três pontos:
+Podemos resumir BEM VBA em alguns pontos:
 - Projetado para substituir as tecnologias antigas XLM (Excel) e Word Basic (Word);
+
+- VBA é uma linguagem de alto nível e orientada a objetos. Tudo em VBA é tratado como um objeto;
+
+- Pode ser usado para conectar banco de dados como SQL;
 
 - Concede maior controle do que o gravador de macro, que por si só pode reproduzir ações disponíveis na interface do usuário;
 

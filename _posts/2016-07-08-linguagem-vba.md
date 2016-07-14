@@ -5,7 +5,7 @@ date: 2016-07-08 12:00:00
 disqus: true
 ---
 
-Acredito que antes de trabalhar em algo na cozinha, você precisa estar familiarizado com os ingredientes antes de tentar cozinhar. O editor de VBA pode ser separado em 5 componentes.
+Acredito que antes de trabalhar em algo na cozinha, você precisa estar familiarizado com os ingredientes antes de tentar cozinhar. Dessa forma podemos é necessário entender a lógica dos componentes do editor de VBA.
 
 ![Editor](/assets/images/vba_editor.JPG)
 
@@ -36,23 +36,49 @@ MsgBox "Primeiro Hello World"
 End Sub
 ```
 
-#### VBA Macro
+#### Tipos de dados
+
+É bastante similar a tipo de dados de outras linguagens, então quem já estudou algoritmos não terá dificuldades. Apenas um resumo com pequenos exemplos, no [site da Microsoft] (https://msdn.microsoft.com/en-us/library/47zceaw7.aspx) poderá encontrar a referência com todos os tipos.
 
 - Variant type
-  O tipo de dado  padrão
+  O tipo de dado  padrão. Pode armazenar qualquer tipo de valor.
+  
+```vbscript  
+  Sub Array()
+	Dim NomesArray() As Variant
+	Dim Familia As String
+	NomesArray = Array("Lisa", "Bart", "Homer", "Margie", "Maggie")
+	Familia = NomesArray(2)
+	MsgBox Familia
+  End Sub
+```
+
+A mensagem retornará o nome de Homer, pois ele ocupa a segunda possição. Lembrar sempre que o valor inicial é 0, logo Lisa ocupa a posição 0.
+
 - ​String type
-  Para caracteres não númericos
+
+  Para caracteres não númericos.
+  
+```vbscript    
+Sub Variables()
+    Dim Usuario As String
+    Usuario = "Ford Prefect" 
+    ActiveCell.FormulaR1C1 = CustomerName
+End Sub
+``` 
+
 - ​Integer types
   O valor padrão para todo número integral é 0
+  
 - ​Boolean type
-  Usado para valores True e False. O valor padrão é False
+  Usado para valores True e False. O valor padrão é False.
+  
 - ​Floating-point types
 - Scaled types
 - ​Date type
   O valor padrão é 12/30/1899 00:00:00
-- ​Enumerations
-- ​Object types
-- User-Defined type
+  
+
 
 ```vbscript
 Sub condicional()
