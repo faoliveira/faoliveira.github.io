@@ -8,7 +8,7 @@ disqus: true
 <br>
 Acredito que antes de trabalhar em algo na cozinha, você precisa estar familiarizado com os ingredientes antes de tentar cozinhar. O editor de VBA pode ser separado em 5 componentes.
 
-![Editor](/assets/images/vba_editor.jpg)
+![Editor](/assets/images/vba_editor.JPG)
 
 #### Componentes
 
@@ -71,7 +71,7 @@ No exemplo acima usamos não só uma atribuição (=) e a concatenação (&), ma
 
 Existe vários sites onde pode consultar as funções do VBA, particularmente gosto do [TechOnTheNet](http://www.techonthenet.com/excel/formulas/index_vba.php). Lá poderá ver as funções com exemplos.
 
-![Exemplos de funções](/assets/images/totn_example.jpg)
+![Exemplos de funções](/assets/images/totn_example.JPG)
 
 Para terminar, uma lista de atalhos de teclados no editor:
 ALT+F11- Visualizar o VBA Editor
