@@ -3,6 +3,7 @@ layout: post
 title: Hello VBA my darkness old friend
 date: 2016-07-07 12:00:00
 disqus: true
+excerpt: Voltando ao Jekyll e sem mais postergar VBA.
 ---
 
 Chegamos na terceira versão do faoliveira.me, voltando novamente para [Jekyll](https://jekyllrb.com), já que dessa forma o site fica hospedado no Github. Os antigos textos agora estão disponíveis no [Medium](https://medium.com/@faoliveira). 

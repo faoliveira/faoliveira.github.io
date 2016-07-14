@@ -1,6 +1,7 @@
 ---
 layout: page
-title: Me in a nutshell 
+title: Me in a nutshell
+excerpt: Pedaços de textos, conversas e outras minúcias por @faoliveira
 ---
 
 <p><img src="/assets/images/profile.jpg" class="bio-photo"></p>

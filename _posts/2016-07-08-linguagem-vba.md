@@ -3,6 +3,7 @@ layout: post
 title: A linguagem VBA
 date: 2016-07-08 12:00:00
 disqus: true
+excerpt: Antes de trabalhar em algo na cozinha, você precisa estar familiarizado com os ingredientes antes de tentar cozinhar.
 ---
 
 Acredito que antes de trabalhar em algo na cozinha, você precisa estar familiarizado com os ingredientes antes de tentar cozinhar. Dessa forma podemos é necessário entender a lógica dos componentes do editor de VBA.
