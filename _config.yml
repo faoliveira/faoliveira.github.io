@@ -9,6 +9,7 @@ paginate: 7
 url: http://faoliveira.me
 baseurl: /
 domain_name: 'http://faoliveira.me'
+permalink: /:year/:month/:title
 
 # Jekyll configuration
 
