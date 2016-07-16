@@ -80,6 +80,8 @@ Existe também a acromática, onde as cores ficam em tons de cinza, podendo assi
 
 Existem diversos sites que ajudam ao escolher esquemas de cores, o qual indico o [Adobe Color CC](https://color.adobe.com) e [Coolors](https://coolors.co).
 
-Tal qual Pablo Picasso disse ***“Bons artistas copiam, grandes artistas roubam”*** sempre é bom ter fonte de inspiração. SlideShare e Prezi estão cheio de bons exemplos.
+Tal qual Pablo Picasso disse ***“Bons artistas copiam, grandes artistas roubam”*** sempre é bom ter fonte de inspiração. [SlideShare](http://pt.slideshare.net) e [Prezi](https://prezi.com/explore/) estão cheio de bons exemplos.
 
 <iframe src="//pt.slideshare.net/slideshow/embed_code/key/qU77e9lTaLbNNH" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> 
+
+<iframe id="iframe_container" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" width="595" height="485" src="https://prezi.com/embed/3jk4domsau3i/?bgcolor=ffffff&amp;lock_to_path=0&amp;autoplay=0&amp;autohide_ctrls=0&amp;landing_data=bHVZZmNaNDBIWnNjdEVENDRhZDFNZGNIUE43MHdLNWpsdFJLb2ZHanI5a2pLVUQ5Zm9QVHNLa01DckZUK1dMV0NRPT0&amp;landing_sign=Uddv2vxQYDSLyd4hCMNT1PvItYo46yHu6fBf0bSUZFA"></iframe>

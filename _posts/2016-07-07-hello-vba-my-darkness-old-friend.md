@@ -12,7 +12,7 @@ Já fazia um tempo que estava postergando o aprendizado de VBA, afim de ampliar 
 
 <iframe src="//giphy.com/embed/1EzbweBp6XRv2?html5=true" width="480" height="269" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/cat-wait-1EzbweBp6XRv2"></a></p>
 
-Podemos resumir BEM VBA em alguns pontos:
+Podemos resumir **BEM** VBA em alguns pontos:
 
 - Projetado para substituir as tecnologias antigas XLM (Excel) e Word Basic (Word);
 
@@ -24,4 +24,5 @@ Podemos resumir BEM VBA em alguns pontos:
 
 - Pode aumentar suas capacidades ao adicionar biblioteca de vínculo dinâmico (DLL) por exemplo.
 
-Mas não só de VBA irei falar aqui, nessa minha busca para aprender sobre, acabei por ler livros acerca de Big Data, dessa forma também irei futuramente escrever sobre [Minitab](https://www.minitab.com/pt-br/products/minitab/) - software estatístico bastante utilizado em ambientes com Seis Sigma - e o [Tableau](https://www.tableau.com/pt-br/products/desktop).
+Mas não só de VBA irei falar aqui, pelo interesse em análise de dados, é inevitável não cair no assunto Big Data, dessa forma pretendo futuramente escrever sobre [Minitab](https://www.minitab.com/pt-br/products/minitab/) - software estatístico bastante utilizado em ambientes com Seis Sigma - e o [Tableau](https://www.tableau.com/pt-br/products/desktop). Aliás, aos curioso sobre Big Data, indico fortemente a leitura do livro [Dados Demais!](https://www.amazon.com.br/Dados-Demais-Thomas-H-Davenport/dp/8535264019). É um livro curto e introdutório com bastante exemplos de empresas que utilizam análises quantitativas, além que não é incomum achar em promoção. 
+
