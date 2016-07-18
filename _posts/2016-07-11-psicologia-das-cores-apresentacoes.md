@@ -21,7 +21,7 @@ Sabe aquela apresentação que você que está recheado de texto e imagens desne
 
 ## Psicologia das cores
 
-Toda cor diz alguma coisa, o que não seria nenhuma surpresa, pois todos já lemos sobre significado das cores do McDonalds ou Coca. Verde é uma cor que está ligado não só ao ambiente, como harmonia e confiança, temos como exemplo o verde da logo do Starbucks.
+Toda cor diz alguma coisa, o que não seria nenhuma surpresa, pois todos já lemos sobre significado das cores do McDonalds ou Coca. Verde, por exemplo, é uma cor que está ligado não só ao ambiente, como harmonia e confiança. Temos o caso de uso de verde no logo da Starbucks. Pensa agora numa grande marca da área de moda. Pensou? Reparou que bastante delas usam preto? Pois a cor preta está conectado prestígio, poder e elegância. A escolha da cor é importante, porque num nível psicológico, ela diz algo. Dessa forma uma escolha de cor certa pode aumentar o impacto do que você quer dizer.
 
 <table>
   <tbody>
@@ -72,7 +72,7 @@ Temos a abordagem monocromática, onde se pega uma cor e outra próxima a ela no
 	<figcaption>Monocromático e Complementar</figcaption>
 </figure> 
 
-Existe também a acromática, onde as cores ficam em tons de cinza, podendo assim usar uma cor para dar destaque.
+Existe também a acromática, onde as cores ficam em tons de cinza, podendo assim usar uma cor para destacar um ponto importante.
 <figure>
 	<img src="/assets/images/achromatic.jpg" alt="Acromático">
 	<figcaption>Acromático</figcaption>
