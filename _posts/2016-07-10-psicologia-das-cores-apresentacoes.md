@@ -1,7 +1,7 @@
 ---
 layout: post
 title: A psicologia das cores e outras dicas em apresentações
-date: 2016-07-11
+date: 2016-07-10
 disqus: true
 ---
 
