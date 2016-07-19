@@ -3,7 +3,7 @@ layout: post
 title: Por que dados não são suficiente
 date: 2016-07-09
 disqus: true
-description: Depois de ter reunido uma quantidade relativa de dados, chega o momento onde é necessário expressar os números numa forma visual de percepção. 
+excerpt: Depois de ter reunido uma quantidade relativa de dados, chega o momento onde é necessário expressar os números numa forma visual de percepção. 
 ---
 
 Depois de ter reunido uma quantidade relativa de dados, chega o momento onde é necessário expressar os números numa forma visual de percepção. Iniciando com um exemplo[^dado] bem simples.
