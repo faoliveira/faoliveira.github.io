@@ -21,7 +21,7 @@ Dos gráficos acima, qual é mais perceptivo a evolução? É um exemplo bem sim
 Seu estudo pode ser encontrado em diversas leituras, mas simplicando, como um dado pode ser contado em diferentes formas e histórias.
 
 <figure>
-<a href='http:&#47;&#47;faoliveira.me&#47;2016&#47;07&#47;por-que-dados-nao-sao-suficientes'><img src="/assets/images/Painel1.jpg"></a>
+<a href='https://public.tableau.com/views/Exemplo1_7/Painel1?:embed=y&:display_count=yes&:showTabs=y'><img src="/assets/images/Painel1.jpg"></a>
 </figure> 
 
 Por uma simples decisão de mostrar o lucro por província em um mapa, já mudamos nossa forma de percepção. Dessa forma teste sempre o tipo e formato que irá mostrar seus dados. 
