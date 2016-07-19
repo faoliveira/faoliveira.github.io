@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Por que dados não são suficiente
+title: Por que só dados não são suficiente
 date: 2016-07-09
 disqus: true
 excerpt: Depois de ter reunido uma quantidade relativa de dados, chega o momento onde é necessário expressar os números numa forma visual de percepção. 
@@ -21,14 +21,15 @@ Dos gráficos acima, qual é mais perceptivo a evolução? É um exemplo bem sim
 Seu estudo pode ser encontrado em diversas leituras, mas simplicando, como um dado pode ser contado em diferentes formas e histórias.
 
 <figure>
-<img src="/assets/images/Painel1.jpg">
+<a href='http:&#47;&#47;faoliveira.me&#47;2016&#47;07&#47;por-que-dados-nao-sao-suficientes'<img src="/assets/images/Painel1.jpg"></a>
 </figure> 
 
-Por uma simples decisão de mostrar o lucro por província num mapa, já mudamos nossa percepção. Dessa forma teste sempre o tipo e formato que irá mostrar seus dados.
+Por uma simples decisão de mostrar o lucro por província em um mapa, já mudamos nossa forma de percepção. Dessa forma teste sempre o tipo e formato que irá mostrar seus dados. 
 
 
 
 
 
+----------
 
 [^dado]: Tabela de dados usada disponivel através do [link](https://community.tableau.com/docs/DOC-1236).
