@@ -32,4 +32,4 @@ Por uma simples decisão de mostrar o lucro por província em um mapa, já mudam
 
 ----------
 
-[^dado]: Tabela de dados usada disponivel através do [link](https://community.tableau.com/docs/DOC-1236).
+[^dado]: Tabela de dados usada disponível através do [link](https://community.tableau.com/docs/DOC-1236).

@@ -3,17 +3,18 @@ layout: post
 title: A psicologia das cores e outras dicas em apresentações
 date: 2016-07-10
 disqus: true
+excerpt: Outrora lembro-me do meu professor de Marketing chamar minha atenção numa apresentação em PowerPoint sobre as cores que eu estava utilizando. Não sou um designer, mas sempre considerei que tinha uma percepção sobre
 ---
 
 
 
-Outrora lembro-me do meu professor de Marketing chamar minha atenção numa apresentação em PowerPoint sobre as cores que eu estava utilizando. Não sou um designer, mas sempre considerei que tinha uma percepção sobre, resolvi então ler o livro que o professor tinha indicado *A Psicologia Das Cores: Como As Cores Afetam a Emoção e a Razão* e irei passar algumas dicas de apresentações.
+Outrora lembro-me do meu professor de Marketing chamar minha atenção numa apresentação em PowerPoint sobre as cores que eu estava utilizando. Não sou um designer, mas sempre considerei que tinha uma boa percepção sobre. Resolvi então ler o livro que o professor tinha indicado, *A Psicologia Das Cores: Como As Cores Afetam a Emoção e a Razão*, o qual me deu *insights* como a cor afeta mais do que imaginamos. De leitura e (esporros), tentarei passar o que aprendi e continuo aprendendo.
 
 ## Design Matters!
 
 <a href="https://www.flickr.com/photos/21560098@N06/7778608072/" title="Day 346 I love post it notes ( 3,000 Views ) ta por Nina Matthews Photography, no Flickr"><img src="https://farm8.staticflickr.com/7275/7778608072_994485de27_z.jpg" width="640" height="425" alt="Day 346 I love post it notes ( 3,000 Views ) ta"></a>
 
-Antes de direto para o Prezi, Keynote ou PowerPoint, tente ir [analógico primeiramente](https://www.fastcompany.com/3013039/unplug/need-to-get-focused-first-go-analog "Need To Get Focused? First Go Analog"). Perdemos tempo e foco (quase) sempre indo direto ao computador. Pegando um pedaço de papel ou usando um post-it para cada slide, por exemplo, facilita a organização de ideias e pensamentos. 
+Antes de ir direto para o Prezi, Keynote ou PowerPoint, tente ir [analógico primeiramente](https://www.fastcompany.com/3013039/unplug/need-to-get-focused-first-go-analog "Need To Get Focused? First Go Analog"). Perdemos tempo e foco (quase) sempre indo direto ao computador. Pegando um pedaço de papel ou usando um post-it para cada slide, por exemplo, facilita a organização de ideias e pensamentos. 
 
 ## Menos é Mais
 
