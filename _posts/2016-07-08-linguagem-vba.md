@@ -43,7 +43,7 @@ End Sub
 
 - Variant type
   O tipo de dado  padrão. Pode armazenar qualquer tipo de valor.
-  
+
 ```vbscript  
 Sub Exemplo()
     Dim NomesArray() As Variant
@@ -59,24 +59,24 @@ A mensagem retornará o nome de Homer, pois ele ocupa a segunda possição. Lemb
 - ​String type
 
   Para caracteres não númericos.
-  
+
 ```vbscript    
 Sub Exemplo3()
     Dim Usuario As String
     Usuario = "Ford Prefect" 
     ActiveCell.FormulaR1C1 = Usuario
 End Sub
-``` 
+```
 
 - ​Integer types.
    O valor padrão para todo número integral é 0
-  
+
 - ​Boolean type.
    Usado para valores True e False. O valor padrão é False.
-  
+
 - ​Date type.
    O valor padrão é 12/30/1899 00:00:00
-  
+
 ```vbscript 
 Sub Exemplo2()
     Dim Aniversario As Date 
@@ -103,6 +103,20 @@ End Sub
 Existe vários sites onde pode consultar as funções do VBA, particularmente gosto do [TechOnTheNet](http://www.techonthenet.com/excel/formulas/index_vba.php). Lá poderá ver as funções com exemplos.
 
 ![Exemplos de funções](/assets/images/totn_example.JPG)
+
+
+#### Fórmulas Personalizadas
+
+Todos devem já estar familiarizados com as fórumas do Excel como SOMA, SE, MEDIA entre outras. O qual na versão 2016 dá mais de 400 fórmulas estabelecidas no programa. Não obstante a isso, pode-se criar ainda mais com o VBA, as *user-defined functions*. Para criar, basta no editor iniciar a fórmula deseja com Function NOMEDAFORMULA(). O exemplo abaixo é uma fórmula que ao USER() na planilha, retorna o nome do usuário.
+
+```vbscript
+Function USER()
+	USER = Application.UserName
+End Function
+```
+
+Lembrete: Coloque suas fórmulas em módulos. Além que fórmulas são passivas, não podem alterar qualquer coisa na planilha. Ou seja, não irá mudar cor ou tamanho da fonte. Fórmulas sempre irão mostrar valores.
+
 
 Para terminar, uma lista de atalhos de teclados no editor:
 
