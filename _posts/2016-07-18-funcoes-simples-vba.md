@@ -3,7 +3,7 @@ layout: post
 title: Funções Simples em VBA
 date: 2016-07-18
 disqus: true
-excerpt: Lista com pequenas funções em VBA
+excerpt: Sempre fui dos que preferem aprender olhando exemplos, então segue uma lista com pequenas funções em VBA
 ---
 
 Particulamente sempre fui dos que preferem aprender olhando exemplos. Não que a teoria seja desnecessária, mas como dito no [texto anterior](http://faoliveira.me/2016/07/linguagem-vba), dá para consutar todas as funções do VBA no [TechOnTheNet](http://www.techonthenet.com/excel/formulas/index_vba.php) e no site da [Microsoft](https://msdn.microsoft.com/en-us/library/sh9ywfdk.aspx). A lógica do VBA no fim é igual a de qualquer outra linguagem aprendida. Desse modo, vamos a prática.
