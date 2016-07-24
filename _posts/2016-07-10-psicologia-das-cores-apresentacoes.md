@@ -6,8 +6,6 @@ disqus: true
 excerpt: Outrora lembro-me do meu professor de Marketing chamar minha atenção numa apresentação em PowerPoint sobre as cores que eu estava utilizando. 
 ---
 
-
-
 Outrora lembro-me do meu professor de Marketing chamar minha atenção numa apresentação em PowerPoint sobre as cores que eu estava utilizando. Não sou um designer, mas sempre considerei que tinha uma boa percepção sobre. Resolvi então ler o livro que o professor tinha indicado, *A Psicologia Das Cores: Como As Cores Afetam a Emoção e a Razão*, o qual me deu *insights* como a cor afeta mais do que imaginamos. De leitura e (esporros), tentarei passar o que aprendi e continuo aprendendo.
 
 ## Design Matters!
