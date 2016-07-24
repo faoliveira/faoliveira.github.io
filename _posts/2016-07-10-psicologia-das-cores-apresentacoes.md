@@ -3,7 +3,7 @@ layout: post
 title: A psicologia das cores e outras dicas em apresentações
 date: 2016-07-10
 disqus: true
-excerpt: Outrora lembro-me do meu professor de Marketing chamar minha atenção numa apresentação em PowerPoint sobre as cores que eu estava utilizando. Não sou um designer, mas sempre considerei que tinha uma percepção sobre
+excerpt: Outrora lembro-me do meu professor de Marketing chamar minha atenção numa apresentação em PowerPoint sobre as cores que eu estava utilizando. 
 ---
 
 
