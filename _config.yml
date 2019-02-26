@@ -1,58 +1,60 @@
-# Site wide configuration
+# Site
+repository: sproogen/resume-theme
+# favicon: images/favicon.ico
 
-title: Felipe Oliveira
-locale: pt_BR
-encoding: utf-8
-description: Pedaços de textos, conversas e outras minúcias por @faoliveira
-logo: drawing.png
-paginate: 7
-url: http://faoliveira.me
-baseurl: /
-domain_name: 'http://faoliveira.me'
-permalink: /:year/:month/:title
+# Personal info
+name: Brett Harris
+title: Senior Network System Administrator
+email: brett.h@email.co.uk
+website: www.github.com/sproogen/resume-theme
 
-# Jekyll configuration
+# Social links
+twitter_username: facespics
+github_username:  sproogen
+# dribbble_username: jekyll
+# facebook_username: jekyll
+# flickr_username: jekyll
+instagram_username: chillwildlife
+linkedin_username: jameswgrant
+# pinterest_username: jekyll
+youtube_username: globalmtb
+# googleplus_username: +jekyll
 
-markdown:    kramdown
-highlighter: rouge
-gems: 
-    - jekyll-paginate
-    - jekyll-feed
-    - jekyll-sitemap
-kramdown:
-  input: GFM
-  auto_ids: true
-  footnote_nr: 1
-  entity_output: as_char
-  toc_levels: 1..2
-  enable_coderay: false
+# About Section
+# about_title: About Me
+about_profile_image: images/profile.jpg
+about_content: | # this will include new lines to allow paragraphs
+  Hi, my name's Brett and I'm a senior network system administrator. As well as administrating systems I also have experience making software and web apps. I have worked at a number of companies gaining teamwork and leadership skills.
 
-mathjax: true
+  I am most skilled in: <mark>AWS</mark> and <mark>Eating Pizza</mark>
+
+# Projects Section
+# projects_title: Projects
+
+# Experience Section
+# experience_title: Experience
+
+# Education Section
+# educaton_title: Education
+
+# More Section
+# more_title: A Little More About Me
+more_content: | # this will include new lines to allow paragraphs
+  Alongside my interests in networks and software engineering some of my other interests and hobbies are:
+   - Rock climbing
+   - Gaming
+   - Knitting
+   - [Becoming a ninja](https://www.youtube.com/watch?v=vtg4o__aRMg)
+
+# Footer
+footer_show_references: true
+
+# Build settings
+remote_theme: sproogen/resume-theme
 
 sass:
-    style: compressed
+  sass_dir: _sass
+  style: compressed
 
-exclude: ["lib", "config.rb", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", ".less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules", "Gemfile", "Gemfile.lock", "LICENSE", "README.md", "vendor"]
-
-# Site owner
-owner:
-  name: Felipe Oliveira
-  avatar: profile.jpg
-  email: felipe@faoliveira.me
-  disqus-shortname: faoliveira
-  twitter: faoliveira
-  facebook: #username
-  github: faoliveira
-  linkedin: faoliveiras
-  instagram: faoliveiras
-  flickr: #username
-  tumblr: #username
-  pinterest: #username
-  weibo: #userid
-  google:
-    plus: #username
-    verify: sIpDx7JS7-MQDYLq2l-xyfK058lu8d-JyFWY7pHfUBw
-    analytics: UA-76828181-1
-    ad-client:
-    ad-slot:
-  bing-verify: 4905B0479AEF9FFFFAB536283BC5238E
+plugins:
+ - jekyll-seo-tag
