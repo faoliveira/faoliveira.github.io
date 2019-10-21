@@ -26,8 +26,6 @@ about_profile_image: images/profile.jpg
 about_content: | # this will include new lines to allow paragraphs
   After realizing that I would not become a professional athlete and wasn't close, I sought through engineering to absorb analytical knowledge and problem solving to seek to understand setbacks in several areas. In this way generating knowledge for competitive advantage.
 
-  Currently working in the beverage industry, contributing to the growth of other categories through planning and market analysis at Solar Coca-Cola.
-
   I’m always in a state of learning, because I believe in active growth. Innovating today is imperative.</mark>
 
 # Projects Section
@@ -49,7 +47,7 @@ more_content: | # this will include new lines to allow paragraphs
    - After  attempts, try to go back to the gym like a logarithmic growth
 
 # Footer
-footer_show_references: true
+footer_show_references: false
 
 # Build settings
 remote_theme: sproogen/resume-theme
