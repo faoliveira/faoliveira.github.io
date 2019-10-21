@@ -1,7 +1,8 @@
-- company: Solar Coca-Cola
+- layout: left
+  company: Solar Coca-Cola
   link: www.solarbr.com.br/
-  job_title: Market Analyst II
-  dates: Mar 2018 - Present
+  job_title: Market Analyst
+  dates: Mar 2018 - Sep 2019
   quote: >
    Assist in the growth of Still Beverages in the Hydration portfolio
   description: | # this will include new lines to allow paragraphs
@@ -10,9 +11,10 @@
     Market analysis and positioning of hydration category products;   
     Follow-up of projects and the implementation of communication plans.
 
-- company: Coca-Cola
+- layout: left
+  company: Coca-Cola
   link: www.cocacolabrasil.com.br
-  job_title: Still Beverages Intern
+  job_title: Planning Still Beverages Intern
   dates: Aug 2016 - Mar 2018
   description: | # this will include new lines to allow paragraphs
     Analysis of performance indicators and market trends, supporting the planning process of the area;
@@ -21,16 +23,18 @@
     Perform the tracking of the main market activities and product launches;
     Control of the management routines of market investment indicators
     
-- company: Wyden Educational
-  link: www.wyden.com.br
-  job_title: Performance Intern
+- layout: left
+  company: Adtalem Educacional do Brasil
+  link: https://adtalembrasil.com.br
+  job_title: Process Intern
   dates: Jan 2014 - Jul 2015
   description: | # this will include new lines to allow paragraphs
     Creation and monitoring of indicators for presentation to the area manager. Summed with process mapping to standardize the attendance of the educational institutions that Devry Brazil controls.
 
-- company: Casa Magalhães
+- layout: left
+  company: Casa Magalhães
   link: www.casamagalhaes.com.br
-  job_title: Performance Intern
+  job_title: IT Intern
   dates: Fev 2012 - Oct 2012
   description: | # this will include new lines to allow paragraphs
     Support for the company tax program for direct customers and resellers.

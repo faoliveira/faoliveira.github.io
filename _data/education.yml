@@ -1,9 +1,11 @@
-- name: Universidade de Fortaleza - UNIFOR
+- layout: left
+  name: Universidade de Fortaleza - UNIFOR
   dates: 2012 - 2018
   qualification: B.Eng Industrial engineering
   quote: >
   
-- name: Instituto Federal de Ciência e Tecnologia - IFCE
+- layout: left 
+  name: Instituto Federal de Ciência e Tecnologia - IFCE
   dates: 2009 - 2012
   qualification: Telecommunications (interrupted)
   quote: >
