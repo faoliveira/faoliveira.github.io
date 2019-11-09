@@ -1,6 +1,6 @@
 - layout: left
   company: Solar Coca-Cola
-  link: www.solarbr.com.br
+  link: solarbr.com.br
   job_title: Market Analyst
   dates: Mar 2018 - Sep 2019
   description: | # this will include new lines to allow paragraphs
@@ -11,7 +11,7 @@
 
 - layout: left
   company: Coca-Cola
-  link: www.cocacolabrasil.com.br
+  link: cocacolabrasil.com.br
   job_title: Planning Still Beverages Intern
   dates: Aug 2016 - Mar 2018
   description: | # this will include new lines to allow paragraphs
@@ -23,7 +23,7 @@
     
 - layout: left
   company: Adtalem Educacional do Brasil
-  link: https://adtalembrasil.com.br
+  link: adtalembrasil.com.br
   job_title: Process Intern
   dates: Jan 2014 - Jul 2015
   description: | # this will include new lines to allow paragraphs
@@ -31,7 +31,7 @@
 
 - layout: left
   company: Casa Magalhães
-  link: www.casamagalhaes.com.br
+  link: casamagalhaes.com.br
   job_title: IT Intern
   dates: Fev 2012 - Oct 2012
   description: | # this will include new lines to allow paragraphs
