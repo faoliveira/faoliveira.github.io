@@ -50,6 +50,12 @@ more_content: | # this will include new lines to allow paragraphs
 # Footer
 footer_show_references: false
 
+# Analytics
+jekyll_analytics:
+  GoogleAnalytics:          # Add, if you want to track with Google Analytics
+    id: UA-76828181-2         # Required - replace with your tracking id
+    anonymizeIp: true      # Optional - Default: false - set to true for anonymized tracking 
+
 # Build settings
 remote_theme: sproogen/resume-theme
 
@@ -59,3 +65,4 @@ sass:
 
 plugins:
  - jekyll-seo-tag
+ - jekyll-analytics
