@@ -1,4 +1,11 @@
 - layout: left
+  company: Diageo
+  link: diageo.com.br
+  job_title: Market Analyst
+  dates: Jan 2020 - Present
+  description: | # this will include new lines to allow paragraphs
+
+- layout: left
   company: Solar Coca-Cola
   link: solarbr.com.br
   job_title: Market Analyst

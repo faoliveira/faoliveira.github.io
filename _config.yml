@@ -6,8 +6,8 @@ encoding: UTF-8
 # Personal info
 name: Felipe Oliveira
 title: Business Analyst | Analytics
-email: felipe@faoliveira.me
-website: faoliveira.me
+email: hi@felipeo.me
+website: felipeo.me
 
 # Social links
 # twitter_username: facespics
@@ -27,7 +27,7 @@ about_profile_image: images/profile.jpg
 about_content: | # this will include new lines to allow paragraphs
   After realizing that I would not become a professional athlete and wasn't close, I sought through engineering to absorb analytical knowledge and problem solving to seek to understand setbacks in several areas. In this way generating knowledge for competitive advantage.
 
-  I’m always in a state of learning, because I believe in active growth. Innovating today is imperative.</mark>
+  I’m always in a state of learning, because I believe in active growth. Innovating today is imperative.
 
 # Projects Section
 # projects_title: Projects
