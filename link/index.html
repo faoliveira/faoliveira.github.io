@@ -1,60 +1,87 @@
-<!doctype html>
-<html class="no-js" lang="">
-
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <title></title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="apple-touch-icon" href="icon.png">
-  <!-- Place favicon.ico in the root directory -->
+    <title>Felipe Afiliados</title>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css">
-  <link rel="stylesheet" href="css/main.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  <script src="https://unpkg.com/prefixfree@1.0.0/prefixfree.min.js"></script>
-
-  <script src="https://wzrd.in/standalone/formdata-polyfill@latest"></script>
-  <script src="https://wzrd.in/standalone/promise-polyfill@latest"></script>
-  <script src="https://wzrd.in/standalone/whatwg-fetch@latest"></script>
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 </head>
-
 <body>
-  <!--[if IE]>
-    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]-->
+    <div class="container">
+        <div class="page-header">
+            <h1>Gerador Link Amazon</h1>
+            <p class="lead">Ajude a pagar a ração do Nuno</p>
+            <img src="nuno.jpg" alt="Nuno" style="width:250px;height:250px;">
+        </div>
 
-  <!-- Add your site or application content here -->
-  
+        <div id="group" class="form-group">
+            <label for="url" class="control-label">Link Amazon</label>
+            <input id="url" name="url" type="url" class="form-control" placeholder="Link do produto">
+        </div>
 
-  <div class="form-container">
-    <form name="submit-to-google-sheet">
-      <input name="email" type="email" placeholder="Email" required>
-      <input name="firstName" type="text" placeholder="First Name">
-      <input name="lastName" type="text" placeholder="Last Name">
-      <button type="submit">Subscribe</button>
-    </form>
+        <div class="form-group">
+            <label class="control-label" for="longUrl">Resultado</label>
+            <input id="longUrl" onclick="this.select();" class="form-control" type="url"/>
+        </div>
 
-    <div class="loading js-loading is-hidden">
-      <div class="loading-spinner">
-        <svg><circle cx="25" cy="25" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg>
-      </div>
+        <div class="form-group">
+            <a href="#" id="directLink" title="Lien direct"></a>
+        </div>
     </div>
 
-    <p class="js-success-message is-hidden">Success!</p>
-    <p class="js-error-message is-hidden">Error!</p>
-  </div>
+    <script>
+        window.onload = function() {
+
+            var url = document.getElementById('url');
+            url.addEventListener('input', function () {
+                var search = url.value;
+                var pattern = 'B[0-9|A-Z]{9}';
+                var asin = search.match(pattern);
+                var directLink = document.getElementById('directLink');
+
+               
+                if(asin){
+                    var tag = "faoliveira14-20;
+                    var longUrl = "http://www.amazon.com.br/dp/" + asin + "/?tag=" + tag;
+                    var params = "asin=" + asin + "&tag=" + tag;
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
 
 
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
 
-  <script src="js/vendor/modernizr-3.8.0.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
-  <script src="js/plugins.js"></script>
-  <script src="js/main.js"></script>
+                    request.send(params);
 
-
+                } else {
+                    document.getElementById("group").classList.add('has-error');
+                    document.getElementById('longUrl').value = "";
+                    directLink.href = "";
+                    directLink.innerHTML = "";
+                }
+            });
+        }
+    </script>
 </body>
-
 </html>
