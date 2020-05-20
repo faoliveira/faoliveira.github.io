@@ -32,7 +32,7 @@
         </div>
 
         <div id="group" class="form-group">
-            <label for="url" class="control-label">Link Amazon</label>
+            <label for="url" class="control-label">Link Produto</label>
             <input id="url" name="url" type="url" class="form-control" placeholder="Link do produto">
         </div>
 
@@ -56,13 +56,25 @@
             url.addEventListener('input', function () {
                 var search = url.value;
                 var pattern = 'B[0-9|A-Z]{9}';
+                var pattern2 = '1[0-9]{9}';
+                var pattern3 = 'submarino';
+                var pattern4 = 'soubarato';
+                var pattern5 = 'americanas';
+                var pattern6 = 'shoptime';
+                var pattern7 = 'amazon';
                 var asin = search.match(pattern);
+                var asin2 = search.match(pattern2);
+                var asin3 = search.match(pattern3);
+                var asin4 = search.match(pattern4);
+                var asin5 = search.match(pattern5);
+                var asin6 = search.match(pattern6);
+                var asin7 = search.match(pattern7);
                 var directLink = document.getElementById('directLink');
 
                
-                if(asin){
+                if(asin && asin7){
                     var tag = "faoliveira14-20";
-                    var longUrl = "http://www.amazon.com.br/dp/" + asin + "/?tag=" + tag;
+                    var longUrl = "https://www.amazon.com.br/dp/" + asin + "/?tag=" + tag;
                     var params = "asin=" + asin + "&tag=" + tag;
 
                     // Instant parsed url result
@@ -91,7 +103,137 @@
 
                     request.send(params);
 
-                } else {
+                } 
+
+                else if(asin2 && asin3) {
+                    var longUrl = "https://www.submarino.com.br/produto/" + asin2 + "/?opn=AFLNOVOSUB&epar=b2wafiliados&franq=AFL-03-5900690";
+                    var params = "asin=" + asin2 + "?opn=AFLNOVOSUB&epar=b2wafiliados&franq=AFL-03-5900690";
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                }
+
+                else if(asin2 && asin4) {
+                    var longUrl = "https://www.soubarato.com.br/produto/" + asin2 + "/?opn=B2WAFILIADO&epar=b2wafiliados&franq=AFL-03-5900690";
+                    var params = "asin=" + asin2 + "?opn=B2WAFILIADO&epar=b2wafiliados&franq=AFL-03-5900690";
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                }
+
+                else if(asin2 && asin5) {
+                    var longUrl = "https://www.americanas.com.br/produto/" + asin2 + "/?opn=AFLACOM&epar=b2wafiliados&franq=AFL-03-5900690";
+                    var params = "asin=" + asin2 + "?opn=AFLACOM&epar=b2wafiliados&franq=AFL-03-5900690";
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                }
+
+                else if(asin2 && asin6) {
+                    var longUrl = "https://www.shoptime.com.br/produto/" + asin2 + "/?opn=AFLSHOP&epar=b2wafiliados&franq=AFL-03-5900690";
+                    var params = "asin=" + asin2 + "?opn=AFLSHOP&epar=b2wafiliados&franq=AFL-03-5900690";
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                }
+                
+                else {
                     document.getElementById("group").classList.add('has-error');
                     document.getElementById('longUrl').value = "";
                     directLink.href = "";
@@ -103,10 +245,10 @@
     <script>
         superplaceholder({
 		    el: url,
-			sentences: ['amazon.com.br'],
+			sentences: ['amazon.com.br', 'submarino.com.br', 'americanas.com.br', 'shoptime.com.br', 'soubarato.com.br'],
 				options: {
-					letterDelay: 150,
-					loop: false,
+					letterDelay: 100,
+					loop: true,
 					startOnFocus: false
 			}
 		})
