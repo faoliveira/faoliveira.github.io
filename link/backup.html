@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt_BR">
+<head>
+    <title>Feliz Afiliados</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Ajude a pagar a ração do Nuno"">
+    <meta property="og:title" content="Feliz Afiliados" />
+    <meta property="og:description" content="Ajude a pagar a ração do Nuno" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:url" content="https://felipeo.me/link/" />
+    <meta property="og:image" content="https://felipeo.me/link/nuno.jpg" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    
+</head>
+<body>
+  <!--[if IE]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+    <div class="container">
+        <div class="page-header">
+            <h1>Gerador Link</h1>
+            <p class="lead">Ajude a pagar a ração do Nuno</p>
+            <img src="nuno.jpg" alt="Nuno" style="width:250px;height:250px;">
+        </div>
+
+        <div id="group" class="form-group">
+            <label for="url" class="control-label">Link Produto</label>
+            <input id="url" name="url" type="url" class="form-control" placeholder="Link do produto">
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="longUrl">Resultado</label>
+            <input id="longUrl" onclick="this.select();" class="form-control" type="url"/>
+        </div>
+
+        <div class="form-group">
+            <a href="#" id="directLink" title="Lien direct"></a>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/superplaceholder/1.0.0/superplaceholder.min.js"></script>
+    <script>
+        window.onload = function() {
+
+            var url = document.getElementById('url');
+            url.addEventListener('input', function () {
+                var search = url.value;
+                var pattern = 'B[0-9|A-Z]{9}';
+                var pattern2 = '1[0-9]{9}';
+                var pattern3 = 'submarino';
+                var pattern4 = 'soubarato';
+                var pattern5 = 'americanas';
+                var pattern6 = 'shoptime';
+                var pattern7 = 'amazon';
+                var asin = search.match(pattern);
+                var asin2 = search.match(pattern2);
+                var asin3 = search.match(pattern3);
+                var asin4 = search.match(pattern4);
+                var asin5 = search.match(pattern5);
+                var asin6 = search.match(pattern6);
+                var asin7 = search.match(pattern7);
+                var directLink = document.getElementById('directLink');
+
+               
+                if(asin && asin7){
+                    var tag = "faoliveira00-20;
+                    var longUrl = "https://www.amazon.com.br/dp/" + asin + "/?tag=" + tag;
+                    var params = "asin=" + asin + "&tag=" + tag;
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                } 
+
+                else if(asin2 && asin3) {
+                    var longUrl = "https://www.submarino.com.br/produto/" + asin2 + "/?opn=AFLNOVOSUB&epar=b2wafiliados&franq=AFL-03-5900690";
+                    var params = "asin=" + asin2 + "?opn=AFLNOVOSUB&epar=b2wafiliados&franq=AFL-03-5900690";
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                }
+
+                else if(asin2 && asin4) {
+                    var longUrl = "https://www.soubarato.com.br/produto/" + asin2 + "/?opn=B2WAFILIADO&epar=b2wafiliados&franq=AFL-03-5900690";
+                    var params = "asin=" + asin2 + "?opn=B2WAFILIADO&epar=b2wafiliados&franq=AFL-03-5900690";
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                }
+
+                else if(asin2 && asin5) {
+                    var longUrl = "https://www.americanas.com.br/produto/" + asin2 + "/?opn=AFLACOM&epar=b2wafiliados&franq=AFL-03-5900690";
+                    var params = "asin=" + asin2 + "?opn=AFLACOM&epar=b2wafiliados&franq=AFL-03-5900690";
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                }
+
+                else if(asin2 && asin6) {
+                    var longUrl = "https://www.shoptime.com.br/produto/" + asin2 + "/?opn=AFLSHOP&epar=b2wafiliados&franq=AFL-03-5900690";
+                    var params = "asin=" + asin2 + "?opn=AFLSHOP&epar=b2wafiliados&franq=AFL-03-5900690";
+
+                    // Instant parsed url result
+                    document.getElementById('longUrl').value = longUrl;
+                    document.getElementById("group").classList.remove('has-error');
+
+                    var request = new XMLHttpRequest();
+                    request.open('POST', endpoint, true); // asynchronous POST request
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                    request.onreadystatechange = function(){
+
+                        if(request.readyState == 4 && request.status == 200){
+                            if(JSON.parse(request.response).error){
+                                console.log (JSON.parse(request.response).error);
+                            } else {
+                                var data = JSON.parse(request.response).data;
+                                var shortUrl = data.url;
+
+
+                                directLink.href = shortUrl;
+                                directLink.innerHTML = shortUrl;
+                            }
+                        }
+                    };
+
+                    request.send(params);
+
+                }
+                
+                else {
+                    document.getElementById("group").classList.add('has-error');
+                    document.getElementById('longUrl').value = "";
+                    directLink.href = "";
+                    directLink.innerHTML = "";
+                }
+            });
+        }
+    </script>
+    <script>
+        superplaceholder({
+		    el: url,
+			sentences: ['amazon.com.br', 'submarino.com.br', 'americanas.com.br', 'shoptime.com.br', 'soubarato.com.br'],
+				options: {
+					letterDelay: 100,
+					loop: true,
+					startOnFocus: false
+			}
+		})
+    </script>
+</body>
+</html>
