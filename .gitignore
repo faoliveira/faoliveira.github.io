@@ -578,3 +578,4 @@ MigrationBackup/
 # End of https://www.gitignore.io/api/git,node,linux,macos,jekyll,windows,sublimetext,visualstudio,visualstudiocode
 .DS_Store
 .DS_Store
+.DS_Store
