@@ -45,12 +45,11 @@ content:
     content:
       - layout: top-middle
         title: San Francisco Bay Area Bike Share Data Analysis
-        link: faoliveira.me/projects/nd110
         # link_text: Project Website
         additional_links:
           - title:  faoliveira.me/projects/nd110
             icon: fab fa-github
-            url: github.com/faoliveira.me/projects/nd110
+            url: https://github.com/faoliveira/nd110
           # - title:  Github page for project (eg. sproogen/modern-resume-theme)
           #   icon: fab fa-github
           #   url: Link to project (eg. sproogen.github.io/modern-resume-theme)
@@ -61,59 +60,89 @@ content:
     layout: list # Type of content section (list/text)
     content:
       - layout: left
-        title: The Boring Company
-        link: boringcompany.com
+        title: Diageo
+        link: diageo.com
         # link_text: boringcompany.com
-        sub_title: Senior Network System Administrator
-        caption: November 2017 - Present
-        quote: >
-          Solving 21st century problems by diging holes and making game changing products like the *not a flamethrower*
+        sub_title: Senior Data Analyst
+        caption: Jan 2020 - Present
+
+  - title: Experience # Title for the section
+    layout: list # Type of content section (list/text)
+    content:
+      - layout: left
+        title: Solar Coca-Cola
+        link: solarbr.com.br
+        sub_title: Marketing Analyst
+        caption: Mar 2018 - Sep 2019
         description: | # this will include new lines to allow paragraphs
-            Every company needs its networks properly administered and The Boring Compay is no exception. Digging holes is hard and I play my part making sure the whole company stays connected. I lead a team of 5 people and enjoy driving the company to try new technologies.
+          Performance evaluation of the products in each region; 
+          Evaluate price movement opportunities in each market; 
+          Market analysis and positioning of hydration category products;   
+          Follow-up of projects and the implementation of communication plans.
+
+  - title: Experience # Title for the section
+    layout: list # Type of content section (list/text)
+    content:
+      - layout: left
+        title: Coca-Cola
+        link: cocacolabrasil.com.br
+        sub_title: Planning Still Beverages Intern
+        caption: Aug 2016 - Mar 2018
+        description: | # this will include new lines to allow paragraphs
+          Analysis of performance indicators and market trends, supporting the planning process of the area;
+         Analyzes and studies of performance indicators of the Still Beverages categories;
+         Interaction between the areas of the company and bottlers to support the implementation of planned market activities in the company's Business Plan, such as approval of communication materials, follow-up of internal activities;
+        Perform the tracking of the main market activities and product launches;
+         Control of the management routines of market investment indicators
+
+  - title: Experience # Title for the section
+    layout: list # Type of content section (list/text)
+    content:
+      - layout: left
+        title: Adtalem Educacional do Brasil
+        link: adtalembrasil.com.br
+        sub_title: Process Intern
+        caption: Jan 2014 - Jul 2015
+        description: | # this will include new lines to allow paragraphs
+            Creation and monitoring of indicators for presentation to the area manager. Summed with process mapping to standardize the attendance of the educational institutions that Devry Brazil controls.
+
+  - title: Experience # Title for the section
+    layout: list # Type of content section (list/text)
+    content:
+      - layout: left
+        title: Casa Magalhães
+        link: casamagalhaes.com.br
+        sub_title: IT Intern
+        caption: Fev 2012 - Oct 2012
+        description: | # this will include new lines to allow paragraphs
+            Support for the company tax program for direct customers and resellers.
 
   - title: Education # Title for the section
     layout: list # Type of content section (list/text)
     content:
       - layout: left
-        title: Harvard University
-        caption: 2010 - 2013
-        sub_title: BSc Computer Science
-        quote: >
-          Established in 1636, Harvard is the oldest higher education institution in the United States, and is widely regarded in terms of its influence, reputation, and academic pedigree as a leading university in not just the US but also the world.
-        description: | # this will include new lines to allow paragraphs
-          During my time at Harvard I learnt most of my key skills that have I have taken through my career such as teamwork and working to tight deadlines. I thouroughly enjoyed my time as university and learnt a lot about a healthy work life balance.
+        title: Universidade de Fortaleza
+        caption: 2012 - 2018
+        sub_title: B.Eng Industrial engineering
 
-          I spent a lot of my free time as a committee member of the *Harvard Mountaineering Club* taking on roles such as *Trip Secretary* and *Vice-President*.
+  - title: Education # Title for the section
+    layout: list # Type of content section (list/text)
+    content:
+      - layout: left
+        title: Instituto Federal de Educação, Ciência e Tecnologia do Ceará
+        caption: 2009 - 2012
+        sub_title: Telecommunications
 
   - title: A Little More About Me
     layout: text
     content: | # this will include new lines to allow paragraphs
-      Alongside my interests in networks and software engineering some of my other interests and hobbies are:
-      - Rock climbing
+     Alongside my interests in data science and industrial engineering some of my other interests are:
+      - Try to understand why some people think Earth is flat?
       - Gaming
-      - Knitting
-      - [Becoming a ninja](https://www.youtube.com/watch?v=vtg4o__aRMg)
+      - Watch some dubious movies
+     - After  attempts, try to go back to the gym like a logarithmic growth
 
-      Look at this cool image  
-      ![Trees](/modern-resume-theme/images/landscape-trees.jpg "Trees")
 
-# Projects Section
-# projects_title: Projects
-
-# Experience Section
-# experience_title: Experience
-
-# Education Section
-# educaton_title: Education
-
-# More Section
-# more_title: A Little More About Me
-more_content: | # this will include new lines to allow paragraphs
-  Alongside my interests in data science and industrial engineering some of my other interests are:
-   - Try to understand why some people think Earth is flat?
-   - Gaming
-   - Watch some dubious movies
-   - After  attempts, try to go back to the gym like a logarithmic growth
 
 # Footer
 footer_show_references: false
