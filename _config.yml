@@ -1,7 +1,7 @@
 # Site
 repository: faoliveira/faoliveira.github.io
 encoding: UTF-8
-darkmode: true
+darkmode: false
 
 # Content configuration version
 version: 2
