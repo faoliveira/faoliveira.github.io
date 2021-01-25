@@ -65,6 +65,7 @@ content:
         # link_text: boringcompany.com
         sub_title: Senior Data Analyst
         caption: Jan 2020 - Present
+        description: |
 
   - title: Experience # Title for the section
     layout: list # Type of content section (list/text)
