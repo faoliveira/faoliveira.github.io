@@ -1,6 +1,11 @@
 # Site
 repository: faoliveira/faoliveira.github.io
 encoding: UTF-8
+darkmode: true
+
+# Content configuration version
+version: 2
+
 # favicon: images/favicon.ico
 
 # Personal info
