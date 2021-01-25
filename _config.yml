@@ -121,7 +121,7 @@ content:
   - title: Education # Title for the section
     layout: list # Type of content section (list/text)
     content:
-      - layout: left
+      - layout: top-middle
         title: Universidade de Fortaleza
         caption: 2012 - 2018
         sub_title: B.Eng Industrial engineering
