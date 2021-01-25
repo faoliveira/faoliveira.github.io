@@ -67,7 +67,7 @@ content:
         caption: Jan 2020 - Present
         description: |
 
-  - title:  # Title for the section
+  - title: Experience # Title for the section
     layout: list # Type of content section (list/text)
     content:
       - layout: left
@@ -81,7 +81,7 @@ content:
            - Market analysis and positioning of hydration category products; 
            - Follow-up of projects and the implementation of communication plans. 
 
-  - title:  # Title for the section
+  - title: Experience # Title for the section
     layout: list # Type of content section (list/text)
     content:
       - layout: left
