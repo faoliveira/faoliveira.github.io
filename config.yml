@@ -1,0 +1,131 @@
+baseURL: https://faoliveira.github.io
+languageCode: en-us
+title: Insights Notes
+paginate: 5
+theme: "PaperMod"
+
+enableRobotsTXT: true
+enableEmoji: true
+pygmentsUseClasses: true
+enableInlineShortcodes: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+googleAnalytics: UA-76828181-2
+
+outputs:
+    home:
+        - HTML
+        - RSS
+        - JSON
+
+minify:
+  disableXML: true
+
+menu:
+    main:
+        - identifier: Posts
+          name: posts
+          url: /posts/
+          weight: 10
+        - identifier: About
+          name: about
+          url: /about/
+          weight: 20
+        - identifier: Search
+          name: search
+          url: /search/
+          weight: 30
+
+
+
+params:
+    env: production # to enable google analytics, opengraph, twitter-cards and schema.
+    description: "Theme PaperMod"
+    author: Felipe Oliveira
+    # description: Share / Summary / Record
+    keywords: [ Blog ]
+
+    defaultTheme: light
+    # disableThemeToggle: true
+    ShowShareButtons: false
+    ShowReadingTime: true
+    # disableSpecial1stPost: true
+    displayFullLangName: true
+    ShowPostNavLinks: true
+    ShowBreadCrumbs: false
+    ShowCodeCopyButtons: true
+    ShowRssButtonInSectionTermList: true
+    ShowToc: true
+    tocopen: false
+    comments: false
+    # images: ["papermod-cover.png"]
+
+
+    profileMode:
+        enabled: true
+        title: Felipe Oliveira
+        subtitle: Currently Data Analyst @ iFood
+        # imageUrl: "profile_avatar.webp"
+        # imageWidth: 120
+        # imageHeight: 120
+        buttons:
+            - name: Posts
+              url: posts
+            - name: About
+              url: about
+
+    homeInfoParams:
+        Title: "Felipe Oliveira"
+        Content: >
+            **Data Analyst @ iFood**
+
+            - Hi! Welcome to my corner on the internet
+
+            - Here, I [document personal projects](posts.html). Feel free to [say hello](felipe@felipeo.me), I won’t bite.
+    socialIcons:
+        - name: github
+          url: "https://github.com/faoliveira/"
+        - name: linkedin
+          url: "https://www.linkedin.com/in/faoliveiras/"
+        - name: email
+          url: "mailto:felipe@felipeo.me"
+        # - name: Rss
+        #   url: "index.xml"
+
+    assets:
+        disableHLJS: true
+        favicon: "/favicon.ico"
+        favicon16x16: "/favicon-16x16.png"
+        favicon32x32: "/favicon-32x32.png"
+        apple_touch_icon: "/apple-touch-icon.png"
+        safari_pinned_tab: "/safari-pinned-tab.svg"
+
+    fuseOpts:
+        isCaseSensitive: false
+        shouldSort: true
+        location: 0
+        distance: 1000
+        threshold: 0.4
+        minMatchCharLength: 0
+        keys: [ "title", "permalink", "summary", "content" ]
+
+services:
+    instagram:
+        disableInlineCSS: true
+    twitter:
+        disableInlineCSS: true
+
+markup:
+    goldmark:
+        parser:
+          attribute:
+            block: true
+            title: true
+        renderer:
+            unsafe: true
+    highlight:
+        noClasses: false
+
+taxonomies:
+  tag: tags
