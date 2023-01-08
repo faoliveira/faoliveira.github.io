@@ -11,7 +11,8 @@ enableInlineShortcodes: true
 buildDrafts: false
 buildFuture: false
 buildExpired: false
-googleAnalytics: UA-76828181-2
+googleAnalytics: G-G71GJS1G2Y
+hideFooter: true
 
 outputs:
     home:
