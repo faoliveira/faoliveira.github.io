@@ -29,12 +29,13 @@
 </noscript>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-G71GJS1G2Y"></script>
 <script>
-var doNotTrack = false;
+var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+var doNotTrack = (dnt == "1" || dnt == "yes");
 if (!doNotTrack) {
 	window.dataLayer = window.dataLayer || [];
 	function gtag(){dataLayer.push(arguments);}
 	gtag('js', new Date());
-	gtag('config', 'G-G71GJS1G2Y', { 'anonymize_ip': false });
+	gtag('config', 'G-G71GJS1G2Y', { 'anonymize_ip': true });
 }
 </script>
 <meta property="og:title" content="404 Page not found" />
