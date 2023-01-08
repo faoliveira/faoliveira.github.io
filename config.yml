@@ -130,3 +130,15 @@ markup:
 
 taxonomies:
   tag: tags
+
+privacy:
+  googleAnalytics:
+    anonymizeIP: true
+    respectDoNotTrack: true
+    useSessionStorage: true
+  twitter:
+    enableDNT: true
+  vimeo:
+    enableDNT: true
+  youtube:
+    privacyEnhanced: true
