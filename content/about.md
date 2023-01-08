@@ -21,4 +21,4 @@ I'm **Data Analyst**. Before that, I had experience in consumer packaged goods c
 
 When I'm not working, I like watch some dubious movies, walk with my dog and try to go back to the gym.
 
-Feel free to [contact me](mailto:felipe@felipeo.me).
+Feel free to [contact me](mailto:felipe@felipeo.me), , I won’t bite.
