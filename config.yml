@@ -42,9 +42,8 @@ menu:
 
 params:
     env: production # to enable google analytics, opengraph, twitter-cards and schema.
-    description: "Theme PaperMod"
+    description: "I'm a data analyst. I document personal projects and write sometimes about work life."
     author: Felipe Oliveira
-    # description: Share / Summary / Record
     keywords: [ blog, faoliveira ]
     hideFooter: true
 
