@@ -12,7 +12,7 @@ buildDrafts: false
 buildFuture: false
 buildExpired: false
 googleAnalytics: G-G71GJS1G2Y
-hideFooter: true
+
 
 outputs:
     home:
@@ -45,7 +45,8 @@ params:
     description: "Theme PaperMod"
     author: Felipe Oliveira
     # description: Share / Summary / Record
-    keywords: [ Blog ]
+    keywords: [ blog, faoliveira ]
+    hideFooter: true
 
     defaultTheme: light
     # disableThemeToggle: true
