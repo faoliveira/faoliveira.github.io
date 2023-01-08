@@ -142,3 +142,7 @@ privacy:
     enableDNT: true
   youtube:
     privacyEnhanced: true
+
+label:
+  text: Home
+  icon: "/safari-pinned-tab.svg"
