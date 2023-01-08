@@ -62,6 +62,10 @@ params:
     comments: false
     images: ["cover.png"]
 
+    label:
+        text: Insights Notes
+        icon: "/safari-pinned-tab.svg"
+        iconHeight: 35
 
     profileMode:
         enabled: true
@@ -142,8 +146,3 @@ privacy:
     enableDNT: true
   youtube:
     privacyEnhanced: true
-
-label:
-  text: Insights Notes
-  icon: "/safari-pinned-tab.svg"
-  iconHeight: 35
