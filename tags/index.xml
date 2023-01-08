@@ -4,6 +4,10 @@
     <title>Tags on Insights Notes</title>
     <link>https://felipeo.me/tags/</link>
     <description>Recent content in Tags on Insights Notes</description>
+    <image>
+      <url>https://felipeo.me/cover.png</url>
+      <link>https://felipeo.me/cover.png</link>
+    </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language><atom:link href="https://felipeo.me/tags/index.xml" rel="self" type="application/rss+xml" />
   </channel>
