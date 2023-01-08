@@ -60,7 +60,7 @@ params:
     ShowToc: true
     tocopen: false
     comments: false
-    # images: ["papermod-cover.png"]
+    images: ["cover.png"]
 
 
     profileMode:
