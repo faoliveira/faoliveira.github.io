@@ -144,5 +144,6 @@ privacy:
     privacyEnhanced: true
 
 label:
-  text: Home
+  text: Insights Notes
   icon: "/safari-pinned-tab.svg"
+  iconHeight: 35
