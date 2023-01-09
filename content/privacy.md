@@ -1,5 +1,5 @@
 ---
-title: Privacy
+title: Privacy Policy
 date: 2023-01-08
 showtoc: false
 hidemeta: true
@@ -9,7 +9,8 @@ ShowReadingTime: false
 ShowBreadCrumbs: false
 ---
 
-This website is generated using [Hugo](https://gohugo.io), a static website generator. 
+
+This website is generated using [Hugo](https://gohugo.io), an open-source static website generator. 
 
 Containing an Analytics script from Google. Unfortunately, it’s the free option for now, but it’s in the pipeline to switch to a lighter option that better respects user privacy such as Plausible. It’s possible to see in more detail what is captured by GA4 in its [documentation](https://support.google.com/analytics/answer/11593727?hl=en).
 

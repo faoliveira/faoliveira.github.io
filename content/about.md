@@ -23,4 +23,4 @@ When I'm not working, I like watch some dubious movies, walk with my dog and try
 
 Feel free to [contact me](mailto:felipe@felipeo.me), I won’t bite.
 
-There is a [Privacy Page](/privacy), containing what is collected
+There is a [Privacy policy page](/privacy), containing what is collected in this website.
