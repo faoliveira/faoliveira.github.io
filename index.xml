@@ -11,12 +11,12 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language><atom:link href="https://felipeo.me/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Privacy</title>
+      <title>Privacy Policy</title>
       <link>https://felipeo.me/privacy/</link>
       <pubDate>Sun, 08 Jan 2023 00:00:00 +0000</pubDate>
       
       <guid>https://felipeo.me/privacy/</guid>
-      <description>This website is generated using Hugo, a static website generator.
+      <description>This website is generated using Hugo, an open-source static website generator.
 Containing an Analytics script from Google. Unfortunately, it’s the free option for now, but it’s in the pipeline to switch to a lighter option that better respects user privacy such as Plausible. It’s possible to see in more detail what is captured by GA4 in its documentation.
 I use the information only to determine which posts are most popular, how much time a person spends on the site, where it is most accessed, etc.</description>
     </item>
