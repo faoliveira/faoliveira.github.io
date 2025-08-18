@@ -503,3 +503,21 @@ $RECYCLE.BIN/
 # Claude Code specific files
 CLAUDE.md
 .claude/
+
+# Cursor IDE
+.cursor/
+.cursorrules
+
+# Gemini CLI
+.gemini/
+
+# AI Tools temporary files
+*.ai-temp
+.ai-session*
+
+# Bun (JavaScript runtime and package manager)
+.bun
+
+# UV (Python package manager)
+.uv_cache/
+uv.lock
