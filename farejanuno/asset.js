@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Get the main content container
   const mainContent = document.querySelector('.content-wrapper');
-  
+
   if (!mainContent) {
     console.warn('Main content container not found.');
     return;
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Check for reduced motion preference
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  
+
   if (prefersReducedMotion) {
     // Respect user's motion preference - show content immediately
     mainContent.style.opacity = '1';
@@ -58,6 +58,20 @@ document.addEventListener('DOMContentLoaded', function() {
           duration: 0.6,
           easing: 'ease-out',
           delay: 0.4
+        }
+      );
+
+      // Add a continuous "sniffing" animation to the logo
+      Motion.animate(
+        logo,
+        {
+          transform: ['rotate(0deg)', 'rotate(-2deg)', 'rotate(2deg)', 'rotate(-2deg)', 'rotate(2deg)', 'rotate(0deg)']
+        },
+        {
+          duration: 2.5,      // Slower duration for a subtle effect
+          repeat: Infinity,   // Loop forever
+          delay: 1.5,         // Start after the initial animations
+          easing: 'ease-in-out'
         }
       );
     }
@@ -99,11 +113,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // Optional: Add hover animation for the Telegram button
 document.addEventListener('DOMContentLoaded', function() {
   const telegramButton = document.querySelector('.telegram-button');
-  
+
   if (telegramButton && typeof Motion !== 'undefined') {
     // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
+
     if (!prefersReducedMotion) {
       telegramButton.addEventListener('mouseenter', function() {
         try {
@@ -145,10 +159,10 @@ document.addEventListener('DOMContentLoaded', function() {
 // Optional: Add subtle parallax effect to the footer GIF on scroll
 document.addEventListener('DOMContentLoaded', function() {
   const footerGif = document.querySelector('.footer-gif');
-  
+
   if (footerGif && typeof Motion !== 'undefined') {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
+
     if (!prefersReducedMotion) {
       let ticking = false;
 
