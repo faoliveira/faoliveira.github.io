@@ -1,7 +1,8 @@
 baseURL: https://felipeo.me
 languageCode: en-us
 title: Insights Notes
-paginate: 5
+pagination:
+  pagerSize: 5
 theme: "PaperMod"
 
 enableRobotsTXT: true
@@ -118,7 +119,7 @@ params:
 services:
     instagram:
         disableInlineCSS: true
-    twitter:
+    x:
         disableInlineCSS: true
 
 markup:
@@ -140,7 +141,7 @@ privacy:
     anonymizeIP: true
     respectDoNotTrack: true
     useSessionStorage: true
-  twitter:
+  x:
     enableDNT: true
   vimeo:
     enableDNT: true
