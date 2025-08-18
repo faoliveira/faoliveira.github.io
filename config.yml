@@ -122,6 +122,8 @@ services:
     x:
         disableInlineCSS: true
 
+staticDir: ["static", "farejanuno"]
+
 markup:
     goldmark:
         parser:
