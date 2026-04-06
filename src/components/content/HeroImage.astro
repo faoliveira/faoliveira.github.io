@@ -1,0 +1,53 @@
+---
+// HeroImage.astro — full-width hero image with optional caption
+// alt is required (TypeScript enforced) for accessibility
+//
+// Usage patterns:
+//   Local asset (optimized): <HeroImage src={import("@assets/hero.jpg")} alt="..." width={1200} height={630} />
+//   External URL (raw img):  <HeroImage src="https://example.com/hero.jpg" alt="..." width={1200} height={630} />
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  src: string | ImageMetadata;
+  alt: string;
+  caption?: string;
+  loading?: "lazy" | "eager";
+  width?: number;
+  height?: number;
+}
+
+const { src, alt, caption, loading = "lazy", width, height } = Astro.props;
+const isLocalAsset = typeof src !== "string";
+---
+
+<figure class="hero-image">
+  {isLocalAsset ? (
+    <Image src={src} alt={alt} width={width} height={height} loading={loading} />
+  ) : (
+    <img src={src} alt={alt} width={width} height={height} loading={loading} />
+  )}
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .hero-image {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-block: var(--ma-spacious);
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .hero-image figcaption {
+    text-align: center;
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    margin-top: var(--ma-narrow);
+    font-family: var(--font-mono);
+  }
+</style>

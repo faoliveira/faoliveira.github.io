@@ -218,6 +218,7 @@ dist
 
 # vuepress build output
 .vuepress/dist
+/dist
 
 # vuepress v2.x temp and cache directory
 .temp
@@ -501,8 +502,8 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/git,macos,linux,windows,node,go,hugo,visualstudiocode,notepadpp,sublimetext,python,jupyternotebooks
 
 # Claude Code specific files
-CLAUDE.md
 .claude/
+skills-lock.json
 
 # Cursor IDE
 .cursor/
@@ -521,3 +522,18 @@ CLAUDE.md
 # UV (Python package manager)
 .uv_cache/
 uv.lock
+
+
+docs/
+_bmad-output/
+_bmad/
+.agent/
+.agents/
+.opencode/
+
+### Content drafts (local only) ###
+src/content/posts/drafts/
+
+### Astro ###
+dist/
+.astro/

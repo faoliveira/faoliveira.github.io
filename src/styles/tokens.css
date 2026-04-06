@@ -1,0 +1,84 @@
+/* src/styles/tokens.css */
+/* SYNC: noscript dark-mode fallback in BaseLayout.astro must match these values */
+/* SYNC: design-system.astro line 9 hardcodes --color-surface-alt value as a display label — update on every token change */
+
+:root {
+  /* ── Colors: Day Mode (oklch) ── */
+  --color-surface: oklch(0.96 0.012 80);
+  --color-surface-alt: oklch(
+    0.91 0.018 80
+  ); /* WCAG: text-secondary (L≈0.45) on this surface ≈ 5.7:1 ✓ */
+  --color-text-primary: oklch(0.22 0.02 60);
+  --color-text-secondary: oklch(0.45 0.02 60);
+  --color-text-tertiary: oklch(0.55 0.015 60);
+  --color-accent: oklch(0.5 0.1 155);
+  --color-accent-hover: oklch(0.44 0.11 155);
+  --color-accent-tint: oklch(0.5 0.1 155 / 0.1);
+  --color-border: oklch(0.85 0.01 80);
+  --color-code-surface: oklch(0.94 0.008 80);
+
+  /* ── Accessibility ── */
+  --touch-target-min: 44px; /* WCAG 2.5.8 minimum touch target */
+
+  /* ── Texture Tokens ── */
+  --texture-grain-opacity: 0.05;
+  --texture-grain-tint: oklch(0.6 0.04 60 / 0.4);
+  --texture-grain-opacity-elevated: 0.09;
+
+  /* ── Opacity ── */
+  --opacity-muted: 0.85;
+
+  /* ── Radii ── */
+  --radius-md: 6px;
+
+  /* ── Ma (間) Spacing System ── */
+  --ma-list-indent: 1.75rem;
+  --ma-hair: 2px;
+  --ma-thin: 4px;
+  --ma-narrow: 8px;
+  --ma-base: 16px;
+  --ma-wide: 24px;
+  --ma-broad: 32px;
+  --ma-spacious: 48px;
+  --ma-vast: 64px;
+  --ma-breath: 96px;
+  --ma-silence: 128px;
+
+  /* ── Motion Tokens ── */
+  --motion-duration-quick: 150ms; /* links hover */
+  --motion-duration-normal: 200ms; /* card lifts */
+  --motion-duration-smooth: 300ms; /* nightfall transition */
+  --motion-duration-reveal: 400ms; /* scroll-driven entrance */
+  --motion-easing-out: ease-out;
+  --motion-easing-in-out: ease-in-out;
+  --motion-easing-ease: ease;
+
+  /* ── Shadow Tokens ── */
+  --shadow-card: 0 1px 3px oklch(0 0 0 / 0.04);
+  --shadow-card-hover: 0 4px 12px oklch(0 0 0 / 0.08);
+
+  /* ── Breakpoints ── */
+  /* NOTE: CSS custom properties do not resolve inside @media conditions.
+     Use these values in JS/component logic only — write literal px in media queries. */
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+}
+
+/* ── Fallback: browsers without oklch() support (Safari <15.4, Chrome <111) ── */
+/* Hex approximations of the oklch values above — intentionally approximate */
+@supports not (color: oklch(0 0 0)) {
+  :root {
+    --color-surface: #f4efe5;
+    --color-surface-alt: #e7e0d1;
+    --color-text-primary: #38302a;
+    --color-text-secondary: #746d64;
+    --color-text-tertiary: #908b82;
+    --color-accent: #2b8e65;
+    --color-accent-hover: #1f7c55;
+    --color-accent-tint: rgb(43 142 101 / 0.1);
+    --color-border: #d4cfc6;
+    --color-code-surface: #ece8e0;
+  }
+}

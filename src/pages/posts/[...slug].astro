@@ -1,0 +1,75 @@
+---
+import { render } from "astro:content";
+import DataEssayLayout from "@layouts/DataEssayLayout.astro";
+import LogLayout from "@layouts/LogLayout.astro";
+import PostLayout from "@layouts/PostLayout.astro";
+import ProjectLayout from "@layouts/ProjectLayout.astro";
+import { calculateReadingTime, getPublishedPosts } from "@modules/content";
+import { SITE_URL } from "@modules/seo";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const isDataEssay = post.data.type === "data-essay";
+const isProject = post.data.type === "project";
+const isLog = post.data.type === "log";
+const ogImage = post.data.og_image || `${SITE_URL}/og/${post.id}.png`;
+---
+
+{isDataEssay ? (
+  <DataEssayLayout
+    title={post.data.title}
+    description={post.data.description}
+    date={post.data.date}
+    type={post.data.type}
+    image={ogImage}
+  >
+    <Content />
+  </DataEssayLayout>
+) : isProject ? (
+  <ProjectLayout
+    title={post.data.title}
+    description={post.data.description}
+    type="project"
+    stack={post.data.stack}
+    last_run={post.data.last_run}
+    season={post.data.season}
+    repo={post.data.repo}
+    liveUrl={post.data.liveUrl}
+    hasIsland={post.data.hasIsland}
+    image={ogImage}
+  >
+    <Content />
+  </ProjectLayout>
+) : isLog ? (
+  <LogLayout
+    title={post.data.title}
+    description={post.data.description}
+    date={post.data.date}
+    type="log"
+    image={ogImage}
+  >
+    <Content />
+  </LogLayout>
+) : (
+  <PostLayout
+    title={post.data.title}
+    description={post.data.description}
+    date={post.data.date}
+    readingTime={calculateReadingTime(post.body ?? "")}
+    type={post.data.type}
+    reading={post.data.reading}
+    toc={post.data.toc}
+    headings={headings}
+    image={ogImage}
+  >
+    <Content />
+  </PostLayout>
+)}

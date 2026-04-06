@@ -1,0 +1,16 @@
+/* src/styles/code.css */
+
+/* ── Expressive Code Overrides ── */
+
+/* Spacing for code blocks inside prose — EC generates .expressive-code wrapper */
+.prose .expressive-code {
+  margin-block: calc(var(--leading-base) * 1rem);
+}
+
+/* Ensure EC code blocks inside prose don't inherit conflicting pre styles */
+.prose .expressive-code pre {
+  margin: 0;
+}
+
+/* Elevated grain for .expressive-code is handled in texture.css
+   alongside .grain-surface (shared selector list). */

@@ -1,0 +1,144 @@
+---
+// ClickToLoad.astro — shared click-to-load pattern for video/audio embeds
+// Renders a placeholder; replaces with iframe on click for bandwidth + privacy.
+interface Props {
+  src: string;
+  title: string;
+  ariaLabel?: string; // explicit label for the load button (e.g. "Play video", "Load embed")
+  aspectRatio?: string; // e.g. "16/9" for video, "auto" for fixed-height
+  height?: number; // fixed height in px (Spotify, CodePen)
+  fallbackUrl: string;
+  fallbackLabel: string;
+}
+
+const {
+  src,
+  title,
+  ariaLabel = "Load embed",
+  aspectRatio = "16/9",
+  height,
+  fallbackUrl,
+  fallbackLabel,
+} = Astro.props;
+
+// Guard against height=0 bypassing the ?? fallback
+const safeHeight = typeof height === "number" && height > 0 ? height : 400;
+const placeholderStyle =
+  aspectRatio !== "auto" ? `aspect-ratio: ${aspectRatio}` : `height: ${safeHeight}px`;
+---
+
+<!-- tabindex="-1": allows programmatic focus for AT without entering natural tab order -->
+<div
+  class="click-to-load"
+  tabindex="-1"
+  data-src={src}
+  data-title={title}
+  data-fallback-url={fallbackUrl}
+  data-fallback-label={fallbackLabel}
+>
+  <div class="click-to-load__placeholder" style={placeholderStyle}>
+    <slot />
+    <button class="click-to-load__button" aria-label={ariaLabel}>
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    </button>
+  </div>
+  <noscript>
+    <a href={fallbackUrl} class="click-to-load__fallback">{fallbackLabel}</a>
+  </noscript>
+</div>
+
+<script>
+  function initClickToLoad(root: Document | HTMLElement = document) {
+    root.querySelectorAll<HTMLElement>(".click-to-load").forEach((wrapper) => {
+      const button = wrapper.querySelector<HTMLButtonElement>(".click-to-load__button");
+      if (!button || button.dataset.initialized) return;
+      button.dataset.initialized = "true";
+
+      button.addEventListener("click", () => {
+        // Disable immediately to prevent double-click double-inject
+        button.disabled = true;
+
+        const src = wrapper.dataset.src;
+        const title = wrapper.dataset.title ?? "";
+        const fallbackUrl = wrapper.dataset.fallbackUrl ?? "#";
+        const fallbackLabel = wrapper.dataset.fallbackLabel ?? "View content";
+        if (!src) return;
+
+        wrapper.classList.add("click-to-load--loading");
+
+        const iframe = document.createElement("iframe");
+        iframe.src = src;
+        iframe.title = title;
+        iframe.loading = "lazy";
+        iframe.allow = "autoplay; encrypted-media";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.display = "block";
+
+        const placeholder = wrapper.querySelector(".click-to-load__placeholder");
+        if (placeholder) {
+          // Guard: only use computed values when the element has been painted
+          const computed = getComputedStyle(placeholder);
+          const aspectRatio =
+            computed.aspectRatio && computed.aspectRatio !== "auto"
+              ? computed.aspectRatio
+              : null;
+          const height =
+            computed.height && computed.height !== "0px" ? computed.height : null;
+          if (aspectRatio) iframe.style.aspectRatio = aspectRatio;
+          if (height) iframe.style.minHeight = height;
+          wrapper.replaceChild(iframe, placeholder);
+        } else {
+          wrapper.appendChild(iframe);
+        }
+
+        // P-5: remove loading skeleton only after iframe content is ready
+        iframe.addEventListener(
+          "load",
+          () => {
+            wrapper.classList.remove("click-to-load--loading");
+            // Focus wrapper (not iframe) to signal embed loaded to AT without
+            // trapping keyboard focus inside a cross-origin document (WCAG 2.1.2)
+            wrapper.focus();
+          },
+          { once: true },
+        );
+
+        // Best-effort error recovery: iframes don't reliably fire error for HTTP failures
+        // but this catches network-level failures (refused connection, DNS, etc.)
+        iframe.addEventListener(
+          "error",
+          () => {
+            wrapper.classList.remove("click-to-load--loading");
+            const errorDiv = document.createElement("div");
+            const link = document.createElement("a");
+            link.href = fallbackUrl;
+            link.textContent = `${fallbackLabel} →`;
+            link.className = "click-to-load__fallback";
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            errorDiv.appendChild(link);
+            wrapper.replaceChild(errorDiv, iframe);
+          },
+          { once: true },
+        );
+      });
+    });
+  }
+
+  // Initial load
+  initClickToLoad();
+
+  // Re-initialize after Astro View Transitions (astro:page-load pattern from Story 5.5)
+  // Astro deduplicates module scripts — this listener is registered exactly once.
+  document.addEventListener("astro:page-load", () => initClickToLoad());
+</script>

@@ -1,0 +1,66 @@
+---
+import TypeTag from "@components/TypeTag.astro";
+import type { Post } from "@modules/content";
+import { formatDate, toISODateString } from "@modules/content";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { title, date, type } = post.data;
+---
+
+<a href={`/posts/${post.id}`} class="post-row">
+  <span class="post-title">{title}</span>
+  {type && <TypeTag type={type} />}
+  <time datetime={toISODateString(date)} class="post-date">{formatDate(date)}</time>
+</a>
+
+<style>
+  .post-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--ma-base);
+    padding-block: var(--ma-narrow);
+    border-bottom: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  @media (hover: hover) {
+    .post-row:hover {
+      color: var(--color-accent);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .post-row {
+      transition: none;
+    }
+  }
+
+  .post-title {
+    font-size: var(--type-base);
+    color: var(--color-text-primary);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .post-row:hover .post-title {
+    color: inherit;
+  }
+
+  .post-date {
+    font-size: var(--type-sm);
+    font-family: var(--font-mono);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    margin-inline-start: auto;
+  }
+
+  .post-row:hover .post-date {
+    color: inherit;
+  }
+</style>

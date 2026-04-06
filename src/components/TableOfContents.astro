@@ -1,0 +1,238 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface TocItem extends Heading {
+  children: Heading[];
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+const items: TocItem[] = [];
+for (const h of tocHeadings) {
+  if (h.depth === 2) {
+    items.push({ ...h, children: [] });
+  } else if (h.depth === 3 && items.length > 0) {
+    items[items.length - 1].children.push(h);
+  }
+}
+---
+
+{items.length > 0 && (
+  <>
+    <!-- Mobile: collapsible <details> (< 1024px) -->
+    <details class="toc-mobile">
+      <summary class="toc-summary">Contents</summary>
+      <nav aria-label="Table of contents">
+        <ul class="toc-list">
+          {
+            items.map((item) => (
+              <li>
+                <a href={`#${item.slug}`} class="toc-link">
+                  {item.text}
+                </a>
+                {item.children.length > 0 && (
+                  <ul class="toc-sublist">
+                    {item.children.map((child) => (
+                      <li>
+                        <a href={`#${child.slug}`} class="toc-link">
+                          {child.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </details>
+
+    <!-- Desktop: sticky sidebar nav (≥ 1024px) -->
+    <nav class="toc-desktop" aria-label="Table of contents">
+      <ul class="toc-list">
+        {
+          items.map((item) => (
+            <li>
+              <a href={`#${item.slug}`} class="toc-link">
+                {item.text}
+              </a>
+              {item.children.length > 0 && (
+                <ul class="toc-sublist">
+                  {item.children.map((child) => (
+                    <li>
+                      <a href={`#${child.slug}`} class="toc-link">
+                        {child.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </>
+)}
+
+<script>
+  // Active section highlighting via IntersectionObserver.
+  // Uses a Set to track currently intersecting headings, so:
+  // - Multiple entries in the same callback batch are handled correctly (topmost wins)
+  // - Active state clears when no heading is intersecting (D3)
+  // - Both mobile + desktop toc-links receive aria-current (P1)
+  const intersecting = new Set<string>();
+  const articleHeadings = Array.from(
+    document.querySelectorAll("article :is(h2, h3)[id]"),
+  ) as HTMLElement[];
+
+  function updateActiveLink() {
+    const allIds = articleHeadings.map((h) => h.id);
+    const activeId = allIds.find((id) => intersecting.has(id)) ?? null;
+
+    document
+      .querySelectorAll(".toc-link")
+      .forEach((a) => a.removeAttribute("aria-current"));
+    if (activeId) {
+      document
+        .querySelectorAll(`.toc-link[href="#${activeId}"]`)
+        .forEach((link) => link.setAttribute("aria-current", "location"));
+    }
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          intersecting.add((entry.target as HTMLElement).id);
+        } else {
+          intersecting.delete((entry.target as HTMLElement).id);
+        }
+      }
+      updateActiveLink();
+    },
+    { rootMargin: "-80px 0px -70% 0px" },
+  );
+
+  articleHeadings.forEach((h) => observer.observe(h));
+
+  // Escape key closes mobile ToC and returns focus to the summary trigger
+  function handleEscape(e: KeyboardEvent) {
+    if (e.key === "Escape") {
+      const details = document.querySelector(
+        ".toc-mobile[open]",
+      ) as HTMLDetailsElement | null;
+      if (details) {
+        details.open = false;
+        (details.querySelector("summary") as HTMLElement | null)?.focus();
+      }
+    }
+  }
+
+  document.addEventListener("keydown", handleEscape);
+
+  // Cleanup for Astro View Transitions (Story 3.5)
+  document.addEventListener(
+    "astro:before-swap",
+    () => {
+      observer.disconnect();
+      document.removeEventListener("keydown", handleEscape);
+    },
+    { once: true },
+  );
+</script>
+
+<style>
+  /* ── Shared list styles ── */
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-sublist {
+    list-style: none;
+    padding-inline-start: var(--ma-base);
+    margin-top: var(--ma-thin);
+  }
+
+  .toc-link {
+    display: block;
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    padding-block: 0.2em;
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  .toc-link:hover {
+    color: var(--color-accent);
+  }
+
+  .toc-link[aria-current="location"] {
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  .toc-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ── Mobile: collapsible ── */
+  .toc-mobile {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: var(--ma-narrow) var(--ma-base);
+    margin-block-end: var(--ma-wide);
+  }
+
+  .toc-summary {
+    font-size: var(--type-sm);
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    user-select: none;
+    padding-block: var(--ma-narrow);
+    list-style: none;
+  }
+
+  .toc-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc-mobile nav {
+    padding-top: var(--ma-narrow);
+  }
+
+  /* ── Desktop: hidden on mobile, sticky sidebar on ≥ 1024px ── */
+  .toc-desktop {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .toc-mobile {
+      display: none;
+    }
+
+    .toc-desktop {
+      display: block;
+      position: sticky;
+      top: var(--ma-spacious);
+      border-inline-start: 2px solid var(--color-border);
+      padding-inline-start: var(--ma-base);
+    }
+  }
+</style>

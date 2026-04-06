@@ -1,0 +1,189 @@
+---
+// src/components/NightfallToggle.astro
+---
+
+<button
+  id="nightfall-toggle"
+  role="switch"
+  aria-checked="false"
+  aria-label="Nightfall mode"
+>
+  <svg
+    class="chochin-wrap"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 26 32"
+    width="18"
+    height="22"
+    fill="none"
+    aria-hidden="true"
+  >
+    <!-- Inner glow: amber fill, day opacity:0, nightfall opacity:0.55 -->
+    <circle class="inner-glow" cx="13" cy="19" r="8" fill="var(--glow-fill)" />
+    <!-- Body fill: amber fill, day opacity:0, nightfall opacity:0.25 -->
+    <circle class="body-fill" cx="13" cy="19" r="8" fill="var(--body-fill)" />
+    <!-- Globe body: stroke only, currentColor -->
+    <circle cx="13" cy="19" r="8" stroke="currentColor" stroke-width="1.8" />
+    <!-- Ribs: 3 horizontal lines at 0.25 opacity -->
+    <line x1="5.6" y1="16" x2="20.4" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.25" />
+    <line x1="5" y1="19" x2="21" y2="19" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.25" />
+    <line x1="5.6" y1="22" x2="20.4" y2="22" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.25" />
+    <!-- Flame group: day opacity:0, nightfall opacity:1 + flicker -->
+    <g class="flame-group">
+      <ellipse cx="13" cy="17" rx="2.5" ry="3.5" fill="var(--flame-color)" />
+      <ellipse cx="13" cy="16.5" rx="1.2" ry="2" fill="var(--flame-inner)" />
+    </g>
+    <!-- Top cap -->
+    <rect x="9" y="8" width="8" height="3" rx="1" fill="currentColor" />
+    <!-- Cord -->
+    <line x1="13" y1="4" x2="13" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    <!-- Hook -->
+    <path d="M 13,4 C 13,1 20,1 20,3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none" />
+    <!-- Bottom cap -->
+    <rect x="9" y="27" width="8" height="3" rx="1" fill="currentColor" />
+  </svg>
+</button>
+
+<!-- Sync aria-checked immediately from the already-set data-theme, before module scripts run -->
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('nightfall-toggle');
+    if (btn) {
+      btn.setAttribute('aria-checked',
+        document.documentElement.dataset.theme === 'nightfall' ? 'true' : 'false');
+    }
+  })();
+</script>
+
+<style>
+  /* Component-level color tokens for chochin glow states */
+  :root {
+    --glow-amber: oklch(0.75 0.14 70 / 0.5);
+    --glow-amber-strong: oklch(0.75 0.14 70 / 0.8);
+    --flame-color: oklch(0.80 0.16 70);
+    --flame-inner: oklch(0.95 0.10 90 / 0.85);
+    --body-fill: oklch(0.80 0.16 70 / 0.3);
+    --glow-fill: oklch(0.80 0.16 70 / 0.4);
+  }
+
+  button {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 6px;
+    transition:
+      color var(--motion-duration-smooth) var(--motion-easing-out),
+      filter var(--motion-duration-smooth) var(--motion-easing-out),
+      border-color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  button:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Swing pivot point at the hook/cord top */
+  .chochin-wrap {
+    transform-origin: top center;
+    display: block;
+  }
+
+  /* Day mode: glow, fill, and flame layers hidden */
+  .inner-glow,
+  .body-fill,
+  .flame-group {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+
+  /* Nightfall mode: warm amber glow, fill, and flame visible */
+  :global([data-theme="nightfall"]) button {
+    color: var(--flame-color);
+    filter: drop-shadow(0 0 10px var(--glow-amber));
+  }
+
+  :global([data-theme="nightfall"]) button:hover {
+    color: var(--flame-color);
+    border-color: var(--flame-color);
+    filter: drop-shadow(0 0 14px var(--glow-amber-strong));
+  }
+
+  :global([data-theme="nightfall"]) .inner-glow { opacity: 0.55; }
+  :global([data-theme="nightfall"]) .body-fill { opacity: 0.25; }
+
+  :global([data-theme="nightfall"]) .flame-group {
+    opacity: 1;
+    animation: flameFlicker 2.5s ease-in-out infinite;
+  }
+
+  /* Swing animation on click: spring-physics approximation */
+  .chochin-wrap.swinging {
+    animation: chochinSwing 600ms ease-out forwards;
+  }
+
+  @keyframes flameFlicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+
+  @keyframes chochinSwing {
+    0%   { transform: rotate(0deg); }
+    15%  { transform: rotate(7deg); }
+    35%  { transform: rotate(-4.5deg); }
+    50%  { transform: rotate(2.5deg); }
+    65%  { transform: rotate(-1.5deg); }
+    80%  { transform: rotate(0.8deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  /* Reduced motion: disable swing and flicker, preserve glow opacity transition */
+  @media (prefers-reduced-motion: reduce) {
+    .chochin-wrap.swinging {
+      animation: none;
+    }
+
+    :global([data-theme="nightfall"]) .flame-group {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { getTheme, toggleTheme } from '@modules/theme';
+
+  const btn = document.getElementById('nightfall-toggle');
+  const chochin = btn?.querySelector('.chochin-wrap');
+
+  function syncState() {
+    if (!btn) return;
+    const isNightfall = getTheme() === 'nightfall';
+    btn.setAttribute('aria-checked', String(isNightfall));
+  }
+
+  syncState();
+
+  btn?.addEventListener('click', () => {
+    document.documentElement.classList.add('theme-animated');
+    toggleTheme();
+    syncState();
+
+    // Swing animation: remove first to allow restart on rapid clicks
+    if (chochin) {
+      chochin.classList.remove('swinging');
+      void chochin.getBoundingClientRect(); // force reflow to restart animation
+      chochin.classList.add('swinging');
+      chochin.addEventListener('animationend', () => {
+        chochin.classList.remove('swinging');
+      }, { once: true });
+    }
+  });
+</script>

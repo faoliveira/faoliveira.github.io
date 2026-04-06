@@ -1,0 +1,22 @@
+---
+// Gist.astro — GitHub Gist embed with syntax highlighting
+// Wraps @astro-community/astro-embed-gist in EmbedContainer
+import { Gist as UpstreamGist } from "@astro-community/astro-embed-gist";
+import EmbedContainer from "./EmbedContainer.astro";
+
+interface Props {
+  id: string; // gist ID
+  file?: string; // specific filename for multi-file gists
+}
+
+const { id, file } = Astro.props;
+
+// Sanitize: Gist IDs are hex strings — strip anything that isn't alphanumeric
+const safeId = id.replace(/[^a-zA-Z0-9]/g, "");
+const gistUrl = `https://gist.github.com/${safeId}`;
+---
+
+<EmbedContainer>
+  <UpstreamGist id={safeId} file={file} />
+  <a href={gistUrl} class="click-to-load__fallback">View Gist on GitHub</a>
+</EmbedContainer>

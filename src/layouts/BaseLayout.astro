@@ -1,0 +1,104 @@
+---
+import "@styles/global.css";
+import { ClientRouter } from "astro:transitions";
+import Footer from "@components/Footer.astro";
+import GoatCounter from "@components/GoatCounter.astro";
+import Nav from "@components/Nav.astro";
+import SEOHead from "@components/SEOHead.astro";
+import SkipLink from "@components/SkipLink.astro";
+import { SITE_TITLE } from "@modules/seo";
+import { getThemeScript } from "@modules/theme/theme-script";
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: string;
+  noindex?: boolean;
+  nopagefind?: boolean;
+  type?: "website" | "article";
+  image?: string;
+}
+const {
+  title = SITE_TITLE,
+  description,
+  lang = "en",
+  noindex = false,
+  nopagefind = false,
+  type,
+  image,
+} = Astro.props;
+const themeScript = getThemeScript();
+---
+<!doctype html>
+<html lang={lang} data-pagefind-ignore={nopagefind ? "all" : undefined}>
+  <head>
+    <script is:inline set:html={themeScript} />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <SEOHead title={title} description={description} url={Astro.url.pathname} type={type} image={image} />
+    <title>{title}</title>
+    <link rel="preload" href="/fonts/sora-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="felipeo.me RSS" href="/rss.xml" />
+    <noscript>
+      <style>
+        /* SYNC: these values must match tokens.css / nightfall.css — see D-38 */
+        /* Duplicated tokens: --color-surface, --color-surface-alt, --color-text-primary,
+           --color-text-secondary, --color-text-tertiary, --color-accent, --color-accent-hover,
+           --color-accent-tint, --color-border, --color-code-surface,
+           --texture-grain-opacity, --texture-grain-tint, --texture-grain-opacity-elevated */
+        /* Hide JS-dependent UI — NightfallToggle requires JS to function */
+        #nightfall-toggle { display: none !important; }
+        /* CSS-only dark mode fallback: respect prefers-color-scheme when JS is disabled */
+        @media (prefers-color-scheme: dark) {
+          html {
+            --color-surface: oklch(0.22 0.04 270);
+            --color-surface-alt: oklch(0.28 0.04 270);
+            --color-text-primary: oklch(0.9 0.01 80);
+            --color-text-secondary: oklch(0.7 0.01 80);
+            --color-text-tertiary: oklch(0.55 0.01 80);
+            --color-accent: oklch(0.62 0.1 155);
+            --color-accent-hover: oklch(0.56 0.11 155);
+            --color-accent-tint: oklch(0.62 0.1 155 / 0.15);
+            --color-border: oklch(0.3 0.03 270);
+            --color-code-surface: oklch(0.18 0.04 270);
+            --texture-grain-opacity: 0.03;
+            --texture-grain-tint: oklch(0.40 0.03 60 / 0.25);
+            --texture-grain-opacity-elevated: 0.055;
+          }
+        }
+      </style>
+    </noscript>
+    <slot name="head" />
+    <ClientRouter />
+    <script>
+      // Press "/" from anywhere to jump to search
+      document.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
+        const active = document.activeElement;
+        if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active instanceof HTMLSelectElement || (active instanceof HTMLElement && active.isContentEditable)) return;
+        e.preventDefault();
+        window.location.href = "/search/";
+      });
+    </script>
+  </head>
+  <body>
+    <SkipLink />
+    <Nav />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+    <GoatCounter />
+  </body>
+</html>
+
+<style>
+  main {
+    padding-block-start: var(--ma-broad);
+  }
+</style>

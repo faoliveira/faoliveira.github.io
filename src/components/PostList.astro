@@ -1,0 +1,67 @@
+---
+import PostRow from "@components/PostRow.astro";
+import { getPublishedPosts, type Post } from "@modules/content";
+
+interface Props {
+  posts?: Post[];
+  showHeading?: boolean;
+}
+
+const { posts: propPosts, showHeading = true } = Astro.props;
+const posts = propPosts ?? (await getPublishedPosts());
+---
+
+<section class="post-list">
+  {showHeading && <h2 class="section-heading reveal">All posts</h2>}
+  {posts.length > 0 ? (
+    <ul class="posts" role="list">
+      {posts.map((post) => (
+        <li class="reveal">
+          <PostRow post={post} />
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="empty-state">Coming soon.</p>
+  )}
+</section>
+
+<style>
+  .post-list {
+    /* No top margin needed when FeaturedGrid is present — its margin-block-end
+       plus Hero's padding-block-end already provide breathing room above. */
+  }
+
+  /* When FeaturedGrid is absent (post-list directly follows hero),
+     add equivalent top spacing so the gap feels intentional in both cases. */
+  :global(.hero + .post-list) {
+    margin-block-start: var(--ma-vast);
+  }
+
+  .section-heading {
+    font-size: var(--type-xl);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-block-end: var(--ma-wide);
+  }
+
+  .posts {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .posts li {
+    min-height: 44px;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .posts li > :global(a) {
+    flex: 1;
+  }
+
+  .empty-state {
+    color: var(--color-text-tertiary);
+  }
+</style>

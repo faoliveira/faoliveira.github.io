@@ -1,0 +1,29 @@
+---
+// PullQuote.astro — large centered emphasis quote, NOT for attribution
+// Visually distinct from .prose blockquote (which has citation semantics)
+// Uses a top accent border — consistent with centered text-align
+// No props — uses slot for content
+---
+
+<blockquote class="pull-quote">
+  <slot />
+</blockquote>
+
+<style>
+  .pull-quote {
+    font-size: var(--type-2xl);
+    text-align: center;
+    border-top: 3px solid var(--color-accent);
+    padding-top: var(--ma-wide);
+    padding-inline: var(--ma-wide);
+    margin-inline: auto;
+    color: var(--color-text-primary);
+    font-style: italic;
+    line-height: var(--leading-sm);
+    margin-block: var(--ma-spacious);
+  }
+
+  .pull-quote :global(p) {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+import TypeTag from "@components/TypeTag.astro";
+import type { Post } from "@modules/content";
+import { formatDate, toISODateString } from "@modules/content";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { title, description, date, type } = post.data;
+---
+
+<a href={`/posts/${post.id}`} class="featured-card grain-surface">
+  {type && <TypeTag type={type} />}
+  <h3 class="card-title">{title}</h3>
+  {description && <p class="card-description">{description}</p>}
+  <time datetime={toISODateString(date)} class="card-date">{formatDate(date)}</time>
+</a>
+
+<style>
+  .featured-card {
+    display: block;
+    background: var(--color-surface-alt);
+    padding: var(--ma-wide);
+    border-radius: var(--ma-narrow);
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow-card);
+    transition: transform var(--motion-duration-normal) var(--motion-easing-out),
+                box-shadow var(--motion-duration-normal) var(--motion-easing-out);
+    container-type: inline-size;
+  }
+
+  @media (hover: hover) {
+    .featured-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .featured-card {
+      transition: none;
+    }
+  }
+
+  .card-title {
+    font-size: var(--type-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-block-start: var(--ma-narrow);
+    line-height: var(--leading-lg);
+  }
+
+  .card-description {
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-sm);
+    margin-block-start: var(--ma-narrow);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-date {
+    display: block;
+    font-size: var(--type-xs);
+    font-family: var(--font-mono);
+    color: var(--color-text-secondary);
+    margin-block-start: var(--ma-base);
+  }
+</style>

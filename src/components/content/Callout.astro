@@ -1,0 +1,79 @@
+---
+// Callout.astro — contextual aside with icon and accent-colored background
+// type determines icon and color treatment
+interface Props {
+  type?: "note" | "tip" | "warning" | "important";
+}
+
+const { type = "note" } = Astro.props;
+
+const icons: Record<string, string> = {
+  note: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="7" x2="8" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>`,
+  tip: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1a5 5 0 0 1 2 9.58V12H6v-1.42A5 5 0 0 1 8 1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="6" y="12" width="4" height="1.5" rx="0.5" stroke="currentColor" stroke-width="1"/><line x1="7" y1="14.5" x2="9" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  warning: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2L14.5 13H1.5L8 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><line x1="8" y1="7" x2="8" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.75" fill="currentColor"/></svg>`,
+  important: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r="0.75" fill="currentColor"/></svg>`,
+};
+
+const icon = icons[type];
+---
+
+<aside class={`callout callout--${type}`}>
+  <span class="callout-icon" set:html={icon} />
+  <div class="callout-body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    display: flex;
+    gap: var(--ma-narrow);
+    padding: var(--ma-base);
+    border-radius: 4px;
+    margin-block: var(--ma-wide);
+    background: var(--callout-bg, var(--color-accent-tint));
+    border-left: 3px solid var(--callout-border, var(--color-accent));
+    color: var(--color-text-primary);
+  }
+
+  .callout-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    color: var(--callout-icon-color, var(--color-accent));
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .callout-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .callout-body :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .callout-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* warning type — warm orange */
+  .callout--warning {
+    --callout-bg: oklch(0.85 0.14 70 / 0.12);
+    --callout-border: oklch(0.65 0.14 70);
+    --callout-icon-color: oklch(0.65 0.14 70);
+  }
+
+  :global([data-theme="nightfall"]) .callout--warning {
+    --callout-bg: oklch(0.30 0.10 70 / 0.20);
+    --callout-border: oklch(0.65 0.14 70);
+    --callout-icon-color: oklch(0.70 0.14 70);
+  }
+
+  /* important type — stronger accent tint */
+  .callout--important {
+    --callout-bg: color-mix(in oklch, var(--color-accent-tint) 150%, transparent);
+  }
+</style>

@@ -1,0 +1,80 @@
+/* src/styles/texture.css */
+/* Paper grain overlay — static WebP tile, no SVG filter recalculation.
+   Note: position:fixed + mix-blend-mode prevents independent compositing —
+   the browser re-composites this layer on repaints (scroll, hover, theme transitions).
+   Cost is acceptable vs. SVG feTurbulence, but not truly zero. */
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("/textures/grain.webp");
+  background-repeat: repeat;
+  /* Warm tint: blends the amber color with the grayscale grain tile
+     before compositing onto the page. Result feels like aged paper ink. */
+  background-color: var(--texture-grain-tint);
+  background-blend-mode: multiply;
+  opacity: var(--texture-grain-opacity);
+  mix-blend-mode: multiply;
+}
+
+/* Nightfall mode: softer blend, tokens already reduce opacity */
+html[data-theme="nightfall"] body::after {
+  mix-blend-mode: soft-light;
+}
+
+/* Smooth opacity cross-fade on theme toggle (not on page load — .theme-animated is JS-added) */
+/* Note: mix-blend-mode is non-interpolatable in CSS — it snaps on toggle.
+   Only opacity fades; blend character changes instantly. Accepted CSS limitation. */
+html[data-theme].theme-animated body::after {
+  transition: opacity var(--motion-duration-smooth) var(--motion-easing-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme].theme-animated body::after {
+    transition: none;
+  }
+}
+
+/* Print: hide decorative grain overlay on printed pages */
+@media print {
+  body::after {
+    display: none;
+  }
+}
+
+/* ── Elevated grain utility ── */
+/* Apply to card and code-block surfaces for stronger tactile texture.
+   isolation: isolate scopes the ::after blend mode within the element,
+   preventing it from compositing outside the surface boundary.
+   Note: body::after (position:fixed, z-index:9999) lives in the root stacking
+   context and still composites over these surfaces — grain layers stack
+   additively at these opacity levels, which is visually acceptable. */
+.grain-surface,
+.expressive-code {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain-surface::after,
+.expressive-code::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: url("/textures/grain.webp");
+  background-repeat: repeat;
+  background-color: var(--texture-grain-tint);
+  background-blend-mode: multiply;
+  opacity: var(--texture-grain-opacity-elevated);
+  mix-blend-mode: multiply;
+}
+
+/* Nightfall: elevated surfaces use soft-light, consistent with body::after */
+html[data-theme="nightfall"] .grain-surface::after,
+html[data-theme="nightfall"] .expressive-code::after {
+  mix-blend-mode: soft-light;
+}

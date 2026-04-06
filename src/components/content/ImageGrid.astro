@@ -1,0 +1,52 @@
+---
+// ImageGrid.astro — 2 or 3 images side by side via CSS Grid
+// Collapses to single column on mobile (< 480px)
+interface Props {
+  columns?: 2 | 3;
+  ariaLabel?: string;
+}
+
+const { columns = 2, ariaLabel = "Image gallery" } = Astro.props;
+
+if (import.meta.env.DEV && columns !== 2 && columns !== 3) {
+  console.warn(`[ImageGrid] Invalid columns value: ${columns}. Expected 2 or 3.`);
+}
+---
+
+<div class="image-grid" role="group" aria-label={ariaLabel} data-columns={columns}>
+  <slot />
+</div>
+
+<style>
+  .image-grid {
+    display: grid;
+    gap: var(--ma-narrow);
+    margin-block: var(--ma-wide);
+  }
+
+  .image-grid[data-columns="2"] {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .image-grid[data-columns="3"] {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  @media (max-width: 480px) {
+    .image-grid[data-columns="2"],
+    .image-grid[data-columns="3"] {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .image-grid :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+  }
+
+  .image-grid :global(figure) {
+    margin: 0;
+  }
+</style>

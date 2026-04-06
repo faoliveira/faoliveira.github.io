@@ -1,0 +1,190 @@
+---
+import TypeTag from "@components/TypeTag.astro";
+import type { PostType } from "@modules/content";
+import { toISODateString } from "@modules/content";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  type: PostType;
+  image?: string;
+}
+
+const { title, description, date, type, image } = Astro.props;
+
+const day = String(date.getUTCDate());
+const month = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  timeZone: "UTC",
+})
+  .format(date)
+  .toUpperCase();
+const year = date.getUTCFullYear();
+const isoDate = toISODateString(date);
+---
+
+<BaseLayout title={title} description={description} type="article" image={image}>
+  <article class="log-article" data-post-type="log">
+    <div class="dateline-grid">
+      <aside class="date-col">
+        <time datetime={isoDate}>
+          <span class="date-month">{month}</span>
+          <span class="date-day">{day}</span>
+          <span class="date-year">{year}</span>
+        </time>
+        <div class="date-tag">
+          <TypeTag type={type} href="/log/" />
+        </div>
+      </aside>
+      <div class="content-col">
+        <h1 class="post-title">{title}</h1>
+        <div class="prose">
+          <slot />
+        </div>
+        <footer class="back-link-footer">
+          <a href="/log/" class="back-link">← all logs</a>
+        </footer>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .log-article {
+    /* Graceful arrival: supplement BaseLayout's --ma-broad to reach --ma-spacious */
+    margin-block-start: calc(var(--ma-spacious) - var(--ma-broad));
+  }
+
+  /* Desktop (≥1024px): 2-column dateline grid */
+  .dateline-grid {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: var(--ma-wide);
+    align-items: start;
+  }
+
+  .date-col {
+    position: sticky;
+    top: var(--ma-broad);
+    text-align: right;
+    padding-right: var(--ma-base);
+    border-right: 2px solid var(--color-accent-tint);
+  }
+
+  .date-col time {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ma-hair);
+  }
+
+  .date-month {
+    font-size: var(--type-xs);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+
+  .date-day {
+    font-size: var(--type-3xl);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1;
+  }
+
+  .date-year {
+    font-size: var(--type-xs);
+    font-family: var(--font-mono);
+    color: var(--color-text-tertiary);
+    line-height: 1;
+  }
+
+  .date-tag {
+    margin-block-start: var(--ma-narrow);
+  }
+
+  .post-title {
+    font-size: var(--type-xl);
+    font-weight: 600;
+    margin-block-end: var(--ma-base);
+  }
+
+  .back-link-footer {
+    margin-block-start: var(--ma-spacious);
+    padding-block-start: var(--ma-wide);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  @media (hover: hover) {
+    .back-link:hover {
+      color: var(--color-accent);
+    }
+  }
+
+  /* Tablet (768–1023px) */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .dateline-grid {
+      grid-template-columns: 80px 1fr;
+      gap: var(--ma-base);
+    }
+
+    .date-col {
+      position: static;
+    }
+
+    .date-day {
+      font-size: var(--type-2xl);
+    }
+  }
+
+  /* Mobile (<768px) */
+  @media (max-width: 767px) {
+    .dateline-grid {
+      display: block;
+    }
+
+    .date-col {
+      position: static;
+      text-align: left;
+      padding-right: 0;
+      border-right: none;
+      margin-block-end: var(--ma-base);
+    }
+
+    .date-col time {
+      flex-direction: row;
+      align-items: baseline;
+      gap: var(--ma-narrow);
+    }
+
+    .date-month {
+      font-size: var(--type-sm);
+    }
+
+    .date-day {
+      font-size: var(--type-sm);
+      font-family: var(--font-mono);
+      font-weight: 500;
+    }
+
+    .date-year {
+      font-size: var(--type-sm);
+    }
+
+    .post-title {
+      font-size: var(--type-lg);
+    }
+  }
+</style>

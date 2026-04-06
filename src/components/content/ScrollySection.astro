@@ -1,0 +1,42 @@
+---
+/**
+ * Pudding-style scrollytelling section.
+ *
+ * Desktop: flex row — text (40%) scrolls while graphic (60%) sticks.
+ * Mobile: stacked — graphic on top (sticky), text below.
+ * CSS-only: no JavaScript, uses position: sticky.
+ *
+ * Usage in MDX:
+ * ```mdx
+ * <ScrollySection>
+ *   <Fragment slot="graphic">
+ *     <img src="/chart.png" alt="Chart" />
+ *   </Fragment>
+ *   <ScrollyStep>Step 1 content...</ScrollyStep>
+ *   <ScrollyStep>Step 2 content...</ScrollyStep>
+ * </ScrollySection>
+ * ```
+ */
+---
+
+<div class="scrolly-section">
+  <div class="scrolly-text">
+    <slot />
+  </div>
+  <div class="scrolly-graphic">
+    <slot name="graphic" />
+  </div>
+</div>
+
+<noscript>
+  <style>
+    .scrolly-graphic {
+      position: static !important;
+      height: auto !important;
+      min-height: 40vh !important;
+    }
+    .scrolly-step {
+      margin-bottom: var(--ma-wide) !important;
+    }
+  </style>
+</noscript>

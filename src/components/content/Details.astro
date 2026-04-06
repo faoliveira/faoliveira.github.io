@@ -1,0 +1,93 @@
+---
+// Details.astro — native <details>/<summary> styled to match design system
+// Smooth open/close animation respecting prefers-reduced-motion
+interface Props {
+  summary: string;
+}
+
+const { summary } = Astro.props;
+const hasContent = Astro.slots.has("default");
+---
+
+<details class="details">
+  <summary class="details-summary">{summary}</summary>
+  {hasContent && (
+    <div class="details-body">
+      <slot />
+    </div>
+  )}
+</details>
+
+<style>
+  .details {
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    margin-block: var(--ma-wide);
+    overflow: hidden;
+  }
+
+  .details-summary {
+    padding: var(--ma-base);
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: var(--ma-narrow);
+    user-select: none;
+  }
+
+  .details-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-summary::before {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 8px;
+    border-color: transparent transparent transparent var(--color-accent);
+    flex-shrink: 0;
+    /* No transition by default — respects prefers-reduced-motion: reduce */
+  }
+
+  .details[open] .details-summary::before {
+    transform: rotate(90deg);
+  }
+
+  .details[open] .details-summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-summary:hover {
+    color: var(--color-accent);
+  }
+
+  .details-summary:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    border-radius: 4px;
+  }
+
+  .details-body {
+    padding: var(--ma-base);
+  }
+
+  .details-body :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .details-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .details-summary::before {
+      transition: transform var(--motion-duration-normal) var(--motion-easing-out);
+    }
+  }
+</style>

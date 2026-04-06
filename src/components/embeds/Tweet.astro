@@ -1,0 +1,31 @@
+---
+// Tweet.astro — zero-JS static HTML tweet embed (fetched at build time)
+// Wraps @astro-community/astro-embed-twitter in EmbedContainer
+import { Tweet as UpstreamTweet } from "@astro-community/astro-embed-twitter";
+import EmbedContainer from "./EmbedContainer.astro";
+
+interface Props {
+  url: string; // full tweet URL (twitter.com or x.com)
+}
+
+const { url } = Astro.props;
+---
+
+<EmbedContainer>
+  <UpstreamTweet id={url} />
+  <a href={url} class="click-to-load__fallback">View on X/Twitter</a>
+</EmbedContainer>
+
+<style>
+  /* Override upstream tweet card styles to use design system tokens */
+  :global(.embed-container .tweet) {
+    background: var(--color-surface-alt) !important;
+    color: var(--color-text-primary) !important;
+    border: none !important;
+    font-family: inherit !important;
+  }
+
+  :global(.embed-container .tweet a) {
+    color: var(--color-accent) !important;
+  }
+</style>

@@ -1,0 +1,53 @@
+---
+// YouTube.astro — lite embed: poster thumbnail at build, iframe on click
+// Wraps @astro-community/astro-embed-youtube in EmbedContainer with noscript fallback
+import { YouTube as UpstreamYouTube } from "@astro-community/astro-embed-youtube";
+import EmbedContainer from "./EmbedContainer.astro";
+
+interface Props {
+  id: string; // video ID or full YouTube URL
+  title?: string;
+  poster?: string;
+  params?: string;
+  playlabel?: string;
+}
+
+const { id, title = "YouTube video", poster, params, playlabel } = Astro.props;
+
+// Derive a clean video ID for the fallback URL.
+// Uses URL/URLSearchParams to reliably handle ?v=ID&list=PL and youtu.be/ID?t=30.
+let videoId = id;
+try {
+  const url = new URL(id);
+  if (url.hostname.includes("youtube.com")) {
+    videoId = url.searchParams.get("v") ?? id;
+  } else if (url.hostname === "youtu.be") {
+    // Strip any query params from the path segment
+    videoId = url.pathname.slice(1).split("?")[0];
+  }
+} catch {
+  // Not a URL — treat id as a raw video ID (no transformation needed)
+}
+
+const fallbackUrl = `https://www.youtube.com/watch?v=${videoId}`;
+---
+
+<EmbedContainer>
+  <UpstreamYouTube
+    id={id}
+    poster={poster}
+    params={params}
+    playlabel={playlabel ?? `Play ${title}`}
+  />
+  <noscript>
+    <a href={fallbackUrl} class="click-to-load__fallback">Watch on YouTube</a>
+  </noscript>
+</EmbedContainer>
+
+<style>
+  /* Override upstream component styles to fill container */
+  :global(.embed-container lite-youtube) {
+    max-width: 100%;
+    border-radius: 0;
+  }
+</style>

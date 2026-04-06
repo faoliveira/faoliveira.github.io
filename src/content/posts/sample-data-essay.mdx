@@ -1,0 +1,76 @@
+---
+title: "Where the Water Goes"
+date: 2026-03-21
+type: "data-essay"
+tags: ["data", "sample"]
+description: "A sample data essay demonstrating scrollytelling and breakout components."
+draft: true
+---
+
+import { ScrollySection, ScrollyStep, Wide, DataTable } from '@components/content';
+
+This is a sample data essay. The layout is visual-first — no reading time, no table of contents. Just the content and the experience.
+
+Data essays combine normal prose with scrollytelling sections and wide breakout visualizations. The text you're reading now sits in a standard `65ch` prose container, same as a regular post.
+
+## The Scrollytelling Section
+
+Below is a Pudding-style scrollytelling section. The graphic panel sticks in place while the text steps scroll past it.
+
+<ScrollySection>
+  <Fragment slot="graphic">
+    <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-family: var(--font-mono); font-size: var(--type-sm); color: var(--color-text-secondary);">
+      Sticky graphic panel — replace with a chart, image, or Svelte island
+    </div>
+  </Fragment>
+  <ScrollyStep>
+
+### Step One
+
+This is the first step. As you scroll past this card, the graphic panel on the right stays fixed in place. This is the core Pudding pattern — text drives the narrative, the visual persists.
+
+  </ScrollyStep>
+  <ScrollyStep>
+
+### Step Two
+
+The second step scrolls into view. In a real data essay, the graphic might update here — a chart highlighting a different region, a map zooming in, an animation advancing. For now, the sticky behavior is the feature.
+
+  </ScrollyStep>
+  <ScrollyStep>
+
+### Step Three
+
+The final step. After this, the scrollytelling section ends and normal prose flow resumes. The graphic unsticks as it scrolls out of view.
+
+  </ScrollyStep>
+</ScrollySection>
+
+## Back to Normal Prose
+
+After a scrollytelling section, the essay returns to the standard prose container. This is where you'd continue the narrative, add context, or transition to the next visualization.
+
+The Vinizone pattern uses `<Wide>` and `<Full>` components to break content out of the prose container — the same components available in every other post type.
+
+<Wide>
+  <DataTable caption="Urban population snapshot">
+
+| City | Population | Growth |
+|------|-----------|--------|
+| Fortaleza | 2.7M | 1.2% |
+| São Paulo | 12.3M | 0.5% |
+| Tokyo | 13.9M | -0.3% |
+| Berlin | 3.6M | 0.8% |
+
+  </DataTable>
+</Wide>
+
+## Wrapping Up
+
+This sample demonstrates the three modes of a data essay:
+
+1. **Normal prose** — standard `65ch` reading width
+2. **Scrollytelling** — sticky graphic with scrolling text steps
+3. **Breakout** — `<Wide>` and `<Full>` for data tables, charts, and images
+
+The layout ships zero client-side JavaScript. Scrollytelling is pure CSS `position: sticky`.

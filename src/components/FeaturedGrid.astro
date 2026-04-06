@@ -1,0 +1,45 @@
+---
+import FeaturedCard from "@components/FeaturedCard.astro";
+import { getFeaturedPosts } from "@modules/content";
+
+const posts = await getFeaturedPosts();
+---
+
+{posts.length > 0 && (
+  <section class="featured-grid" aria-labelledby="featured-heading">
+    <h2 id="featured-heading" class="section-heading reveal">Featured</h2>
+    <div class="grid">
+      {posts.map((post) => (
+        <div class="reveal">
+          <FeaturedCard post={post} />
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .featured-grid {
+    margin-block-end: var(--ma-vast);
+  }
+
+  .section-heading {
+    font-size: var(--type-xl);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-block-end: var(--ma-wide);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--ma-wide);
+  }
+
+  /* 768px = var(--bp-md) — CSS custom properties can't be used in media query expressions */
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

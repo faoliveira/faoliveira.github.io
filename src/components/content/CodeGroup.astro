@@ -1,0 +1,204 @@
+---
+// CodeGroup.astro — tabbed code blocks with per-tab copy button
+// Uses static named slots (tab-0 through tab-7) and Astro.slots.has() to detect content
+// Tab switching via inline script (no Svelte island — simple show/hide with ARIA)
+interface Props {
+  labels: string[];
+}
+
+const { labels } = Astro.props;
+
+// Determine which slots have content (up to 8 tabs max)
+const MAX_TABS = 8;
+
+if (import.meta.env.DEV && labels.length > MAX_TABS) {
+  console.warn(
+    `[CodeGroup] Only ${MAX_TABS} tabs are supported. Got ${labels.length} labels — extra labels will be ignored.`,
+  );
+}
+
+const activeLabels = labels.slice(0, MAX_TABS);
+const activeTabs = activeLabels
+  .map((label, i) => ({ label, i }))
+  .filter(({ i }) => Astro.slots.has(`tab-${i}`));
+
+// Deterministic ID from labels — stable across dev hot-reloads for valid ARIA relationships
+function hashLabels(items: string[]): string {
+  const str = items.join("\x00");
+  let h = 0x811c9dc5; // FNV-1a offset basis
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193); // FNV prime
+  }
+  return (h >>> 0).toString(36);
+}
+const groupId = `cg-${hashLabels(activeLabels)}`;
+---
+
+<div class="code-group" data-group-id={groupId}>
+  <div class="code-group-tabs" role="tablist" aria-label="Code examples">
+    {activeTabs.map(({ label, i }, pos) => (
+      <button
+        class="code-group-tab"
+        role="tab"
+        aria-selected={pos === 0 ? 'true' : 'false'}
+        aria-controls={`${groupId}-panel-${i}`}
+        id={`${groupId}-tab-${i}`}
+        tabindex={pos === 0 ? 0 : -1}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
+
+  <div class="code-group-panels">
+    {Astro.slots.has('tab-0') && (
+      <div class="code-group-panel" role="tabpanel" id={`${groupId}-panel-0`} aria-labelledby={`${groupId}-tab-0`}>
+        <slot name="tab-0" />
+      </div>
+    )}
+    {Astro.slots.has('tab-1') && (
+      <div class="code-group-panel" role="tabpanel" id={`${groupId}-panel-1`} aria-labelledby={`${groupId}-tab-1`} hidden>
+        <slot name="tab-1" />
+      </div>
+    )}
+    {Astro.slots.has('tab-2') && (
+      <div class="code-group-panel" role="tabpanel" id={`${groupId}-panel-2`} aria-labelledby={`${groupId}-tab-2`} hidden>
+        <slot name="tab-2" />
+      </div>
+    )}
+    {Astro.slots.has('tab-3') && (
+      <div class="code-group-panel" role="tabpanel" id={`${groupId}-panel-3`} aria-labelledby={`${groupId}-tab-3`} hidden>
+        <slot name="tab-3" />
+      </div>
+    )}
+    {Astro.slots.has('tab-4') && (
+      <div class="code-group-panel" role="tabpanel" id={`${groupId}-panel-4`} aria-labelledby={`${groupId}-tab-4`} hidden>
+        <slot name="tab-4" />
+      </div>
+    )}
+    {Astro.slots.has('tab-5') && (
+      <div class="code-group-panel" role="tabpanel" id={`${groupId}-panel-5`} aria-labelledby={`${groupId}-tab-5`} hidden>
+        <slot name="tab-5" />
+      </div>
+    )}
+    {Astro.slots.has('tab-6') && (
+      <div class="code-group-panel" role="tabpanel" id={`${groupId}-panel-6`} aria-labelledby={`${groupId}-tab-6`} hidden>
+        <slot name="tab-6" />
+      </div>
+    )}
+    {Astro.slots.has('tab-7') && (
+      <div class="code-group-panel" role="tabpanel" id={`${groupId}-panel-7`} aria-labelledby={`${groupId}-tab-7`} hidden>
+        <slot name="tab-7" />
+      </div>
+    )}
+  </div>
+</div>
+
+<script>
+  function initCodeGroups() {
+    document.querySelectorAll<HTMLElement>('.code-group').forEach((group) => {
+      const tabs = group.querySelectorAll<HTMLElement>('[role="tab"]');
+      const panels = group.querySelectorAll<HTMLElement>('[role="tabpanel"]');
+
+      // ── Tab switching ──────────────────────────────────────────────────────
+
+      function activateTab(index: number) {
+        tabs.forEach((t, i) => {
+          const isActive = i === index;
+          t.setAttribute('aria-selected', String(isActive));
+          t.tabIndex = isActive ? 0 : -1;
+        });
+        panels.forEach((p, i) => {
+          if (i === index) {
+            p.removeAttribute('hidden');
+          } else {
+            p.setAttribute('hidden', '');
+          }
+        });
+      }
+
+      tabs.forEach((tab, i) => {
+        tab.addEventListener('click', () => activateTab(i));
+        tab.addEventListener('keydown', (e: KeyboardEvent) => {
+          if (e.key === 'ArrowRight') {
+            activateTab((i + 1) % tabs.length);
+            (tabs[(i + 1) % tabs.length] as HTMLElement).focus();
+          } else if (e.key === 'ArrowLeft') {
+            const prev = (i - 1 + tabs.length) % tabs.length;
+            activateTab(prev);
+            (tabs[prev] as HTMLElement).focus();
+          }
+        });
+      });
+    });
+  }
+
+  // Re-initialize after each View Transition navigation
+  document.addEventListener('astro:page-load', initCodeGroups);
+</script>
+
+<style>
+  .code-group {
+    margin-block: var(--ma-wide);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .code-group-tabs {
+    display: flex;
+    background: var(--color-surface-alt);
+    border-bottom: 1px solid var(--color-border);
+    overflow-x: auto;
+  }
+
+  .code-group-tab {
+    padding: var(--ma-narrow) var(--ma-base);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-size: var(--type-sm);
+    font-family: var(--font-mono);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    transition:
+      color var(--motion-duration-quick) var(--motion-easing-out),
+      border-color var(--motion-duration-quick) var(--motion-easing-out);
+    margin-bottom: -1px;
+  }
+
+  .code-group-tab:hover {
+    color: var(--color-text-primary);
+  }
+
+  .code-group-tab[aria-selected="true"] {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  .code-group-tab:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    border-radius: 2px;
+  }
+
+  /* Remove extra margin/border from EC code blocks inside panels */
+  .code-group-panel :global(.expressive-code) {
+    margin: 0;
+  }
+
+  .code-group-panel :global(.expressive-code .frame) {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  .code-group-panel :global(.expressive-code pre) {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+  }
+</style>

@@ -1,0 +1,64 @@
+---
+import type { PostType } from "@modules/content";
+
+interface Props {
+  type: PostType;
+  href?: string;
+}
+
+const { type, href } = Astro.props;
+
+// Override labels for types where auto-formatting doesn't produce the right display name
+const LABELS: Record<string, string> = {
+  "data-essay": "Data Essay",
+  "nota-tecnica": "Technical Note",
+  log: "Log",
+  project: "Project",
+};
+
+const label =
+  LABELS[type] ??
+  (type
+    ? type
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ")
+    : "Unknown");
+---
+
+{
+  href ? (
+    <a class="type-tag" href={href}>
+      {label}
+    </a>
+  ) : (
+    <span class="type-tag">
+      {label}
+    </span>
+  )
+}
+
+<style>
+  .type-tag {
+    display: inline-block;
+    font-size: var(--type-sm);
+    line-height: var(--leading-sm);
+    font-weight: 500;
+    color: var(--color-accent-hover);
+    background: var(--color-accent-tint);
+    padding: var(--ma-hair) var(--ma-narrow);
+    border-radius: 3px;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  a.type-tag:hover {
+    background: var(--color-accent);
+    color: var(--color-surface);
+  }
+
+  a.type-tag:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+</style>

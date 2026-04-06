@@ -1,0 +1,127 @@
+---
+import TableOfContents from "@components/TableOfContents.astro";
+import TypeTag from "@components/TypeTag.astro";
+import type { PostType } from "@modules/content";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  readingTime: number;
+  type?: PostType;
+  reading?: boolean;
+  toc?: boolean;
+  headings?: Array<{ depth: number; slug: string; text: string }>;
+  image?: string;
+}
+
+const {
+  title,
+  description,
+  date,
+  readingTime,
+  type,
+  reading = false,
+  toc = false,
+  headings = [],
+  image,
+} = Astro.props;
+
+const formattedDate = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+}).format(date);
+
+const isoDate = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+---
+
+<BaseLayout title={title} description={description} type="article" image={image}>
+  <article class:list={[!toc && reading && "prose"]} data-post-type={type}>
+    <header class="post-header">
+      <h1>{title}</h1>
+      <div class="post-meta">
+        <time datetime={isoDate}>{formattedDate}</time>
+        <span class="meta-separator" aria-hidden="true">&middot;</span>
+        <span class="reading-time">{readingTime} min read</span>
+        {type && (
+          <>
+            <span class="meta-separator" aria-hidden="true">&middot;</span>
+            <TypeTag type={type} />
+          </>
+        )}
+      </div>
+    </header>
+    {toc ? (
+      <div class="post-with-toc">
+        <aside class="toc-sidebar">
+          <TableOfContents headings={headings} />
+        </aside>
+        <div class:list={[reading && "prose", "post-body"]}>
+          <slot />
+        </div>
+      </div>
+    ) : (
+      <slot />
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  .post-header {
+    margin-block-end: var(--ma-wide);
+  }
+
+  .post-header h1 {
+    margin-block-end: var(--ma-narrow);
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--ma-narrow);
+    font-size: var(--type-sm);
+    line-height: var(--leading-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .meta-separator {
+    user-select: none;
+  }
+
+  /* ── ToC grid layout ── */
+  .post-with-toc {
+    display: block;
+  }
+
+  .toc-sidebar {
+    /* Mobile: sidebar renders before post-body in DOM, so it appears above content */
+  }
+
+  /* Ensure ToC anchor links have scroll offset regardless of reading mode (P2) */
+  .post-with-toc :is(h2, h3) {
+    scroll-margin-top: var(--ma-spacious);
+  }
+
+  @media (min-width: 1024px) {
+    .post-with-toc {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: var(--ma-broad);
+      align-items: start;
+    }
+
+    .post-body {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .toc-sidebar {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: start; /* Explicit: prevents stretch, required for position: sticky on .toc-desktop (P5) */
+    }
+  }
+</style>

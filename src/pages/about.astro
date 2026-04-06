@@ -1,0 +1,139 @@
+---
+import { Image } from "astro:assets";
+import avatarSrc from "@assets/profile_avatar.webp";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { ABOUT_DESCRIPTION, SITE_URL } from "@modules/seo";
+---
+
+<BaseLayout title="About — felipeo.me" description={ABOUT_DESCRIPTION} image={`${SITE_URL}/og/about.png`}>
+  <noscript slot="head"><style>.email-link { display: none !important; }</style></noscript>
+  <article class="prose-container">
+    <h1>About</h1>
+
+    <p>I don't have a five-year plan. I have seventeen browser tabs open and a dog who won't rest until someone throws the ball again.</p>
+
+    <Image
+      src={avatarSrc}
+      alt="Felipe Oliveira"
+      width={200}
+      height={200}
+      densities={[1, 2]}
+      loading="eager"
+      fetchpriority="high"
+      class="profile-avatar"
+    />
+
+    <p class="reveal">My name is Felipe Augusto — <span class="fa-highlight">FA</span>, like the note. Born in Fortaleza, living in São Paulo. I work as a data analyst. People either ask a lot of follow-up questions or immediately change the subject. Both make sense.</p>
+
+    <p class="reveal">This site is inspired by the koubou, Japanese for workshop. A craftsperson's small space, organized for making rather than showing off. That felt like the right idea.</p>
+
+    <p class="reveal">So this is where I write. About whatever is on my mind: projects I'm building, ideas that feel important at 11pm and somewhat revisable by morning, things I noticed and couldn't leave alone. Occasionally about typefaces, which is apparently who I am now.</p>
+
+    <p class="reveal">If this sounds like your kind of thing — <a href="javascript:void(0)" class="email-link">write me</a><noscript> (enable JavaScript to reveal my email)</noscript>.</p>
+
+    <p class="privacy-note">This site uses GoatCounter for analytics. No cookies, no personal data. <a href="/privacy/">Privacy policy.</a></p>
+  </article>
+</BaseLayout>
+
+<script>
+  function initEmailLink() {
+    const link = document.querySelector('article.prose-container .email-link') as HTMLAnchorElement | null;
+    if (!link || link.href.includes('mailto:')) return;
+    const rot13 = (s: string) => s.replace(/[a-zA-Z]/g, c => {
+      const base = c < 'a' ? 65 : 97;
+      return String.fromCharCode(((c.charCodeAt(0) - base + 13) % 26) + base);
+    });
+    link.href = 'mailto:' + rot13('sryvcr@sryvcrb.zr');
+  }
+  // Run on initial load (MPA hard navigation) and on View Transition soft navigation
+  initEmailLink();
+  document.addEventListener('astro:page-load', initEmailLink);
+</script>
+
+<style>
+  .prose-container {
+    max-width: 65ch;
+    margin-inline: auto;
+    color: var(--color-text-primary);
+  }
+
+  .prose-container h1 {
+    font-size: clamp(var(--type-2xl), 5vw, var(--type-3xl));
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-block-end: var(--ma-broad);
+  }
+
+  .prose-container p {
+    font-size: var(--type-base);
+    line-height: 1.7;
+    margin-block-end: var(--ma-wide);
+  }
+
+  .prose-container p:last-child {
+    margin-block-end: 0;
+  }
+
+  .profile-avatar {
+    display: block;
+    width: 200px;
+    height: 200px;
+    max-width: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-inline: auto;
+    margin-block: var(--ma-broad);
+  }
+
+  .prose-container a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+  }
+
+  .prose-container a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .prose-container a:active {
+    color: var(--color-accent-hover);
+    text-decoration-color: var(--color-accent-hover);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .prose-container a {
+      transition:
+        color var(--motion-duration-quick) var(--motion-easing-out),
+        text-decoration-color var(--motion-duration-quick) var(--motion-easing-out);
+    }
+  }
+
+  @media (hover: hover) {
+    .prose-container a:hover {
+      color: var(--color-accent-hover);
+      text-decoration-color: var(--color-accent-hover);
+    }
+  }
+
+  .fa-highlight {
+    background: var(--color-accent-tint);
+    padding-inline: 0.15em;
+    border-radius: 2px;
+    display: inline-block;
+    transform: rotate(-1.5deg);
+  }
+
+  @media (forced-colors: active) {
+    .fa-highlight {
+      background: transparent;
+    }
+  }
+
+  .privacy-note {
+    margin-block-start: var(--ma-broad);
+    font-size: var(--type-sm);
+    color: var(--color-text-tertiary);
+  }
+</style>

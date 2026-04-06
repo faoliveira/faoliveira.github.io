@@ -1,0 +1,68 @@
+/* src/styles/animations.css */
+/* Scroll-driven reveal + prefers-reduced-motion kill-switch */
+
+/* ── Scroll-driven entrance ── */
+
+/* Base: .reveal elements are visible by default (progressive enhancement).
+   The hidden+animate state is only applied in browsers that support animation-timeline: view().
+   IMPORTANT: Do NOT apply .reveal to elements visible on initial page load (above the fold).
+   For above-fold elements, animation-range: entry 0% entry 30% is already past on load —
+   the element would stay at opacity: 0 permanently. */
+.reveal {
+  /* intentionally no hidden state here — visible by default for unsupported browsers */
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    animation-name: reveal-entrance;
+    animation-timing-function: var(--motion-easing-out);
+    animation-fill-mode: both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 30%;
+  }
+}
+
+@keyframes reveal-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── prefers-reduced-motion: central kill-switch for all site motion ── */
+@media (prefers-reduced-motion: reduce) {
+  /* Reset scroll reveals — elements appear immediately */
+  .reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  /* Override all motion token durations to 0ms — cascades to nightfall + future animations */
+  :root {
+    --motion-duration-quick: 0ms;
+    --motion-duration-normal: 0ms;
+    --motion-duration-smooth: 0ms;
+    --motion-duration-reveal: 0ms;
+  }
+
+  /* Belt-and-suspenders: ensure no animation or transition runs anywhere.
+     Uses 0.01ms (not 0ms) — intentional workaround for a Safari 10–14 layout bug
+     where animation-duration: 0 can cause unexpected reflows. Imperceptible in practice. */
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: required to override any animation regardless of specificity — standard prefers-reduced-motion pattern */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: required to override any animation regardless of specificity — standard prefers-reduced-motion pattern */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: required to override any animation regardless of specificity — standard prefers-reduced-motion pattern */
+    transition-duration: 0.01ms !important;
+  }
+}

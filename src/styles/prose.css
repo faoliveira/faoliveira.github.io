@@ -1,0 +1,224 @@
+/* src/styles/prose.css */
+/* Comprehensive prose element styling — layers on top of typography.css .prose rules */
+
+/* ── Headings (h5 spacing — h2–h4 handled in typography.css) ── */
+.prose h5 {
+  margin-top: calc(var(--leading-base) * 1.5rem);
+  margin-bottom: calc(var(--leading-base) * 0.5rem);
+}
+
+/* ── Blockquotes (Enhanced) ── */
+.prose blockquote {
+  border-inline-start: 2px solid var(--color-accent-tint);
+  padding-inline-start: var(--ma-base);
+  margin-block: calc(var(--leading-base) * 1rem);
+  color: var(--color-text-secondary);
+  font-size: var(--type-sm);
+}
+
+.prose blockquote blockquote {
+  margin-inline-start: var(--ma-base);
+  border-inline-start: none;
+}
+
+/* ── Tables ── */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  margin-block: calc(var(--leading-base) * 1rem);
+}
+
+.prose thead {
+  background: var(--color-surface-alt);
+}
+
+.prose th,
+.prose td {
+  padding: var(--ma-narrow) var(--ma-base);
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.prose th {
+  font-weight: 600;
+}
+
+/* ── Horizontal Rules (Enhanced) ── */
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin-block: var(--ma-spacious);
+}
+
+/* ── Lists (Enhanced — nested depth) ── */
+.prose ul ul,
+.prose ol ol,
+.prose ul ol,
+.prose ol ul {
+  opacity: var(--opacity-muted);
+  margin-block: calc(var(--leading-base) * 0.25rem);
+}
+
+.prose ul ul ul,
+.prose ol ol ol {
+  font-size: var(--type-sm);
+}
+
+/* List item spacing override — AC4: var(--ma-narrow) */
+.prose li + li {
+  margin-top: var(--ma-narrow);
+}
+
+/* ── Task Lists / Checkboxes ── */
+.prose .contains-task-list {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+.prose .task-list-item {
+  position: relative;
+  padding-inline-start: var(--ma-list-indent);
+}
+
+.prose .task-list-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: absolute;
+  left: 0;
+  top: 0.25em;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 2px;
+  background: var(--color-surface);
+}
+
+.prose .task-list-item input[type="checkbox"]:checked {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.prose .task-list-item input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.prose .task-list-item input[type="checkbox"]:checked::after {
+  content: "\2713";
+  color: var(--color-surface);
+  font-size: var(--type-xs);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Definition Lists ── */
+.prose dt {
+  font-weight: 700;
+}
+
+.prose dd {
+  margin-inline-start: var(--ma-base);
+}
+
+.prose dt + dd {
+  margin-block-start: var(--ma-narrow);
+}
+
+.prose dd + dt {
+  margin-block-start: var(--ma-narrow);
+}
+
+/* ── Footnotes ── */
+.prose [data-footnotes] {
+  margin-top: var(--ma-spacious);
+  padding-top: var(--ma-base);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--type-sm);
+  color: var(--color-text-secondary);
+}
+
+.prose sup a[data-footnote-ref] {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.prose [data-footnote-backref] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+}
+
+/* ── Inline Elements ── */
+.prose mark {
+  background: var(--color-accent-tint);
+  color: inherit;
+}
+
+.prose abbr {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+.prose kbd {
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  padding: var(--ma-hair) var(--ma-thin);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface-alt);
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+.prose del {
+  text-decoration: line-through;
+}
+
+.prose sub,
+.prose sup {
+  font-size: var(--type-xs);
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+.prose sup {
+  top: -0.5em;
+}
+
+.prose sub {
+  bottom: -0.25em;
+}
+
+/* ── Images ── */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.prose figure {
+  margin-block: calc(var(--leading-base) * 1.5rem);
+  margin-inline: 0;
+}
+
+.prose figcaption {
+  margin-top: var(--ma-narrow);
+  font-size: var(--type-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* ── Post-Type Variants ── */
+/* Both selectors needed: descendant (ToC path) and same-element (no-ToC path in PostLayout) */
+[data-post-type="log"] .prose,
+[data-post-type="log"].prose {
+  max-width: 55ch;
+  line-height: 1.6;
+}

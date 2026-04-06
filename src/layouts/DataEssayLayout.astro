@@ -1,0 +1,81 @@
+---
+import TypeTag from "@components/TypeTag.astro";
+import type { PostType } from "@modules/content";
+import { toISODateString } from "@modules/content";
+import BaseLayout from "./BaseLayout.astro";
+import "../styles/data-essay.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  type?: PostType;
+  image?: string;
+}
+
+const { title, description, date, type, image } = Astro.props;
+const isoDate = toISODateString(date);
+
+const day = String(date.getUTCDate());
+const month = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  timeZone: "UTC",
+})
+  .format(date)
+  .toUpperCase();
+const year = date.getUTCFullYear();
+---
+
+<BaseLayout title={title} description={description} type="article" image={image}>
+  <article class="data-essay-article" data-post-type="data-essay">
+    <header class="data-essay-header">
+      <h1 class="data-essay-title">{title}</h1>
+      {description && <p class="data-essay-description">{description}</p>}
+      <div class="data-essay-meta">
+        <time datetime={isoDate}>{month} {day}, {year}</time>
+        {type && <TypeTag type={type} />}
+      </div>
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <footer class="back-link-footer">
+      <a href="/posts/" class="back-link">&larr; all posts</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .data-essay-article {
+    margin-block-start: calc(var(--ma-spacious) - var(--ma-broad));
+  }
+
+  .back-link-footer {
+    max-width: 65ch;
+    margin-inline: auto;
+    margin-block-start: var(--ma-spacious);
+    padding-block-start: var(--ma-wide);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  .back-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) {
+    .back-link:hover {
+      color: var(--color-accent);
+    }
+  }
+</style>

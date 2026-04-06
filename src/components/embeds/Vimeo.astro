@@ -1,0 +1,52 @@
+---
+// Vimeo.astro — lite embed: poster thumbnail at build, iframe on click
+// Wraps @astro-community/astro-embed-vimeo in EmbedContainer with noscript fallback
+import { Vimeo as UpstreamVimeo } from "@astro-community/astro-embed-vimeo";
+import EmbedContainer from "./EmbedContainer.astro";
+
+interface Props {
+  id: string; // video ID or full Vimeo URL
+  title?: string;
+  poster?: string;
+  params?: string;
+  playlabel?: string;
+}
+
+const { id, title = "Vimeo video", poster, params, playlabel } = Astro.props;
+
+// Derive a clean video ID for the fallback URL.
+// Extracts the last *numeric* path segment to handle channel/album URLs like
+// vimeo.com/album/12345/video/67890 → 67890, and avoids vimeo.com/ → vimeo.com.
+let videoId = id;
+try {
+  const url = new URL(id);
+  if (url.hostname.includes("vimeo.com")) {
+    const segments = url.pathname.split("/").filter(Boolean);
+    const numericId = segments.reverse().find((s) => /^\d+$/.test(s));
+    videoId = numericId ?? id;
+  }
+} catch {
+  // Not a URL — treat id as a raw video ID (no transformation needed)
+}
+
+const fallbackUrl = `https://vimeo.com/${videoId}`;
+---
+
+<EmbedContainer>
+  <UpstreamVimeo
+    id={id}
+    poster={poster}
+    params={params}
+    playlabel={playlabel ?? `Play ${title}`}
+  />
+  <noscript>
+    <a href={fallbackUrl} class="click-to-load__fallback">Watch on Vimeo</a>
+  </noscript>
+</EmbedContainer>
+
+<style>
+  :global(.embed-container lite-vimeo) {
+    max-width: 100%;
+    border-radius: 0;
+  }
+</style>

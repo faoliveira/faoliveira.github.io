@@ -1,0 +1,16 @@
+---
+// Wide.astro — breaks out of .prose (65ch) to min(1000px, 95vw)
+// Uses the calc(50% - width/2) negative margin technique to escape centered prose container
+---
+
+<div class="wide">
+  <slot />
+</div>
+
+<style>
+  .wide {
+    --wide-max: min(1000px, 95vw);
+    width: var(--wide-max);
+    margin-left: calc(50% - var(--wide-max) / 2);
+  }
+</style>

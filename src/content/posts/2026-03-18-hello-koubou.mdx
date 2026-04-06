@@ -1,0 +1,129 @@
+---
+title: "Hello, Koubou"
+date: 2026-03-18
+type: "reflection"
+tags: ["meta", "design"]
+description: "The workshop is open. I don't know what I'm making yet, which feels about right."
+draft: false
+featured: false
+reading: true
+toc: true
+---
+
+import TestCounter from '@islands/TestCounter.svelte';
+import IslandPlaceholder from '@components/IslandPlaceholder.astro';
+
+## The Workshop Opens
+
+This is the first post written inside the new site — a small koubou tucked into the internet.
+Not a blog in the traditional sense. More like a workbench where things get made and examined.
+
+### Why Rebuild From Scratch?
+
+The old site was a theme someone else made for content I barely published. It felt like wearing someone else's apron.
+
+This new one is different. Every token, every spacing decision, every color was chosen deliberately:
+
+- Warm off-white paper texture instead of stark white
+- Ink-on-paper contrast instead of flat grays
+- Motion that breathes, not bounces
+
+### The Stack
+
+The site runs on `Astro 6` with strict TypeScript. No runtime JavaScript unless it earns its place.
+Content is a first-class domain — posts live in a typed collection, validated at build time.
+
+```ts
+// If the frontmatter is wrong, the build breaks. Not the visitor's experience.
+const posts = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
+  schema: PostSchema,
+});
+```
+
+### What Comes Next
+
+The koubou is open. Now it needs to fill with work.
+
+Posts about data, design, software, and the occasional tangent.
+Written when there's something worth saying — not on a schedule.
+
+---
+
+## Code Block Showcase
+
+A few examples to verify syntax highlighting, copy button, and horizontal scroll.
+
+### Python
+
+```python
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class Post:
+    title: str
+    slug: str
+    reading_time: int
+    draft: bool = True
+    description: Optional[str] = None
+
+    def is_published(self) -> bool:
+        return not self.draft
+```
+
+### Shell — Long Line
+
+```bash
+bun run build && echo "Build succeeded — dist/ is ready for deployment to GitHub Pages via gh-pages branch" && ls -lh dist/
+```
+
+### CSS
+
+```css
+.prose pre {
+  background-color: var(--color-code-surface) !important;
+  border-radius: 6px;
+  padding: var(--ma-base);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+}
+```
+
+### JSON
+
+```json
+{
+  "name": "faoliveira.github.io",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "check": "astro check",
+    "test": "vitest"
+  }
+}
+```
+
+Inline code also works: `const greeting = "Hello, Koubou"` renders distinctly from prose.
+
+---
+
+## Interactive Islands
+
+Astro islands allow individual components to hydrate independently — the rest of the page stays static HTML.
+
+A test island with `client:visible` — hydrates when scrolled into view:
+
+<TestCounter client:visible label="Click Counter" />
+
+A test island with `client:idle` — hydrates after the page is idle (`requestIdleCallback`):
+
+<TestCounter client:idle label="Idle Counter" initialCount={10} />
+
+The `IslandPlaceholder` component provides a styled fallback wrapper for cases where an island needs a meaningful static description before hydration:
+
+<IslandPlaceholder label="Interactive component">
+  This content is always visible, even when JavaScript is blocked.
+</IslandPlaceholder>

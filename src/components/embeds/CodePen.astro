@@ -1,0 +1,152 @@
+---
+// CodePen.astro — custom click-to-load CodePen embed
+// No community package available. Reads dark/light theme at click time.
+import type { CodePenTab } from "./codepen-utils";
+import { buildCodePenLink, sanitizeCodePenSlug } from "./codepen-utils";
+import EmbedContainer from "./EmbedContainer.astro";
+
+interface Props {
+  id: string;
+  user: string;
+  tab?: CodePenTab;
+  height?: number;
+}
+
+const { id, user, tab = "result", height = 400 } = Astro.props;
+
+const safeId = sanitizeCodePenSlug(id);
+const safeUser = sanitizeCodePenSlug(user);
+const linkUrl = buildCodePenLink(safeUser, safeId);
+---
+
+<EmbedContainer>
+  <div
+    class="codepen-click-to-load"
+    data-id={safeId}
+    data-user={safeUser}
+    data-tab={tab}
+    data-height={height}
+  >
+    <!-- tabindex="-1": allows programmatic focus after load without entering natural tab order -->
+    <div
+      class="click-to-load__placeholder codepen-placeholder"
+      style={`height: ${height}px`}
+      tabindex="-1"
+    >
+      <!-- CodePen logo SVG (using currentColor) -->
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 138 26"
+        fill="currentColor"
+        aria-hidden="true"
+        class="codepen-placeholder__icon"
+      >
+        <path d="M80.334 6.666l-11.667-7.778a1.667 1.667 0 0 0-1.834 0L55.166 6.666A1.667 1.667 0 0 0 54.5 8v10a1.667 1.667 0 0 0 .767 1.412l11.666 7.778a1.667 1.667 0 0 0 1.834 0l11.667-7.778A1.667 1.667 0 0 0 81 18V8a1.667 1.667 0 0 0-.666-1.334zm-12.5-4.556L77.082 8.5 72.917 11.25 67.834 7.917V2.11zm-3.334 0v5.806l-5.083 3.333L55.334 8.5l9.166-6.055zM56 10.861l3.25 2.139L56 15.139V10.861zM64.5 23.889l-9.166-6.056 4.083-2.722 5.083 3.334v5.444zm1.667-7.527L62.25 14l3.917-2.583L70.084 14l-3.917 2.362zm1.666 7.527V18.445l5.084-3.334 4.083 2.722L67.833 23.89zm8.5-8.75L79.5 13l-3.25-2.139L79.5 8.861 79.5 15.14zm-22.5-55.14H0v26h138V-40H53.833z"/>
+      </svg>
+      <button
+        class="click-to-load__button"
+        aria-label="Load CodePen embed"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </button>
+      <!-- Always-visible link satisfies AC12 for both JS-enabled and no-JS visitors -->
+      <a href={linkUrl} class="codepen-placeholder__link">View on CodePen</a>
+    </div>
+  </div>
+</EmbedContainer>
+
+<script>
+  const ALLOWED_TABS = ["result", "html", "css", "js"] as const;
+
+  function initCodePen(root: Document | HTMLElement = document) {
+    root.querySelectorAll<HTMLElement>(".codepen-click-to-load").forEach((wrapper) => {
+      const button = wrapper.querySelector<HTMLButtonElement>(".click-to-load__button");
+      if (!button || button.dataset.initialized) return;
+      button.dataset.initialized = "true";
+
+      button.addEventListener("click", () => {
+        // Disable immediately to prevent double-click double-inject
+        button.disabled = true;
+
+        const id = wrapper.dataset.id;
+        const user = wrapper.dataset.user;
+        if (!id || !user) return;
+
+        // Validate tab against allowed values at runtime (dataset is a plain string)
+        const rawTab = wrapper.dataset.tab ?? "result";
+        const tab = (ALLOWED_TABS as readonly string[]).includes(rawTab) ? rawTab : "result";
+
+        // Validate height: parseInt + floor at 50px to prevent zero/invalid heights
+        const rawHeight = wrapper.dataset.height;
+        const height = Math.max(parseInt(rawHeight ?? "400", 10) || 400, 50);
+
+        // Read theme at click time (not build time)
+        const isDark = document.documentElement.dataset.theme === "nightfall";
+        const themeId = isDark ? "dark" : "light";
+        const src = `https://codepen.io/${user}/embed/${id}?default-tab=${tab}&theme-id=${themeId}`;
+
+        wrapper.classList.add("click-to-load--loading");
+
+        const iframe = document.createElement("iframe");
+        iframe.src = src;
+        iframe.title = `CodePen by ${user}: ${id}`;
+        iframe.loading = "lazy";
+        // CodePen pens do not require autoplay or encrypted-media
+        iframe.allow = "";
+        iframe.style.width = "100%";
+        iframe.style.height = `${height}px`;
+        iframe.style.border = "none";
+        iframe.style.display = "block";
+
+        const placeholder = wrapper.querySelector(".click-to-load__placeholder");
+        if (placeholder) {
+          wrapper.replaceChild(iframe, placeholder);
+        } else {
+          wrapper.appendChild(iframe);
+        }
+
+        // P-5: remove loading skeleton only after iframe content is ready
+        iframe.addEventListener(
+          "load",
+          () => {
+            wrapper.classList.remove("click-to-load--loading");
+            // Focus wrapper to signal embed loaded to AT without trapping keyboard
+            // inside a cross-origin document (WCAG 2.1.2)
+            wrapper.focus();
+          },
+          { once: true },
+        );
+
+        // Best-effort error recovery for network-level failures
+        iframe.addEventListener(
+          "error",
+          () => {
+            wrapper.classList.remove("click-to-load--loading");
+            const errorDiv = document.createElement("div");
+            const link = document.createElement("a");
+            link.href = `https://codepen.io/${user}/pen/${id}`;
+            link.textContent = "View on CodePen →";
+            link.className = "click-to-load__fallback";
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            errorDiv.appendChild(link);
+            wrapper.replaceChild(errorDiv, iframe);
+          },
+          { once: true },
+        );
+      });
+    });
+  }
+
+  initCodePen();
+  document.addEventListener("astro:page-load", () => initCodePen());
+</script>

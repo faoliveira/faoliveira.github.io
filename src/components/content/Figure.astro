@@ -1,0 +1,51 @@
+---
+// Figure.astro — semantic figure with figcaption
+// Respects parent width by default; composes with Wide/Full for wider display
+//
+// Usage patterns:
+//   Local asset (optimized): <Figure src={import("@assets/photo.jpg")} alt="..." width={800} height={600} />
+//   External URL (raw img):  <Figure src="https://example.com/photo.jpg" alt="..." width={800} height={600} />
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  src: string | ImageMetadata;
+  alt: string;
+  caption?: string;
+  width?: number;
+  height?: number;
+}
+
+const { src, alt, caption, width, height } = Astro.props;
+const isLocalAsset = typeof src !== "string";
+---
+
+<figure class="figure">
+  {isLocalAsset ? (
+    <Image src={src} alt={alt} width={width} height={height} loading="lazy" />
+  ) : (
+    <img src={src} alt={alt} width={width} height={height} loading="lazy" />
+  )}
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    margin-block: var(--ma-wide);
+  }
+
+  .figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+  }
+
+  .figure figcaption {
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    margin-top: var(--ma-narrow);
+    font-family: var(--font-mono);
+    text-align: center;
+  }
+</style>

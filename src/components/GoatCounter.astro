@@ -1,0 +1,29 @@
+---
+// GoatCounter analytics integration.
+// Privacy-respecting, cookieless, no personal data stored.
+// https://www.goatcounter.com
+---
+<script
+  data-goatcounter="https://kazary.goatcounter.com/count"
+  async
+  src="//gc.zgo.at/count.js"
+  is:inline
+></script>
+<script>
+  // Re-trigger GoatCounter on Astro View Transition soft navigation.
+  // Skip the first event — the GoatCounter script handles the initial page view on load.
+  declare global {
+    interface Window {
+      goatcounter?: { count: (vars?: Record<string, unknown>) => void };
+    }
+  }
+
+  let firstLoad = true;
+  document.addEventListener("astro:page-load", () => {
+    if (firstLoad) {
+      firstLoad = false;
+      return;
+    }
+    window.goatcounter?.count();
+  });
+</script>

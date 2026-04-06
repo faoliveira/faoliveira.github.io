@@ -1,0 +1,37 @@
+---
+interface Props {
+  label?: string;
+}
+
+const { label } = Astro.props;
+---
+
+<div class="island-placeholder">
+  {label && <span class="island-placeholder-label">{label}</span>}
+  <slot><span class="island-placeholder-default">Interactive content</span></slot>
+</div>
+
+<style>
+  .island-placeholder {
+    background: var(--color-surface-alt);
+    padding: var(--ma-base);
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .island-placeholder-default {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+  }
+
+  .island-placeholder-label {
+    display: block;
+    margin-bottom: var(--ma-narrow);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+  }
+</style>

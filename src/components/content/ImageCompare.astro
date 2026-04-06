@@ -1,0 +1,65 @@
+---
+// ImageCompare.astro — Astro wrapper for the ImageCompare Svelte island
+// Static fallback: both images stacked vertically when JS is unavailable
+import ImageCompareIsland from "@islands/ImageCompare.svelte";
+
+interface Props {
+  before: string;
+  after: string;
+  beforeAlt: string;
+  afterAlt: string;
+  beforeLabel?: string;
+  afterLabel?: string;
+}
+
+const { before, after, beforeAlt, afterAlt, beforeLabel, afterLabel } = Astro.props;
+---
+
+<ImageCompareIsland
+  client:visible
+  before={before}
+  after={after}
+  beforeAlt={beforeAlt}
+  afterAlt={afterAlt}
+  beforeLabel={beforeLabel}
+  afterLabel={afterLabel}
+/>
+
+<noscript>
+  <div class="image-compare-fallback">
+    <figure>
+      <img src={before} alt={beforeAlt} loading="lazy" />
+      {beforeLabel && <figcaption>{beforeLabel}</figcaption>}
+    </figure>
+    <figure>
+      <img src={after} alt={afterAlt} loading="lazy" />
+      {afterLabel && <figcaption>{afterLabel}</figcaption>}
+    </figure>
+  </div>
+</noscript>
+
+<style>
+  .image-compare-fallback {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ma-base);
+  }
+
+  .image-compare-fallback figure {
+    margin: 0;
+  }
+
+  .image-compare-fallback img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .image-compare-fallback figcaption {
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    text-align: center;
+    margin-top: var(--ma-thin);
+  }
+</style>

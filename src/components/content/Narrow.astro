@@ -1,0 +1,15 @@
+---
+// Narrow.astro — constrains content further to 45ch, centered
+// For pull quotes, highlighted passages — narrower than the 65ch prose measure
+---
+
+<div class="narrow">
+  <slot />
+</div>
+
+<style>
+  .narrow {
+    max-width: 45ch;
+    margin-inline: auto;
+  }
+</style>

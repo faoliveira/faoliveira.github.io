@@ -1,0 +1,130 @@
+/* Data Essay Layout — header, meta, scrollytelling */
+
+/* Header */
+.data-essay-header {
+  max-width: 65ch;
+  margin-inline: auto;
+  text-align: center;
+  margin-block-end: var(--ma-spacious);
+}
+
+.data-essay-title {
+  font-size: var(--type-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-block-end: 0;
+}
+
+.data-essay-description {
+  color: var(--color-text-secondary);
+  font-size: var(--type-lg);
+  margin-block-start: var(--ma-base);
+  margin-block-end: 0;
+}
+
+.data-essay-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--ma-base);
+  margin-block-start: var(--ma-wide);
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Scrollytelling Section */
+.scrolly-section {
+  display: flex;
+  gap: var(--ma-broad);
+  margin-block: var(--ma-spacious);
+  position: relative;
+}
+
+.scrolly-text {
+  flex: 0 0 40%;
+  min-width: 0;
+}
+
+.scrolly-graphic {
+  flex: 0 0 60%;
+  position: sticky;
+  top: 10vh;
+  height: 80vh;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ScrollyStep cards */
+.scrolly-step {
+  padding: var(--ma-wide);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  opacity: 0.95;
+  margin-bottom: 80vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.scrolly-step:last-child {
+  margin-bottom: var(--ma-spacious);
+}
+
+/* Nightfall adjustments */
+html[data-theme="nightfall"] .scrolly-step {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Reduced motion: keep layout, disable scroll-driven effects */
+@media (prefers-reduced-motion: reduce) {
+  .scrolly-graphic {
+    position: static;
+    height: auto;
+    min-height: 40vh;
+  }
+
+  .scrolly-step {
+    margin-bottom: var(--ma-spacious);
+  }
+}
+
+/* Mobile (< 768px): stack layout */
+@media (max-width: 767px) {
+  .scrolly-section {
+    flex-direction: column;
+    gap: var(--ma-base);
+  }
+
+  .scrolly-text {
+    flex: 1 1 auto;
+    order: 2;
+  }
+
+  .scrolly-graphic {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 50vh;
+    top: 0;
+    order: 1;
+  }
+
+  .scrolly-step {
+    margin-bottom: 50vh;
+  }
+
+  .scrolly-step:last-child {
+    margin-bottom: var(--ma-wide);
+  }
+
+  .data-essay-title {
+    font-size: var(--type-2xl);
+  }
+}
+
+/* noscript fallback: injected by ScrollySection as <noscript><style> */

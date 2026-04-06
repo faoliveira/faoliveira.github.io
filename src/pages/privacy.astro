@@ -1,0 +1,100 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Privacy — felipeo.me"
+  description="What this site tracks and what it doesn't."
+>
+  <article class="prose-container">
+    <h1>Privacy</h1>
+
+    <p>
+      This site uses <a href="https://www.goatcounter.com">GoatCounter</a> for analytics.
+      Each visit records the page path, referrer, browser and OS, screen size, and the
+      country your IP maps to. The IP itself is discarded. No cookies, no fingerprinting,
+      no trail that follows you anywhere else.
+    </p>
+
+    <p>
+      I check it occasionally to understand what gets read. Sometimes I find out nobody
+      read a thing, which is its own kind of useful information.
+    </p>
+
+    <p>
+      To opt out, visit any page on this site with <code>#toggle-goatcounter</code> at the
+      end of the URL. A dialog will confirm the change. The preference is saved in your
+      browser's localStorage and persists across visits.
+    </p>
+
+    <p>
+      Full policy at <a href="https://www.goatcounter.com/help/privacy">goatcounter.com/help/privacy</a>.
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .prose-container {
+    max-width: 65ch;
+    margin-inline: auto;
+    color: var(--color-text-primary);
+  }
+
+  .prose-container h1 {
+    font-size: clamp(var(--type-2xl), 5vw, var(--type-3xl));
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-block-end: var(--ma-broad);
+  }
+
+  .prose-container p {
+    font-size: var(--type-base);
+    line-height: 1.7;
+    margin-block-end: var(--ma-wide);
+  }
+
+  .prose-container p:last-child {
+    margin-block-end: 0;
+  }
+
+  .prose-container code {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.875em;
+    background: var(--color-code-surface);
+    padding-inline: 0.3em;
+    padding-block: 0.1em;
+    border-radius: 3px;
+  }
+
+  .prose-container a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+  }
+
+  .prose-container a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .prose-container a:active {
+    color: var(--color-accent-hover);
+    text-decoration-color: var(--color-accent-hover);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .prose-container a {
+      transition:
+        color var(--motion-duration-quick) var(--motion-easing-out),
+        text-decoration-color var(--motion-duration-quick) var(--motion-easing-out);
+    }
+  }
+
+  @media (hover: hover) {
+    .prose-container a:hover {
+      color: var(--color-accent-hover);
+      text-decoration-color: var(--color-accent-hover);
+    }
+  }
+</style>

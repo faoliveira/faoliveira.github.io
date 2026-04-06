@@ -1,0 +1,25 @@
+---
+// No props needed — self-contained accessibility component
+---
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: var(--ma-base);
+    z-index: 10000; /* above texture overlay (z-index: 9999) */
+    padding: var(--ma-narrow) var(--ma-base);
+    background: var(--color-accent);
+    color: var(--color-surface);
+    font-family: var(--font-sans);
+    font-size: var(--type-sm);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .skip-link:focus-visible {
+    top: 0;
+  }
+</style>

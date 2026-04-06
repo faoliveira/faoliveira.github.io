@@ -1,0 +1,27 @@
+---
+// Divider.astro — semantic hr with decorative koubou dot treatment
+// More prominent than the default .prose hr
+---
+
+<hr class="divider" />
+
+<style>
+  .divider {
+    border: none;
+    margin-block: var(--ma-spacious);
+    position: relative;
+    height: 0;
+  }
+
+  .divider::after {
+    content: '· · ·';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-text-tertiary);
+    font-size: var(--type-lg);
+    letter-spacing: 0.4em;
+    white-space: nowrap;
+  }
+</style>

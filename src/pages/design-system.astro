@@ -1,0 +1,148 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+// This page is intentionally public — static output has no request context for runtime guards.
+// noindex={true} disables crawler indexing; nopagefind={true} excludes from Pagefind search index.
+
+// SYNC: these value strings must match src/styles/tokens.css — they are display-only labels,
+// not live CSS values. Update manually whenever token values change.
+const colorTokens = [
+  { name: "--color-surface", value: "oklch(0.96 0.012 80)", label: "Surface" },
+  { name: "--color-surface-alt", value: "oklch(0.91 0.018 80)", label: "Surface Alt" },
+  { name: "--color-text-primary", value: "oklch(0.22 0.02 60)", label: "Text Primary" },
+  { name: "--color-text-secondary", value: "oklch(0.45 0.02 60)", label: "Text Secondary" },
+  { name: "--color-text-tertiary", value: "oklch(0.55 0.015 60)", label: "Text Tertiary" },
+  { name: "--color-accent", value: "oklch(0.50 0.10 155)", label: "Accent" },
+  { name: "--color-accent-hover", value: "oklch(0.44 0.11 155)", label: "Accent Hover" },
+  { name: "--color-accent-tint", value: "oklch(0.50 0.10 155 / 0.1)", label: "Accent Tint" },
+  { name: "--color-border", value: "oklch(0.85 0.01 80)", label: "Border" },
+  { name: "--color-code-surface", value: "oklch(0.94 0.008 80)", label: "Code Surface" },
+];
+
+const spacingTokens = [
+  { name: "--ma-hair", value: "2px" },
+  { name: "--ma-thin", value: "4px" },
+  { name: "--ma-narrow", value: "8px" },
+  { name: "--ma-base", value: "16px" },
+  { name: "--ma-wide", value: "24px" },
+  { name: "--ma-broad", value: "32px" },
+  { name: "--ma-spacious", value: "48px" },
+  { name: "--ma-vast", value: "64px" },
+  { name: "--ma-breath", value: "96px" },
+  { name: "--ma-silence", value: "128px" },
+];
+
+const typeTokens = [
+  { token: "--type-xs", size: "0.75rem", label: "xs — 12px", usage: "captions, timestamps" },
+  { token: "--type-sm", size: "0.875rem", label: "sm — 14px", usage: "metadata, tags" },
+  { token: "--type-base", size: "1rem", label: "base — 16px", usage: "body text" },
+  { token: "--type-md", size: "1.125rem", label: "md — 18px", usage: "lead paragraphs" },
+  { token: "--type-lg", size: "1.25rem", label: "lg — 20px", usage: "h4" },
+  { token: "--type-xl", size: "1.5rem", label: "xl — 24px", usage: "h3" },
+  { token: "--type-2xl", size: "1.875rem", label: "2xl — 30px", usage: "h2" },
+  { token: "--type-3xl", size: "2.25rem", label: "3xl — 36px", usage: "h1" },
+  { token: "--type-4xl", size: "3rem", label: "4xl — 48px", usage: "display/hero" },
+];
+---
+
+<BaseLayout title="Design System Preview" noindex={true} nopagefind={true}>
+  <div style="padding: 2rem; max-width: 900px; margin: 0 auto;">
+    <h1>Design Tokens</h1>
+
+    <h2>Colors</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+      {colorTokens.map(token => (
+        <div>
+          <div style={`width: 80px; height: 80px; background: var(${token.name}); border: 1px solid var(--color-border);`} />
+          <small>{token.label}</small>
+          <br />
+          <code style="font-size: 0.75rem;">{token.name}</code>
+          <br />
+          <small style="font-size: 0.65rem; opacity: 0.7;">{token.value}</small>
+        </div>
+      ))}
+    </div>
+
+    <h2>Ma Spacing</h2>
+    {spacingTokens.map(token => (
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+        <code style="width: 160px; font-size: 0.75rem;">{token.name}</code>
+        <div style={`height: 16px; min-width: 2px; width: var(${token.name}); background: var(--color-accent);`} />
+        <small>{token.value}</small>
+      </div>
+    ))}
+
+    <h2 style="margin-top: 3rem;">Typography</h2>
+
+    <h3 style="margin-top: 1.5rem;">Type Scale</h3>
+    {typeTokens.map(token => (
+      <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem;">
+        <span style={`font-size: var(${token.token}); line-height: 1.2; min-width: 120px;`}>The Koubou</span>
+        <code style="font-size: 0.75rem; opacity: 0.7; min-width: 130px;">{token.token}</code>
+        <small style="opacity: 0.6;">{token.label} — {token.usage}</small>
+      </div>
+    ))}
+
+    <h3 style="margin-top: 2rem;">Heading Hierarchy</h3>
+    <h1>Heading 1 — The Workshop</h1>
+    <h2>Heading 2 — Craft & Curiosity</h2>
+    <h3>Heading 3 — Made with Care</h3>
+    <h4>Heading 4 — Small Details Matter</h4>
+
+    <h3 style="margin-top: 2rem;">Reading Measure (65ch)</h3>
+    <div class="prose" style="background: var(--color-surface-alt); padding: 1rem; border-radius: 4px;">
+      <p>This paragraph demonstrates the reading measure at 65ch maximum width. Good typography constrains line length to improve readability — somewhere between 45 and 75 characters per line is the sweet spot for comfortable reading. The Koubou is a workshop, and every detail is crafted with care.</p>
+      <p>A second paragraph to show the paragraph spacing. The spacing between paragraphs is 1.5× the body line height, creating breathing room without losing narrative flow.</p>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Japanese Glyphs (Zen Maru Gothic)</h3>
+    <div style="display: flex; gap: 2rem; align-items: baseline; margin-top: 0.5rem;">
+      <span class="font-japanese" style="font-size: var(--type-2xl);">工房</span>
+      <span class="font-japanese" style="font-size: var(--type-2xl);">間</span>
+      <small style="opacity: 0.6;">Zen Maru Gothic — kōbō (workshop) + ma (space/interval)</small>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Code Sample (JetBrains Mono)</h3>
+    <pre style="background: var(--color-code-surface); padding: 1rem; border-radius: 4px; overflow-x: auto;"><code>{`const koubou = {
+  craft: "intentional",
+  typography: "crafted",
+  fonts: ["Sora", "Zen Maru Gothic", "JetBrains Mono"],
+};`}</code></pre>
+
+    <h2 style="margin-top: 3rem;">Texture</h2>
+    <p style="margin-top: 0.5rem; opacity: 0.8;">
+      Paper grain overlay is active — look closely at the background. The <code>body::after</code> pseudo-element
+      tiles <code>/textures/grain.webp</code> (256×256, ~3.0 KB) at <code>opacity: 0.03</code> with
+      <code>mix-blend-mode: multiply</code> in day mode and <code>opacity: 0.02 / soft-light</code> in nightfall.
+    </p>
+    <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 160px; padding: 2rem 1rem; background: oklch(0.96 0.012 80); border: 1px solid oklch(0.80 0.01 80); border-radius: 4px; text-align: center; color: oklch(0.22 0.02 60); opacity: 1;">
+        <small style="font-size: var(--type-sm); opacity: 0.6;">Day mode</small>
+        <p style="margin-top: 0.25rem; font-size: var(--type-sm);">grain at <code>opacity: 0.03 / multiply</code></p>
+      </div>
+      <div style="flex: 1; min-width: 160px; padding: 2rem 1rem; background: oklch(0.14 0.02 250); border: 1px solid oklch(0.25 0.02 250); border-radius: 4px; text-align: center; color: oklch(0.85 0.01 250); opacity: 1;">
+        <small style="font-size: var(--type-sm); opacity: 0.6;">Nightfall mode</small>
+        <p style="margin-top: 0.25rem; font-size: var(--type-sm);">grain at <code>opacity: 0.02 / soft-light</code></p>
+      </div>
+    </div>
+
+    <h2 style="margin-top: 3rem;">Motion</h2>
+    <p style="margin-top: 0.5rem; opacity: 0.8;">
+      Scroll-driven reveals use the CSS Scroll-Driven Animations API (<code>animation-timeline: view()</code>).
+      No JavaScript required. The element below will animate on scroll entry.
+    </p>
+    <p style="margin-top: 0.5rem; font-size: var(--type-sm); opacity: 0.6;">
+      <strong>prefers-reduced-motion:</strong> When active, all animations and transitions are disabled site-wide.
+      All motion token durations resolve to <code>0ms</code>. Verify via DevTools → Rendering → Emulate CSS media feature.
+    </p>
+
+    <div style="margin-top: 4rem; padding: 6rem 0;">
+      <div class="reveal" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); border-radius: 4px; padding: 2rem; text-align: center;">
+        <p style="font-size: var(--type-md); font-weight: 600;">Scroll-driven reveal demo</p>
+        <p style="margin-top: 0.5rem; font-size: var(--type-sm); opacity: 0.7;">
+          This element uses <code>.reveal</code> — it enters via <code>animation-timeline: view()</code>
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

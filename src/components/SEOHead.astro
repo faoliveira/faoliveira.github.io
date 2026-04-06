@@ -1,0 +1,21 @@
+---
+import type { MetaProps } from "@modules/seo";
+import { generateMeta } from "@modules/seo";
+
+type Props = MetaProps;
+
+const meta = generateMeta(Astro.props);
+---
+
+<meta name="description" content={meta.description} />
+<link rel="canonical" href={meta.canonicalUrl} />
+<meta property="og:title" content={meta.title} />
+<meta property="og:description" content={meta.description} />
+<meta property="og:url" content={meta.canonicalUrl} />
+<meta property="og:type" content={meta.type} />
+<meta property="og:site_name" content={meta.siteName} />
+{meta.image && <meta property="og:image" content={meta.image} />}
+{meta.image && <meta property="og:image:width" content="1200" />}
+{meta.image && <meta property="og:image:height" content="630" />}
+{meta.image && <meta property="og:image:alt" content={meta.title} />}
+{meta.image && <meta name="twitter:card" content="summary_large_image" />}

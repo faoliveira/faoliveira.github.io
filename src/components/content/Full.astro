@@ -1,0 +1,15 @@
+---
+// Full.astro — full-bleed breakout from .prose to 100vw
+// Uses calc(50% - 50vw) negative margin to escape centered prose container
+---
+
+<div class="full">
+  <slot />
+</div>
+
+<style>
+  .full {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+</style>

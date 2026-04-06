@@ -1,0 +1,65 @@
+---
+// Timestamp.astro — inline <time> element in monospace for temporal references
+// Renders optional prefix text + <time datetime={isoDate}>
+interface Props {
+  date: string;
+  prefix?: string;
+}
+
+const { date, prefix } = Astro.props;
+
+// Normalize to ISO 8601 date string (YYYY-MM-DD) for the datetime attribute
+function toIso(raw: string): string {
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.getTime())) {
+    return parsed.toISOString().split("T")[0];
+  }
+  if (import.meta.env.DEV) {
+    console.warn(
+      `[Timestamp] Invalid date string: "${raw}". Provide an ISO 8601 date or a parseable date string.`,
+    );
+  }
+  return raw;
+}
+
+const isoDate = toIso(date);
+
+// Human-readable format — force UTC to match isoDate (avoids off-by-one-day in non-UTC environments)
+function toHuman(iso: string): string {
+  const parsed = new Date(`${iso}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return iso;
+  return parsed.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+const humanDate = toHuman(isoDate);
+---
+
+<span class="timestamp">
+  {prefix && <span class="timestamp-prefix">{prefix} </span>}
+  <time datetime={isoDate} class="timestamp-time">{humanDate}</time>
+</span>
+
+<style>
+  .timestamp {
+    font-family: var(--font-mono);
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .timestamp-prefix {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  .timestamp-time {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+</style>

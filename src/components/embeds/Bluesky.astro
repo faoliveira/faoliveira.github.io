@@ -1,0 +1,40 @@
+---
+// Bluesky.astro — zero-JS static HTML Bluesky post embed (fetched at build time)
+// Wraps @astro-community/astro-embed-bluesky in EmbedContainer
+// Overrides upstream brand colors with design system tokens
+import { BlueskyPost } from "@astro-community/astro-embed-bluesky";
+import EmbedContainer from "./EmbedContainer.astro";
+
+interface Props {
+  url: string; // full bsky.app post URL
+}
+
+const { url } = Astro.props;
+---
+
+<EmbedContainer>
+  <BlueskyPost id={url} />
+  <a href={url} class="click-to-load__fallback">View on Bluesky</a>
+</EmbedContainer>
+
+<style>
+  /* Override Bluesky upstream brand colors with design system tokens */
+  :global(.embed-container .bluesky-embed) {
+    background: var(--color-surface-alt) !important;
+    color: var(--color-text-primary) !important;
+    border: none !important;
+    font-family: inherit !important;
+  }
+
+  :global(.embed-container .bluesky-embed a) {
+    color: var(--color-accent) !important;
+  }
+
+  :global(.embed-container .bluesky-embed__author-name) {
+    color: var(--color-text-primary) !important;
+  }
+
+  :global(.embed-container .bluesky-embed__author-handle) {
+    color: var(--color-text-secondary) !important;
+  }
+</style>

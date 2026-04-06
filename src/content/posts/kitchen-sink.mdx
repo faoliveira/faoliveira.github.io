@@ -1,0 +1,375 @@
+---
+title: "Kitchen Sink: Every Prose Element"
+date: 2026-01-01
+type: "reflection"
+tags: ["test"]
+description: "Test post for every prose element in the design system."
+draft: true
+featured: false
+reading: true
+toc: false
+---
+
+## Headings
+
+This section tests heading hierarchy and spacing between paragraphs.
+
+Paragraphs should have comfortable reading rhythm. This is a second paragraph to verify `p + p` spacing works correctly within the prose container.
+
+### H3 Subheading
+
+Content under an h3 heading. The spacing above and below should feel deliberate.
+
+#### H4 Subheading
+
+Content under an h4 heading.
+
+##### H5 Subheading
+
+Content under an h5 heading. Used for fine-grained sections within a post.
+
+## Blockquotes
+
+> Single blockquote with secondary text styling. This should appear in a smaller font size with an accent-tinted left border.
+
+> First level of nesting. The border should use the accent tint color.
+>
+> > Second level of nesting. This inner blockquote should indent further and use the standard border color, without doubling borders.
+
+## Tables
+
+| Column A | Column B | Column C | Column D |
+|----------|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 3   | Cell 4   |
+| Cell 5   | Cell 6   | Cell 7   | Cell 8   |
+| Cell 9   | Cell 10  | Cell 11  | Cell 12  |
+
+A table with longer content to test horizontal overflow on narrow screens:
+
+| Property | Value | Description | Notes |
+|----------|-------|-------------|-------|
+| `max-width` | `65ch` | Controls the measure of the reading column | Based on optimal line length research |
+| `line-height` | `1.7` | Vertical rhythm for body text | Slightly generous for screen reading |
+| `font-size` | `var(--type-base)` | Base size from the type scale | 16px default |
+
+## Lists
+
+Unordered list:
+
+- Unordered item 1
+- Unordered item 2
+  - Nested item 2a
+  - Nested item 2b
+    - Deep nested item
+- Unordered item 3
+
+Ordered list:
+
+1. Ordered item 1
+2. Ordered item 2
+   1. Nested ordered item 2a
+   2. Nested ordered item 2b
+3. Ordered item 3
+
+Mixed nesting:
+
+- Start with unordered
+  1. Then ordered inside
+  2. Second ordered
+- Back to unordered
+
+## Task Lists
+
+- [ ] Unchecked task
+- [x] Checked task
+- [ ] Another unchecked task
+- [x] Another checked task
+
+## Definition Lists
+
+<dl>
+  <dt>Design Token</dt>
+  <dd>A named value in a design system that represents a visual property like color, spacing, or typography.</dd>
+  <dt>Ma (間)</dt>
+  <dd>The Japanese concept of negative space and interval. Used as the spacing scale name in this design system.</dd>
+  <dt>Koubou (工房)</dt>
+  <dd>Japanese for workshop or studio. The conceptual name for this site.</dd>
+</dl>
+
+## Horizontal Rule
+
+Content before the pause. The horizontal rule below should feel like a deliberate breathing point, not just a generic gray line.
+
+---
+
+Content after the pause. The spacing should be generous enough to signal a topic shift.
+
+## Footnotes
+
+This sentence has a footnote[^1]. And this one has another[^2].
+
+[^1]: This is the first footnote. It should appear in a smaller font at the bottom of the post, separated by a thin rule.
+
+[^2]: This is the second footnote. The back-reference arrow should have adequate touch target size.
+
+## Inline Elements
+
+This is <mark>highlighted text</mark> in a sentence. The background should use the accent tint.
+
+The <abbr title="HyperText Markup Language">HTML</abbr> spec defines how web pages are structured. Abbreviations should have a dotted underline and help cursor.
+
+Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to copy. Key caps should have a subtle border and shadow.
+
+This is <del>deleted text</del> in a sentence. Strikethrough should be clear but not distracting.
+
+This is ~~GFM strikethrough~~ using the `~~` syntax. Should render the same as `<del>`.
+
+Water is H<sub>2</sub>O. The subscript should sit below the baseline.
+
+E = mc<sup>2</sup>. The superscript should sit above the baseline (distinct from footnote references).
+
+Here is some `inline code` for comparison with the elements above.
+
+## Emojis
+
+Emoji shortcodes convert automatically: :wave: :rocket: :sparkles: :joy: :100:
+
+A sentence with inline emojis — shipped :ship: and done :white_check_mark:
+
+## Code Blocks
+
+Inline code: `const x = 42;` should have a subtle background.
+
+### File Title
+
+```ts title="greet.ts"
+// TypeScript code block with file title
+function greet(name: string): string {
+  return `Hello, ${name}!`;
+}
+
+const result = greet("koubou");
+console.log(result);
+```
+
+### Line Highlighting
+
+```css {2-3}
+/* CSS code block with line highlighting */
+.prose blockquote {
+  border-inline-start: 2px solid var(--color-accent-tint);
+  font-size: var(--type-sm);
+}
+```
+
+### Diff Markers (Inserted / Deleted Lines)
+
+```ts title="config.ts" del={2,4} ins={3,5}
+const config = {
+  theme: "github-light",
+  theme: "everforest-light",
+  darkTheme: "github-dark-dimmed",
+  darkTheme: "kanagawa-wave",
+  borderRadius: "6px",
+};
+```
+
+### Terminal Frame (auto for bash)
+
+```bash
+bun run build
+astro build && pagefind --site dist/
+```
+
+### Non-Shell Terminal Output
+
+```text frame="terminal" title="Build output"
+10:54:39 [build] 9 page(s) built in 5.75s
+10:54:39 [build] Complete!
+```
+
+## Images
+
+![Placeholder image for testing prose rendering](/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp)
+
+<figure>
+  <img src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Figure test with caption" />
+  <figcaption>This is a centered caption in secondary text color and small font size.</figcaption>
+</figure>
+
+---
+
+## Content Components (Story 6-Y)
+
+import {
+  Wide, Full, Narrow,
+  HeroImage, Figure, ImageGrid,
+  Callout, PullQuote, Details,
+  DataTable, CodeGroup,
+  Divider, Timestamp, Badge,
+} from '@components/content';
+
+### Layout Breakouts
+
+<Wide>
+  <Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Wide breakout test — this image expands to min(1000px, 95vw)" caption="Wide breakout: expands to 1000px max" />
+</Wide>
+
+<Full>
+  <Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Full bleed breakout test — this image spans 100vw" caption="Full bleed: 100vw" />
+</Full>
+
+<Narrow>
+
+A narrow passage of text constrained to 45ch. Good for pull quotes and emphasized passages.
+
+</Narrow>
+
+### Image Components
+
+<Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Figure component at prose width" caption="Figure at default content width" />
+
+<ImageGrid columns={2}>
+  <Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Grid image 1" caption="Image 1" />
+  <Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Grid image 2" caption="Image 2" />
+</ImageGrid>
+
+<ImageGrid columns={3}>
+  <Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Grid image A" caption="A" />
+  <Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Grid image B" caption="B" />
+  <Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Grid image C" caption="C" />
+</ImageGrid>
+
+### Text Enhancement Components
+
+<Callout type="note">
+This is a **note** callout. Uses accent tint background with info icon.
+</Callout>
+
+<Callout type="tip">
+This is a **tip** callout. Same color as note — lightbulb icon variant.
+</Callout>
+
+<Callout type="warning">
+This is a **warning** callout. Warm orange tint in both day and nightfall modes.
+</Callout>
+
+<Callout type="important">
+This is an **important** callout. Stronger accent tint with exclamation icon.
+</Callout>
+
+<PullQuote>
+The real bottleneck wasn't the query — it was the connection pool.
+</PullQuote>
+
+<Details summary="Show methodology details">
+
+This is the body of the details component. It supports **markdown** and `inline code`.
+
+- List items work here
+- As do multiple paragraphs
+
+</Details>
+
+### Composition Patterns
+
+<Wide>
+  <Figure src="/images/jezael-melgoza-alY6_OpdwRQ-unsplash.webp" alt="Wide + Figure composition test" caption="Wide wrapping Figure — should break out to 1000px" />
+</Wide>
+
+<Narrow>
+  <PullQuote>
+    Composed: Narrow wrapping PullQuote.
+  </PullQuote>
+</Narrow>
+
+### Data & Code Components
+
+<DataTable caption="Tool comparison table">
+
+| Tool | Category | License | Stars |
+|------|----------|---------|-------|
+| dbt | Transform | Apache | 8k |
+| SQLMesh | Transform | Apache | 1.2k |
+| Airbyte | Ingest | EL v2 | 13k |
+
+</DataTable>
+
+<Wide>
+  <DataTable caption="Wide + DataTable composition">
+
+  | Metric | Q1 | Q2 | Q3 | Q4 | Total |
+  |--------|----|----|----|----|-------|
+  | Revenue | $12k | $18k | $24k | $31k | $85k |
+  | Users | 420 | 680 | 1200 | 1800 | 4100 |
+
+  </DataTable>
+</Wide>
+
+<CodeGroup labels={['Python', 'SQL']}>
+  <div slot="tab-0">
+
+```python
+# Group by user and count events
+df.groupby('user_id').agg({'event_id': 'count'}).rename(columns={'event_id': 'event_count'})
+```
+
+  </div>
+  <div slot="tab-1">
+
+```sql
+-- Group by user and count events
+SELECT user_id, COUNT(event_id) AS event_count
+FROM events
+GROUP BY user_id;
+```
+
+  </div>
+</CodeGroup>
+
+```bash title="zsh"
+dbt run --select my_model
+Running with dbt=1.7.4
+Found 42 models, 128 tests
+
+Completed successfully
+Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
+```
+
+### Utility Components
+
+<Divider />
+
+Inline badge examples: <Badge text="Python" /> <Badge text="dbt" variant="accent" /> <Badge text="Beta" variant="muted" />
+
+<Timestamp date="2026-03-21" prefix="Updated on" />
+
+<Timestamp date="2026-01-01" />
+
+---
+
+## Media Embeds (Story 6-Z)
+
+import { YouTube, Spotify } from '@components/embeds';
+
+### YouTube (click-to-load)
+
+<YouTube id="dQw4w9WgXcQ" title="Rick Astley — Never Gonna Give You Up" />
+
+### Spotify Track (compact, 152px)
+
+<Spotify type="track" id="4PTG3Z6ehGkBFwjybzWkR8" />
+
+### Spotify Album (expanded, 352px)
+
+<Spotify type="album" id="1DFixLWuPkv3KT3TnV35m3" />
+
+### Spotify Playlist
+
+<Spotify type="playlist" id="37i9dQZF1DXcBWIGoYBM5M" />
+
+### Layout Composition — Wide + YouTube
+
+<Wide>
+  <YouTube id="dQw4w9WgXcQ" title="Wide composition test" />
+</Wide>

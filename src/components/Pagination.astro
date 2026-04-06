@@ -1,0 +1,86 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  basePath: string;
+}
+
+const { currentPage, totalPages, basePath } = Astro.props;
+
+function pageUrl(page: number): string {
+  if (page === 1) return `${basePath}/`;
+  return `${basePath}/page/${page}/`;
+}
+
+const hasPrev = currentPage > 1;
+const hasNext = currentPage < totalPages;
+---
+
+<nav class="pagination" aria-label="Pagination">
+  {hasPrev ? (
+    <a href={pageUrl(currentPage - 1)} class="page-link" rel="prev">← Newer</a>
+  ) : (
+    <span class="page-link disabled">← Newer</span>
+  )}
+  <span class="page-count">Page {currentPage} of {totalPages}</span>
+  {hasNext ? (
+    <a href={pageUrl(currentPage + 1)} class="page-link" rel="next">Older →</a>
+  ) : (
+    <span class="page-link disabled">Older →</span>
+  )}
+</nav>
+
+<style>
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-start: var(--ma-broad);
+    padding-block-start: var(--ma-wide);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .page-link {
+    font-size: var(--type-sm);
+    font-family: var(--font-mono);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  a.page-link {
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a.page-link {
+      transition: color var(--motion-duration-quick) var(--motion-easing-out);
+    }
+  }
+
+  @media (hover: hover) {
+    a.page-link:hover {
+      color: var(--color-accent-hover);
+    }
+  }
+
+  a.page-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .page-count {
+    font-size: var(--type-xs);
+    font-family: var(--font-mono);
+    color: var(--color-text-tertiary);
+    letter-spacing: var(--tracking-wide);
+  }
+</style>

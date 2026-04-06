@@ -1,0 +1,85 @@
+---
+// DataTable.astro — responsive table with optional caption
+// Wraps a markdown-generated <table> or raw <thead>/<tbody> content.
+// sortable=true adds Svelte sort island that finds the table by ID
+import DataTableSortIsland from "@islands/DataTableSort.svelte";
+
+interface Props {
+  caption?: string;
+  sortable?: boolean;
+  id?: string; // provide a stable ID to avoid HMR/incremental-build mismatch
+}
+
+const { caption, sortable = false, id } = Astro.props;
+
+// Use author-provided ID when available; fall back to random (stable within one build pass)
+const tableId = sortable ? (id ?? `dt-${Math.random().toString(36).slice(2, 9)}`) : undefined;
+---
+
+<div class="data-table-wrapper" data-table-id={tableId}>
+  {caption && <div class="data-table-caption">{caption}</div>}
+  <slot />
+</div>
+
+{sortable && tableId && (
+  <DataTableSortIsland client:visible tableId={tableId} />
+)}
+
+<style>
+  .data-table-wrapper {
+    overflow-x: auto;
+    margin-block: var(--ma-wide);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+  }
+
+  .data-table-caption {
+    padding: var(--ma-narrow) var(--ma-base);
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .data-table-wrapper :global(table) {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: var(--type-sm);
+    overflow-x: visible;
+  }
+
+  .data-table-wrapper :global(thead) {
+    background: var(--color-surface-alt);
+  }
+
+  .data-table-wrapper :global(th) {
+    padding: var(--ma-narrow) var(--ma-base);
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+
+  .data-table-wrapper :global(td) {
+    padding: var(--ma-narrow) var(--ma-base);
+    color: var(--color-text-primary);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .data-table-wrapper :global(tr:last-child td) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .data-table-wrapper :global(tr:hover td) {
+    background: var(--color-surface-alt);
+  }
+
+  /* .mono class for numeric columns */
+  .data-table-wrapper :global(.mono) {
+    font-family: var(--font-mono);
+  }
+</style>

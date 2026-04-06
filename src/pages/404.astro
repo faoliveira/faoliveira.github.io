@@ -1,0 +1,356 @@
+---
+import SearchBox from "@components/SearchBox.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found — felipeo.me" description="This page doesn't exist. The rest of the site does, though.">
+  <section class="not-found">
+    <div class="content">
+      <div class="number-wrapper" id="number-wrapper">
+        <div
+          class="display-number"
+          id="display-number"
+          aria-hidden="true"
+          title="click me"
+        >404</div>
+        <!-- aria-hidden: visual only — live region below handles screen reader updates -->
+        <span class="collect-badge" id="collect-badge" aria-hidden="true"></span>
+      </div>
+      <!-- Debounced announcement for click counter — prevents screen reader spam -->
+      <span class="sr-only" id="collect-live" aria-live="polite"></span>
+
+      <h1 class="heading" id="heading">This page doesn't exist.</h1>
+
+      <p class="body-text body-text--last">
+        You ended up here. Broken link, probably. Or a URL typed slightly wrong.
+        Maybe someone sent you here on purpose, which is its own thing.
+        The workshop is still here. The dog too.
+      </p>
+
+      <div class="search-wrapper">
+        <SearchBox autofocus />
+      </div>
+
+      <nav class="recovery" aria-label="Recovery navigation">
+        <a href="/" class="link-primary">Go home</a>
+      </nav>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    place-items: center;
+    min-height: 60vh;
+    padding-block: var(--ma-spacious);
+  }
+
+  .content {
+    max-width: 65ch;
+    margin-inline: auto;
+    padding-inline: clamp(var(--ma-base), 5vw, var(--ma-vast));
+    text-align: center;
+  }
+
+  /*
+   * Float animation lives on .number-wrapper, squish on .display-number.
+   * This prevents float from restarting at 0% when animationend fires for squish.
+   */
+  .number-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-block-end: var(--ma-broad);
+    animation: float 4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .display-number {
+    font-size: clamp(var(--type-4xl), 18vw, 9rem);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-accent);
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .display-number.clicked {
+    animation: squish 150ms ease-out forwards;
+  }
+
+  .collect-badge {
+    position: absolute;
+    inset-inline-end: -0.5rem;
+    inset-block-start: -0.5rem;
+    font-size: var(--type-xs);
+    font-weight: 700;
+    color: var(--color-surface);
+    background: var(--color-accent);
+    border-radius: 999px;
+    padding: var(--ma-hair) var(--ma-narrow);
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity var(--motion-duration-normal) var(--motion-easing-out),
+      transform var(--motion-duration-normal) var(--motion-easing-out);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .collect-badge.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes squish {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.88); }
+    100% { transform: scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .number-wrapper {
+      animation: none;
+      will-change: auto;
+    }
+    .display-number.clicked {
+      animation: none;
+    }
+  }
+
+  .heading {
+    font-size: var(--type-3xl);
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin-block-end: var(--ma-wide);
+    transition: opacity var(--motion-duration-smooth) var(--motion-easing-out);
+  }
+
+  .body-text {
+    font-size: var(--type-md);
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    margin-block-end: var(--ma-wide);
+  }
+
+  .body-text--last {
+    margin-block-end: var(--ma-broad);
+  }
+
+  .search-wrapper {
+    margin-block-end: var(--ma-broad);
+    text-align: start;
+  }
+
+  .recovery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ma-wide);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .link-primary {
+    color: var(--color-accent);
+    font-weight: 700;
+    font-size: var(--type-base);
+    text-decoration: underline;
+    transition:
+      color var(--motion-duration-quick) var(--motion-easing-out),
+      text-decoration-color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  .link-secondary {
+    color: var(--color-text-secondary);
+    font-size: var(--type-base);
+    text-decoration: underline;
+    transition:
+      color var(--motion-duration-quick) var(--motion-easing-out),
+      text-decoration-color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  .link-tertiary {
+    color: var(--color-text-secondary);
+    font-size: var(--type-base);
+    text-decoration: underline;
+    transition:
+      color var(--motion-duration-quick) var(--motion-easing-out),
+      text-decoration-color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  @media (hover: hover) {
+    .link-primary:hover { color: var(--color-accent-hover); }
+    .link-secondary:hover { color: var(--color-text-primary); }
+    .link-tertiary:hover { color: var(--color-text-primary); }
+    .display-number:hover { color: var(--color-accent-hover); }
+  }
+
+</style>
+
+<script>
+  ;(() => {
+    // Cast to HTMLElement — IDs are defined in this template.
+    // The runtime guard below handles the defensive case (e.g. future template refactor).
+    const num = document.getElementById("display-number") as HTMLElement;
+    const wrapper = document.getElementById("number-wrapper") as HTMLElement;
+    const badge = document.getElementById("collect-badge") as HTMLElement;
+    const heading = document.getElementById("heading") as HTMLElement;
+    const liveRegion = document.getElementById("collect-live") as HTMLElement;
+
+    if (!num || !wrapper || !badge || !heading || !liveRegion) return;
+
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    const supportsWAAPI = typeof Element.prototype.animate === "function";
+
+    // Read motion token from CSS custom properties; fall back to 300ms if unavailable
+    const styles = getComputedStyle(document.documentElement);
+    const dSmooth = parseFloat(styles.getPropertyValue('--motion-duration-smooth')) || 300;
+
+    // Milestone progression: Cookie Clicker / billionaire arc
+    const milestones: Record<number, string> = {
+      5:  "five. you are doing this by hand.",
+      15: "fifteen. still you, still the same button.",
+      30: "thirty. this is what compounding looks like up close.",
+      50: "fifty. at some point it stops being about the errors.",
+      75: "seventy-five. the number keeps going. you just have to keep showing up.",
+      80: "eighty. you have an origin story now.",
+      90: "ninety. the explaining is behind you.",
+      95: "ninety-five. five more. just five.",
+    };
+
+    let count = 0;
+    let busy = false;
+    let liveTimer: ReturnType<typeof setTimeout> | undefined;
+    // Stores flee() timeout IDs so they can be cleared on View Transition navigation (D-15)
+    const fleeTimers: ReturnType<typeof setTimeout>[] = [];
+
+    function spawnFloat() {
+      if (reduced || !supportsWAAPI) return;
+      const el = document.createElement("span");
+      el.setAttribute("aria-hidden", "true");
+      el.textContent = "+1";
+      Object.assign(el.style, {
+        position: "absolute",
+        insetInlineStart: "50%",
+        insetBlockStart: "0",
+        fontWeight: "700",
+        fontSize: "var(--type-xs)",
+        color: "var(--color-accent)",
+        pointerEvents: "none",
+        whiteSpace: "nowrap",
+        zIndex: "10",
+      });
+      wrapper.appendChild(el);
+      const anim = el.animate(
+        [
+          { opacity: 1, transform: "translateX(-50%) translateY(0)" },
+          { opacity: 0, transform: "translateX(-50%) translateY(-3rem)" },
+        ],
+        { duration: 800, easing: "ease-out", fill: "forwards" }
+      );
+      anim.onfinish = () => el.remove();
+    }
+
+    function flee() {
+      busy = true;
+      num.style.cursor = "default";
+      heading.textContent = "ok wait—";
+
+      if (reduced) {
+        // No animation — instant reset for reduced-motion users
+        num.textContent = "404";
+        heading.textContent = "anyway.";
+        badge.classList.remove("visible");
+        clearTimeout(liveTimer);
+        liveRegion.textContent = "";
+        count = 0;
+        busy = false;
+        num.style.cursor = "pointer";
+        return;
+      }
+
+      fleeTimers.push(setTimeout(() => {
+        // Guard: DOM may be gone if navigation happened
+        if (!document.body.contains(wrapper)) return;
+        // Slide left — the direction it was always going
+        wrapper.style.animation = "none";
+        wrapper.style.transition = "transform 1.2s ease-in, opacity 0.8s ease-in 0.4s";
+        wrapper.style.transform = "translateX(-200vw)";
+        wrapper.style.opacity = "0";
+        heading.textContent = "this is fine";
+
+        fleeTimers.push(setTimeout(() => {
+          // Guard: DOM may be gone if navigation happened
+          if (!document.body.contains(wrapper)) return;
+          // Teleport back with no transition
+          // Force reflow so transition: none takes effect before transform reset
+          wrapper.style.transition = "none";
+          void wrapper.offsetWidth;
+          wrapper.style.transform = "translateX(0)";
+          wrapper.style.opacity = "1";
+          num.textContent = "...";
+          badge.classList.remove("visible");
+          clearTimeout(liveTimer);
+          liveRegion.textContent = "";
+
+          fleeTimers.push(setTimeout(() => {
+            // Guard: DOM may be gone if navigation happened
+            if (!document.body.contains(num)) return;
+            num.textContent = "404";
+            wrapper.style.animation = "";
+            wrapper.style.transition = ""; // clear inline override — restore CSS control
+            heading.textContent = "anyway.";
+            count = 0;
+            busy = false;
+            num.style.cursor = "pointer";
+            // All timers completed normally — clear the list
+            fleeTimers.length = 0;
+          }, dSmooth * 4)); // 1200ms at 300ms base
+        }, dSmooth * 6)); // 1800ms at 300ms base
+      }, dSmooth * 2)); // 600ms at 300ms base
+    }
+
+    // D-15: Clear flee() timers on View Transition navigation to prevent stale DOM manipulation
+    document.addEventListener('astro:before-swap', () => {
+      for (const id of fleeTimers) clearTimeout(id);
+      fleeTimers.length = 0;
+    }, { once: true });
+
+    num.addEventListener("click", () => {
+      if (busy) return;
+      count++;
+
+      // Visual badge update — immediate
+      badge.textContent = `×${count} errors`;
+      badge.classList.add("visible");
+
+      // Debounced live region — avoids screen reader announcement on every rapid click
+      clearTimeout(liveTimer);
+      liveTimer = setTimeout(() => {
+        liveRegion.textContent = `${count} errors collected`;
+      }, 500);
+
+      spawnFloat();
+
+      // Squish via class — float runs independently on .number-wrapper so it won't restart
+      const removeClicked = () => num.classList.remove("clicked");
+      num.classList.add("clicked");
+      num.addEventListener("animationend", removeClicked, { once: true });
+      setTimeout(removeClicked, 200); // fallback: animationend may not fire in hidden tabs
+
+      if (milestones[count]) {
+        heading.textContent = milestones[count];
+      }
+
+      if (count >= 100) {
+        flee();
+      }
+    });
+  })();
+</script>
