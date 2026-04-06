@@ -55,7 +55,10 @@
 </script>
 
 <style>
-  /* Component-level color tokens for chochin glow states */
+  /* Component-level color tokens for chochin glow states.
+     All amber values use hue 70 — the same hue family as --color-amber and --color-amber-muted
+     in nightfall.css (Story 1.3). Glow chroma ranges 0.14-0.16 for visual intensity;
+     --color-amber-muted (0.08) is the lower-chroma readability variant for text/surfaces. */
   :root {
     --glow-amber: oklch(0.75 0.14 70 / 0.5);
     --glow-amber-strong: oklch(0.75 0.14 70 / 0.8);
@@ -63,6 +66,18 @@
     --flame-inner: oklch(0.95 0.10 90 / 0.85);
     --body-fill: oklch(0.80 0.16 70 / 0.3);
     --glow-fill: oklch(0.80 0.16 70 / 0.4);
+  }
+
+  /* Hex fallback: browsers without oklch() support lose the glow effect without this */
+  @supports not (color: oklch(0 0 0)) {
+    :root {
+      --glow-amber: rgba(201, 160, 58, 0.5);
+      --glow-amber-strong: rgba(201, 160, 58, 0.8);
+      --flame-color: #d4a83a;
+      --flame-inner: rgba(246, 241, 200, 0.85);
+      --body-fill: rgba(212, 168, 58, 0.3);
+      --glow-fill: rgba(212, 168, 58, 0.4);
+    }
   }
 
   button {

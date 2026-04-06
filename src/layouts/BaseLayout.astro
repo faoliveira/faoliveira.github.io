@@ -50,25 +50,50 @@ const themeScript = getThemeScript();
         /* Duplicated tokens: --color-surface, --color-surface-alt, --color-text-primary,
            --color-text-secondary, --color-text-tertiary, --color-accent, --color-accent-hover,
            --color-accent-tint, --color-border, --color-code-surface,
-           --texture-grain-opacity, --texture-grain-tint, --texture-grain-opacity-elevated */
+           --texture-grain-opacity, --texture-grain-tint, --texture-grain-opacity-elevated,
+           --color-amber, --color-amber-muted */
         /* Hide JS-dependent UI — NightfallToggle requires JS to function */
         #nightfall-toggle { display: none !important; }
         /* CSS-only dark mode fallback: respect prefers-color-scheme when JS is disabled */
         @media (prefers-color-scheme: dark) {
           html {
-            --color-surface: oklch(0.22 0.04 270);
-            --color-surface-alt: oklch(0.28 0.04 270);
+            --color-surface: oklch(0.22 0.035 280);
+            --color-surface-alt: oklch(0.28 0.035 280);
             --color-text-primary: oklch(0.9 0.01 80);
-            --color-text-secondary: oklch(0.7 0.01 80);
+            --color-text-secondary: oklch(0.68 0.035 70);
             --color-text-tertiary: oklch(0.55 0.01 80);
             --color-accent: oklch(0.62 0.1 155);
             --color-accent-hover: oklch(0.56 0.11 155);
             --color-accent-tint: oklch(0.62 0.1 155 / 0.15);
-            --color-border: oklch(0.3 0.03 270);
-            --color-code-surface: oklch(0.18 0.04 270);
+            --color-border: oklch(0.3 0.025 280);
+            --color-code-surface: oklch(0.18 0.035 280);
             --texture-grain-opacity: 0.03;
             --texture-grain-tint: oklch(0.40 0.03 60 / 0.25);
             --texture-grain-opacity-elevated: 0.055;
+            --color-amber: oklch(0.75 0.14 70);
+            --color-amber-muted: oklch(0.65 0.08 70);
+          }
+        }
+        /* Hex values are intentionally approximate — right tonal family, not pixel-perfect */
+        @supports not (color: oklch(0 0 0)) {
+          @media (prefers-color-scheme: dark) {
+            html {
+              --color-surface: #23203a;
+              --color-surface-alt: #2d2a40;
+              --color-text-primary: #e6e1db;
+              --color-text-secondary: #b3a98e;
+              --color-text-tertiary: #8a857e;
+              --color-accent: #4aab7e;
+              --color-accent-hover: #3c9a6e;
+              --color-accent-tint: rgb(74 171 126 / 0.15);
+              --color-border: #302d42;
+              --color-code-surface: #181538;
+              --texture-grain-opacity: 0.03;
+              --texture-grain-tint: rgba(80, 75, 50, 0.25);
+              --texture-grain-opacity-elevated: 0.055;
+              --color-amber: #c9a03a;
+              --color-amber-muted: #a88a50;
+            }
           }
         }
       </style>
