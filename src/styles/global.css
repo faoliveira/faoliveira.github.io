@@ -54,6 +54,8 @@ body {
   min-height: 100vh; /* fallback for older browsers */
   /* biome-ignore lint/suspicious/noDuplicateProperties: intentional progressive enhancement — dvh overrides vh in supporting browsers */
   min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   overflow-x: clip; /* prevent horizontal scrollbar from 100vw full-bleed elements (Wide/Full/HeroImage) */
 }
 

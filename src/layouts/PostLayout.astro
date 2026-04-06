@@ -78,6 +78,17 @@ const isoDate = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padSt
     margin-block-end: var(--ma-narrow);
   }
 
+  [data-post-type="nota-tecnica"] .post-header {
+    border-left: 3px solid var(--color-text-secondary);
+    padding-left: var(--ma-base);
+  }
+
+  [data-post-type="nota-tecnica"] .post-header h1 {
+    font-family: var(--font-mono);
+    font-size: var(--type-xl);
+    letter-spacing: -0.02em;
+  }
+
   .post-meta {
     display: flex;
     align-items: center;
@@ -85,6 +96,11 @@ const isoDate = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padSt
     font-size: var(--type-sm);
     line-height: var(--leading-sm);
     color: var(--color-text-secondary);
+  }
+
+  [data-post-type="nota-tecnica"] .post-meta {
+    gap: var(--ma-thin);
+    line-height: 1.2;
   }
 
   .meta-separator {
