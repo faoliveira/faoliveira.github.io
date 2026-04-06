@@ -30,10 +30,19 @@ html[data-theme="nightfall"] {
 }
 
 /* Smooth transition on theme toggle — only after user interaction, not on page load */
+/* All 10 registered color tokens transition together — no property snaps (Story 1.4) */
 html[data-theme].theme-animated {
   transition:
-    background-color var(--motion-duration-smooth) var(--motion-easing-ease),
-    color var(--motion-duration-smooth) var(--motion-easing-ease);
+    --color-surface var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-surface-alt var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-text-primary var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-text-secondary var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-text-tertiary var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-accent var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-accent-hover var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-accent-tint var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-border var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-code-surface var(--motion-duration-smooth) var(--motion-easing-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {

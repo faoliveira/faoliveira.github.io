@@ -2,6 +2,69 @@
 /* SYNC: noscript dark-mode fallback in BaseLayout.astro must match these values */
 /* SYNC: design-system.astro line 9 hardcodes --color-surface-alt value as a display label — update on every token change */
 
+/* ── @property registrations for animatable color tokens (Story 1.4) ── */
+/* Enables smooth nightfall transitions via CSS custom property interpolation */
+/* SYNC: @property initial-values MUST match :root day-mode values below — update both together */
+@property --color-surface {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.96 0.012 80);
+}
+
+@property --color-surface-alt {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.91 0.018 80);
+}
+
+@property --color-text-primary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.22 0.02 60);
+}
+
+@property --color-text-secondary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.45 0.02 60);
+}
+
+@property --color-text-tertiary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.55 0.015 60);
+}
+
+@property --color-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.5 0.1 155);
+}
+
+@property --color-accent-hover {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.44 0.11 155);
+}
+
+@property --color-accent-tint {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.5 0.1 155 / 0.1);
+}
+
+@property --color-border {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.85 0.01 80);
+}
+
+@property --color-code-surface {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.94 0.008 80);
+}
+
 :root {
   /* ── Colors: Day Mode (oklch) ── */
   --color-surface: oklch(0.96 0.012 80);

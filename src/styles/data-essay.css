@@ -81,6 +81,17 @@ html[data-theme="nightfall"] .scrolly-step {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
+/* box-shadow is not token-based, so @property doesn't help — explicit transition (Story 1.4) */
+html[data-theme].theme-animated .scrolly-step {
+  transition: box-shadow var(--motion-duration-smooth) var(--motion-easing-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme].theme-animated .scrolly-step {
+    transition: none;
+  }
+}
+
 /* Reduced motion: keep layout, disable scroll-driven effects */
 @media (prefers-reduced-motion: reduce) {
   .scrolly-graphic {
