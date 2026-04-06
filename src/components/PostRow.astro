@@ -30,7 +30,7 @@ const { title, date, type } = post.data;
   }
 
   @media (hover: hover) {
-    .post-row:hover {
+    .post-row:hover .post-title {
       color: var(--color-accent);
     }
   }
@@ -48,10 +48,6 @@ const { title, date, type } = post.data;
     min-width: 0;
   }
 
-  .post-row:hover .post-title {
-    color: inherit;
-  }
-
   .post-date {
     font-size: var(--type-sm);
     font-family: var(--font-mono);
@@ -60,7 +56,4 @@ const { title, date, type } = post.data;
     margin-inline-start: auto;
   }
 
-  .post-row:hover .post-date {
-    color: inherit;
-  }
 </style>

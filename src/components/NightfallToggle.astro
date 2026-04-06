@@ -93,12 +93,14 @@
     transition:
       color var(--motion-duration-smooth) var(--motion-easing-out),
       filter var(--motion-duration-smooth) var(--motion-easing-out),
-      border-color var(--motion-duration-quick) var(--motion-easing-out);
+      border-color var(--motion-duration-quick) var(--motion-easing-out),
+      opacity var(--motion-duration-quick) var(--motion-easing-out);
   }
 
-  button:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
+  @media (hover: hover) {
+    button:hover {
+      opacity: 0.7;
+    }
   }
 
   button:focus-visible {
@@ -126,10 +128,18 @@
     filter: drop-shadow(0 0 10px var(--glow-amber));
   }
 
-  :global([data-theme="nightfall"]) button:hover {
-    color: var(--flame-color);
-    border-color: var(--flame-color);
-    filter: drop-shadow(0 0 14px var(--glow-amber-strong));
+  @media (hover: hover) {
+    :global([data-theme="nightfall"]) button:hover {
+      opacity: 0.7;
+      filter: drop-shadow(0 0 14px var(--glow-amber-strong));
+    }
+  }
+
+  @media (forced-colors: active) and (hover: hover) {
+    button:hover {
+      opacity: 1;
+      color: Highlight;
+    }
   }
 
   :global([data-theme="nightfall"]) .inner-glow { opacity: 0.55; }

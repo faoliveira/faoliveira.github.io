@@ -5,6 +5,20 @@
 /* ── @property registrations for animatable color tokens (Story 1.4) ── */
 /* Enables smooth nightfall transitions via CSS custom property interpolation */
 /* SYNC: @property initial-values MUST match :root day-mode values below — update both together */
+
+/*
+ * Accent restraint audit, Story 1.5.
+ * "One flower in a vase": accent stays sparse so it still lands when it appears.
+ * Keep accent for sanctioned uses only: prose links, active nav indicator
+ * ([aria-current='page']), :focus-visible outlines, code-group active tab,
+ * ToC current section, pagination links, footnote refs, blockquote border,
+ * skip link, and embed CTAs.
+ * Non-sanctioned uses removed here: TypeTag, PostRow full-row hover,
+ * LogoMark hover, NightfallToggle hover border/color, 404 display number,
+ * search glyph/title decoration, and log entry-day hover.
+ * Viewport rule: no page should show more than 3 simultaneous accent-colored
+ * elements in a viewport. Accessibility focus indicators are exempt.
+ */
 @property --color-surface {
   syntax: "<color>";
   inherits: true;

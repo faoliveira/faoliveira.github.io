@@ -44,8 +44,9 @@ const label =
     font-size: var(--type-sm);
     line-height: var(--leading-sm);
     font-weight: 500;
-    color: var(--color-accent-hover);
-    background: var(--color-accent-tint);
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: 1px solid var(--color-text-tertiary);
     padding: var(--ma-hair) var(--ma-narrow);
     border-radius: 3px;
     white-space: nowrap;
@@ -53,8 +54,9 @@ const label =
   }
 
   a.type-tag:hover {
-    background: var(--color-accent);
-    color: var(--color-surface);
+    background: var(--color-surface-alt);
+    color: var(--color-text-primary);
+    border-color: var(--color-text-secondary);
   }
 
   a.type-tag:focus-visible {

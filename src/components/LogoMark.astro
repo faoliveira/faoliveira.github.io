@@ -23,7 +23,9 @@ const isHomePage = Astro.url.pathname === "/";
     font-size: var(--type-lg);
     text-decoration: none;
     /* Color transition always present — only transform is gated on reduced-motion */
-    transition: color var(--motion-duration-quick) var(--motion-easing-out);
+    transition:
+      color var(--motion-duration-quick) var(--motion-easing-out),
+      opacity var(--motion-duration-quick) var(--motion-easing-out);
   }
 
   .logo--md {
@@ -40,13 +42,14 @@ const isHomePage = Astro.url.pathname === "/";
     .logo--lift {
       transition:
         color var(--motion-duration-quick) var(--motion-easing-out),
+        opacity var(--motion-duration-quick) var(--motion-easing-out),
         transform var(--motion-duration-quick) var(--motion-easing-out);
     }
   }
 
   @media (hover: hover) {
     .logo:hover {
-      color: var(--color-accent);
+      opacity: 0.7;
     }
   }
 
@@ -57,7 +60,14 @@ const isHomePage = Astro.url.pathname === "/";
 
     .logo--lift:active {
       transform: translateY(0);
-      color: var(--color-accent-hover);
+      opacity: 0.5;
+    }
+  }
+
+  @media (forced-colors: active) and (hover: hover) {
+    .logo:hover {
+      opacity: 1;
+      color: Highlight;
     }
   }
 

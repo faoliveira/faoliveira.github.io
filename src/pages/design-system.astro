@@ -62,6 +62,13 @@ const typeTokens = [
         </div>
       ))}
     </div>
+    <p style="margin-top: 1rem; max-width: 65ch; color: var(--color-text-secondary);">
+      <strong>Accent restraint:</strong> The accent follows a "one flower in a vase" rule. Reserve it for interactive affordances like links, active states, and focus indicators, and keep it to 3 or fewer simultaneous visible instances per viewport.
+    </p>
+    <p style="max-width: 65ch; color: var(--color-text-secondary);">
+      <strong>Sanctioned:</strong> prose links, active nav, focus outlines, code-group active tab, ToC current section, pagination links, footnote refs.
+      <strong> Not sanctioned:</strong> TypeTag, decorative search marks, broad hover floods, logo hover, toggle hover chrome, and passive display numbers.
+    </p>
 
     <h2>Ma Spacing</h2>
     {spacingTokens.map(token => (
