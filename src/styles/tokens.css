@@ -129,11 +129,9 @@
   --motion-easing-out: ease-out;
   --motion-easing-in-out: ease-in-out;
   --motion-easing-ease: ease;
-
   /* ── Shadow Tokens ── */
   --shadow-card: 0 1px 3px oklch(0 0 0 / 0.04);
   --shadow-card-hover: 0 4px 12px oklch(0 0 0 / 0.08);
-
   /* ── Breakpoints ── */
   /* NOTE: CSS custom properties do not resolve inside @media conditions.
      Use these values in JS/component logic only — write literal px in media queries. */
@@ -141,6 +139,13 @@
   --bp-md: 768px;
   --bp-lg: 1024px;
   --bp-xl: 1280px;
+
+  /* ── Layout ── */
+  /* Shared max-width for nav, main content, footer, and all aligned containers.
+     Intentionally set to --bp-xl (1280px): the wide spacing between logo and
+     nav links is a deliberate design choice — airy, breathing room consistent
+     with the koubou philosophy. */
+  --layout-max: var(--bp-xl);
 }
 
 /* ── Fallback: browsers without oklch() support (Safari <15.4, Chrome <111) ── */
