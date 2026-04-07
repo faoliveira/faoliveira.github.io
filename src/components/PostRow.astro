@@ -26,7 +26,6 @@ const { title, date, type } = post.data;
     padding-block: var(--ma-narrow);
     text-decoration: none;
     color: inherit;
-    transition: color var(--motion-duration-quick) var(--motion-easing-out);
   }
 
   @media (hover: hover) {
@@ -35,16 +34,21 @@ const { title, date, type } = post.data;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .post-row {
-      transition: none;
-    }
+  .post-row:focus-visible .post-title {
+    color: var(--color-accent);
   }
 
   .post-title {
     font-size: var(--type-base);
     color: var(--color-text-primary);
     min-width: 0;
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .post-title {
+      transition: none;
+    }
   }
 
   .post-tag {
