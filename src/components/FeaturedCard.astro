@@ -23,20 +23,25 @@ const { title, description, date, type } = post.data;
     display: block;
     background: var(--color-surface-alt);
     padding: var(--ma-wide);
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
     border-radius: var(--ma-narrow);
     text-decoration: none;
     color: inherit;
-    box-shadow: var(--shadow-card);
-    transition: transform var(--motion-duration-normal) var(--motion-easing-out),
-                box-shadow var(--motion-duration-normal) var(--motion-easing-out);
+    transition: border-left-color var(--motion-duration-normal) var(--motion-easing-out);
     container-type: inline-size;
   }
 
   @media (hover: hover) {
     .featured-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-card-hover);
+      border-left-color: var(--color-accent);
     }
+  }
+
+  .featured-card:focus-visible {
+    border-left-color: var(--color-accent);
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {

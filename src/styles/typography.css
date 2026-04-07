@@ -248,6 +248,18 @@ pre code {
   font-size: 0.9em;
 }
 
+/* ── Section Labels ── */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-xs);
+  margin-block-end: var(--ma-wide);
+}
+
 /* ── Small Text ── */
 small,
 .text-sm {

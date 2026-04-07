@@ -88,7 +88,7 @@ body {
 
 /* ── Responsive Page Margins ── */
 #main-content {
-  max-width: var(--bp-xl);
+  max-width: var(--layout-max);
   margin-inline: auto;
   padding-inline: clamp(var(--ma-wide), 5vw, var(--ma-breath));
   padding-block-end: var(--ma-breath);

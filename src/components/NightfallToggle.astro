@@ -22,7 +22,7 @@
     <!-- Body fill: amber fill, day opacity:0, nightfall opacity:0.25 -->
     <circle class="body-fill" cx="13" cy="19" r="8" fill="var(--body-fill)" />
     <!-- Globe body: stroke only, currentColor -->
-    <circle cx="13" cy="19" r="8" stroke="currentColor" stroke-width="1.8" />
+    <circle cx="13" cy="19" r="8" stroke="currentColor" stroke-width="2.0" />
     <!-- Ribs: 3 horizontal lines at 0.25 opacity -->
     <line x1="5.6" y1="16" x2="20.4" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.25" />
     <line x1="5" y1="19" x2="21" y2="19" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.25" />
@@ -82,18 +82,16 @@
 
   button {
     background: none;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
+    border: none;
     color: var(--color-text-secondary);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 4px 6px;
+    padding: 11px 13px;
     transition:
       color var(--motion-duration-smooth) var(--motion-easing-out),
       filter var(--motion-duration-smooth) var(--motion-easing-out),
-      border-color var(--motion-duration-quick) var(--motion-easing-out),
       opacity var(--motion-duration-quick) var(--motion-easing-out);
   }
 
@@ -114,18 +112,29 @@
     display: block;
   }
 
-  /* Day mode: glow, fill, and flame layers hidden */
+  /* Day mode: glow, fill, and flame layers hidden.
+     Base transitions define EXTINGUISHING timing (nightfall → day):
+     glow/fill fade first (no delay), flame fades second. */
   .inner-glow,
-  .body-fill,
-  .flame-group {
+  .body-fill {
     opacity: 0;
-    transition: opacity 0.3s ease-out;
+    transition: opacity 0.2s ease-in;
   }
 
-  /* Nightfall mode: warm amber glow, fill, and flame visible */
+  .flame-group {
+    opacity: 0;
+    transition: opacity 0.18s ease-in;
+  }
+
+  /* Nightfall mode: warm amber glow, fill, and flame visible.
+     Button filter ramps slowly to full glow over 600ms. */
   :global([data-theme="nightfall"]) button {
     color: var(--flame-color);
     filter: drop-shadow(0 0 10px var(--glow-amber));
+    transition:
+      color var(--motion-duration-smooth) var(--motion-easing-out),
+      filter 0.6s ease-out,
+      opacity var(--motion-duration-quick) var(--motion-easing-out);
   }
 
   @media (hover: hover) {
@@ -137,17 +146,34 @@
 
   @media (forced-colors: active) and (hover: hover) {
     button:hover {
+      filter: none;
       opacity: 1;
       color: Highlight;
     }
   }
 
-  :global([data-theme="nightfall"]) .inner-glow { opacity: 0.55; }
-  :global([data-theme="nightfall"]) .body-fill { opacity: 0.25; }
+  @media (forced-colors: active) {
+    :global([data-theme="nightfall"]) button {
+      filter: none;
+    }
+  }
+
+  /* Nightfall layer LIGHTING stagger (day → nightfall):
+     flame at ~30% (180ms), glow/fill at ~50% (300ms) */
+  :global([data-theme="nightfall"]) .inner-glow {
+    opacity: 0.55;
+    transition: opacity 0.3s ease-out 300ms;
+  }
+
+  :global([data-theme="nightfall"]) .body-fill {
+    opacity: 0.25;
+    transition: opacity 0.3s ease-out 300ms;
+  }
 
   :global([data-theme="nightfall"]) .flame-group {
     opacity: 1;
-    animation: flameFlicker 2.5s ease-in-out infinite;
+    transition: opacity 0.25s ease-out 180ms;
+    animation: flameFlicker 2.5s ease-in-out infinite 0.5s;
   }
 
   /* Swing animation on click: spring-physics approximation */
@@ -170,10 +196,27 @@
     100% { transform: rotate(0deg); }
   }
 
-  /* Reduced motion: disable swing and flicker, preserve glow opacity transition */
+  /* Reduced motion: instant state swap — no swing, no stagger, no flicker */
   @media (prefers-reduced-motion: reduce) {
+    button,
+    :global([data-theme="nightfall"]) button {
+      transition: none;
+    }
+
     .chochin-wrap.swinging {
       animation: none;
+    }
+
+    .inner-glow,
+    .body-fill,
+    .flame-group {
+      transition: none;
+    }
+
+    :global([data-theme="nightfall"]) .inner-glow,
+    :global([data-theme="nightfall"]) .body-fill,
+    :global([data-theme="nightfall"]) .flame-group {
+      transition: none;
     }
 
     :global([data-theme="nightfall"]) .flame-group {

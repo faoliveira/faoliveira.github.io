@@ -7,7 +7,7 @@ const posts = await getFeaturedPosts();
 
 {posts.length > 0 && (
   <section class="featured-grid" aria-labelledby="featured-heading">
-    <h2 id="featured-heading" class="section-heading reveal">Featured</h2>
+    <h2 id="featured-heading" class="section-label reveal">Featured</h2>
     <div class="grid">
       {posts.map((post) => (
         <div class="reveal">
@@ -20,14 +20,7 @@ const posts = await getFeaturedPosts();
 
 <style>
   .featured-grid {
-    margin-block-end: var(--ma-vast);
-  }
-
-  .section-heading {
-    font-size: var(--type-xl);
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin-block-end: var(--ma-wide);
+    margin-block-end: var(--ma-spacious);
   }
 
   .grid {
