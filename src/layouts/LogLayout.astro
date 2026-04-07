@@ -133,24 +133,8 @@ const isoDate = toISODateString(date);
     }
   }
 
-  /* Tablet (768–1023px) */
-  @media (min-width: 768px) and (max-width: 1023px) {
-    .dateline-grid {
-      grid-template-columns: 80px 1fr;
-      gap: var(--ma-base);
-    }
-
-    .date-col {
-      position: static;
-    }
-
-    .date-day {
-      font-size: var(--type-2xl);
-    }
-  }
-
-  /* Mobile (<768px) */
-  @media (max-width: 767px) {
+  /* Mobile + tablet (<1024px) */
+  @media (max-width: 1023px) {
     .dateline-grid {
       display: block;
     }
