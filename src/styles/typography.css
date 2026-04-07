@@ -138,12 +138,13 @@ h2 {
   font-size: clamp(var(--type-xl), 4vw, var(--type-2xl));
   line-height: var(--leading-2xl);
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 h3 {
   font-size: var(--type-xl);
   line-height: var(--leading-xl);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 h4 {
