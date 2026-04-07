@@ -3,14 +3,27 @@
 
 <section class="hero" aria-labelledby="hero-heading">
   <h1 id="hero-heading">Seventeen tabs open and a restless dog.</h1>
+  <div class="hero-rule" aria-hidden="true"></div>
   <p class="subtitle">Writing about projects, data, and things I noticed that I couldn't leave alone.</p>
 </section>
 
 <style>
+  @keyframes hero-entrance {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .hero {
     padding-block-start: var(--ma-breath);
-    padding-block-end: var(--ma-vast);
+    padding-block-end: var(--ma-silence);
     text-align: center;
+    animation: hero-entrance var(--motion-duration-reveal) var(--motion-easing-out) both;
   }
 
   .hero h1,
@@ -26,9 +39,23 @@
     color: var(--color-text-primary);
   }
 
+  .hero-rule {
+    width: 3ch;
+    height: 2px;
+    background: var(--color-accent);
+    margin-inline: auto;
+    margin-block: var(--ma-base);
+  }
+
   .subtitle {
-    margin-block-start: var(--ma-base);
+    margin-block-start: 0;
     font-size: var(--type-md);
     color: var(--color-text-secondary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero {
+      animation: none;
+    }
   }
 </style>
