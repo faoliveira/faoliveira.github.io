@@ -5,14 +5,23 @@ import { getPublishedPosts, type Post } from "@modules/content";
 interface Props {
   posts?: Post[];
   showHeading?: boolean;
+  headingText?: string;
+  emptyStateText?: string;
+  viewAllHref?: string;
 }
 
-const { posts: propPosts, showHeading = true } = Astro.props;
+const {
+  posts: propPosts,
+  showHeading = true,
+  headingText = "All posts",
+  emptyStateText = "Coming soon.",
+  viewAllHref,
+} = Astro.props;
 const posts = propPosts ?? (await getPublishedPosts());
 ---
 
 <section class="post-list">
-  {showHeading && <h2 class="section-heading reveal">All posts</h2>}
+  {showHeading && <h2 class="section-label reveal">{headingText}</h2>}
   {posts.length > 0 ? (
     <ul class="posts" role="list">
       {posts.map((post) => (
@@ -22,7 +31,10 @@ const posts = propPosts ?? (await getPublishedPosts());
       ))}
     </ul>
   ) : (
-    <p class="empty-state">Coming soon.</p>
+    <p class="empty-state">{emptyStateText}</p>
+  )}
+  {viewAllHref && (
+    <a href={viewAllHref} class="view-all reveal">View all posts &rarr;</a>
   )}
 </section>
 
@@ -32,23 +44,19 @@ const posts = propPosts ?? (await getPublishedPosts());
        plus Hero's padding-block-end already provide breathing room above. */
   }
 
-  /* When FeaturedGrid is absent (post-list directly follows hero),
-     add equivalent top spacing so the gap feels intentional in both cases. */
+  /* Keep the Hero -> PostList path explicit: the hero owns the dramatic
+     pause, so PostList adds no extra margin when FeaturedGrid is absent. */
   :global(.hero + .post-list) {
-    margin-block-start: var(--ma-vast);
-  }
-
-  .section-heading {
-    font-size: var(--type-xl);
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin-block-end: var(--ma-wide);
+    margin-block-start: 0;
   }
 
   .posts {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ma-base);
   }
 
   .posts li {
@@ -63,5 +71,26 @@ const posts = propPosts ?? (await getPublishedPosts());
 
   .empty-state {
     color: var(--color-text-tertiary);
+  }
+
+  .view-all {
+    display: inline-block;
+    margin-block-start: var(--ma-base);
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
+  }
+
+  @media (hover: hover) {
+    .view-all:hover {
+      color: var(--color-accent);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .view-all {
+      transition: none;
+    }
   }
 </style>

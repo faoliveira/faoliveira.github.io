@@ -3,11 +3,19 @@ import FeaturedGrid from "@components/FeaturedGrid.astro";
 import Hero from "@components/Hero.astro";
 import PostList from "@components/PostList.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { getPublishedPosts } from "@modules/content";
 import { SITE_URL } from "@modules/seo";
+
+const recentPosts = await getPublishedPosts({ limit: 5, excludeFeatured: true });
 ---
 
 <BaseLayout title="felipeo.me" image={`${SITE_URL}/og/index.png`}>
   <Hero />
   <FeaturedGrid />
-  <PostList />
+  <PostList
+    posts={recentPosts}
+    headingText="Recent posts"
+    emptyStateText="No recent non-featured posts yet. Browse the archive."
+    viewAllHref="/posts"
+  />
 </BaseLayout>

@@ -12,9 +12,21 @@ function sortByDateDesc(posts: Post[]): Post[] {
   });
 }
 
-export async function getPublishedPosts(): Promise<Post[]> {
-  const posts = await getCollection("posts", ({ data }) => isVisible(data));
-  return sortByDateDesc(posts);
+export async function getPublishedPosts(options?: {
+  limit?: number;
+  excludeFeatured?: boolean;
+}): Promise<Post[]> {
+  const { limit, excludeFeatured = false } = options ?? {};
+  const posts = await getCollection(
+    "posts",
+    ({ data }) => isVisible(data) && (!excludeFeatured || data.featured !== true),
+  );
+  const sorted = sortByDateDesc(posts);
+  if (limit === undefined) {
+    return sorted;
+  }
+
+  return sorted.slice(0, Math.max(0, limit));
 }
 
 export async function getFeaturedPosts(): Promise<Post[]> {

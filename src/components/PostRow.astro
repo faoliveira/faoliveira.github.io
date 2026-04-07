@@ -13,17 +13,17 @@ const { title, date, type } = post.data;
 
 <a href={`/posts/${post.id}`} class="post-row">
   <span class="post-title">{title}</span>
-  {type && <TypeTag type={type} />}
+  <span class="post-tag">{type && <TypeTag type={type} />}</span>
   <time datetime={toISODateString(date)} class="post-date">{formatDate(date)}</time>
 </a>
 
 <style>
   .post-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
     align-items: baseline;
     gap: var(--ma-base);
     padding-block: var(--ma-narrow);
-    border-bottom: 1px solid var(--color-border);
     text-decoration: none;
     color: inherit;
     transition: color var(--motion-duration-quick) var(--motion-easing-out);
@@ -44,8 +44,12 @@ const { title, date, type } = post.data;
   .post-title {
     font-size: var(--type-base);
     color: var(--color-text-primary);
-    flex: 1;
     min-width: 0;
+  }
+
+  .post-tag {
+    display: flex;
+    align-items: baseline;
   }
 
   .post-date {
@@ -53,7 +57,5 @@ const { title, date, type } = post.data;
     font-family: var(--font-mono);
     color: var(--color-text-secondary);
     white-space: nowrap;
-    margin-inline-start: auto;
   }
-
 </style>
