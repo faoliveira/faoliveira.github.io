@@ -28,7 +28,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     {
       params: { slug: "about" },
       props: {
-        title: "About — felipeo.me",
+        title: "About — fa.",
         description: ABOUT_DESCRIPTION,
       },
     },

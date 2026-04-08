@@ -6,11 +6,7 @@ interface Props {
   "aria-label"?: string;
 }
 
-const {
-  size = "md",
-  lift = false,
-  "aria-label": ariaLabel = "fa. — felipeo.me home",
-} = Astro.props;
+const { size = "md", lift = false, "aria-label": ariaLabel = "fa. — home" } = Astro.props;
 
 const isHomePage = Astro.url.pathname === "/";
 ---

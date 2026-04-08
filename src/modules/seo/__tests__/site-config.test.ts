@@ -31,6 +31,6 @@ describe("site-config", () => {
   });
 
   it("SITE_TITLE matches site identity", () => {
-    expect(SITE_TITLE).toBe("felipeo.me");
+    expect(SITE_TITLE).toBe("fa.");
   });
 });
