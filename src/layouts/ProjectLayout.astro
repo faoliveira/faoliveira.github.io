@@ -14,10 +14,22 @@ interface Props {
   repo?: string;
   liveUrl?: string;
   hasIsland?: boolean;
+  canvasMode?: "interactive" | "prose";
   image?: string;
 }
 
-const { title, description, type, last_run, season, repo, liveUrl, hasIsland, image } = Astro.props;
+const {
+  title,
+  description,
+  type,
+  last_run,
+  season,
+  repo,
+  liveUrl,
+  hasIsland,
+  canvasMode = "prose",
+  image,
+} = Astro.props;
 
 const structuredData = buildProjectStructuredData({ title, description, repo, liveUrl });
 ---
@@ -53,10 +65,12 @@ const structuredData = buildProjectStructuredData({ title, description, repo, li
 
     <!-- Canvas Stage: outer = spacing, inner = visible container -->
     <div class="canvas-stage">
-      <div class="canvas-container">
-        <div class="prose">
+      <div class="canvas-container" data-canvas-mode={canvasMode}>
+        {canvasMode === "prose" ? (
+          <div class="prose"><slot /></div>
+        ) : (
           <slot />
-        </div>
+        )}
         {hasIsland && (
           <noscript>
             <p class="noscript-message">
@@ -149,15 +163,22 @@ const structuredData = buildProjectStructuredData({ title, description, repo, li
 
   /* Canvas container: THE visible stage */
   .canvas-container {
-    background: var(--color-surface-alt);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
+    border-block-start: 2px solid var(--color-border);
     min-height: 400px;
     overflow: hidden;
   }
 
-  .prose {
-    padding: var(--ma-wide); /* Optional padding for the prose inside the canvas */
+  .canvas-container[data-canvas-mode="prose"] {
+    padding: var(--ma-wide);
+  }
+
+  .canvas-container[data-canvas-mode="prose"] .prose {
+    max-width: 65ch;
+    margin-inline: auto;
+  }
+
+  .canvas-container[data-canvas-mode="interactive"] {
+    padding: 0;
   }
 
   .noscript-message {

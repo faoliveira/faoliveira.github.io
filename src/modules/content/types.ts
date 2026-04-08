@@ -31,6 +31,7 @@ const ProjectFields = {
   repo: z.url({ protocol: /^https$/ }).optional(),
   liveUrl: z.url({ protocol: /^https$/ }).optional(),
   hasIsland: z.boolean().optional(),
+  canvasMode: z.enum(["interactive", "prose"]).default("prose").optional(),
 };
 
 export const PostSchema = z.object({
