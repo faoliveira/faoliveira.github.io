@@ -10,5 +10,6 @@
       "@islands/*": ["src/islands/*"],
       "@assets/*": ["src/assets/*"]
     }
-  }
+  },
+  "exclude": ["docs", "dist", "node_modules"]
 }

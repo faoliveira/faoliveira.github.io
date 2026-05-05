@@ -1,0 +1,23 @@
+{
+  "now": {
+    "music": {
+      "title": "Cajuína",
+      "artist": "Caetano Veloso",
+      "duration": "3:58",
+      "source": {
+        "kind": "youtube",
+        "url": "https://www.youtube.com/watch?v=8ID1plssS4s"
+      }
+    },
+    "reading": {
+      "title": "Cosmicomics",
+      "author": "Italo Calvino",
+      "page": 142,
+      "totalPages": 240
+    },
+    "mood": "idle · loaf",
+    "tabs": 17,
+    "status": "esp32 still won't connect",
+    "updated": "2026-05-04"
+  }
+}
