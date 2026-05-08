@@ -1,12 +1,12 @@
-// src/modules/navigation/index.ts
 import type { NavItem } from "./types";
 
 export type { NavItem };
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "posts", href: "/posts/" },
-  { label: "about", href: "/about/" },
-  { label: "search", href: "/search/" },
+  { label: "Home", href: "/" },
+  { label: "Posts", href: "/posts/" },
+  { label: "About", href: "/about/" },
+  { label: "Search", href: "/search/" },
 ];
 
 export function isActivePath(currentPath: string, itemPath: string): boolean {

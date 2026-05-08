@@ -5,41 +5,76 @@ import { formatDate, toISODateString } from "@modules/content";
 
 interface Props {
   post: Post;
+  tapeSide?: "left" | "right";
+  tapeTone?: "matcha" | "vermillion";
 }
 
-const { post } = Astro.props;
+const { post, tapeSide = "left", tapeTone = "matcha" } = Astro.props;
 const { title, description, date, type } = post.data;
+const titleId = `featured-title-${post.id}`;
 ---
 
-<a href={`/posts/${post.id}`} class="featured-card grain-surface">
-  {type && <TypeTag type={type} />}
-  <h3 class="card-title">{title}</h3>
-  {description && <p class="card-description">{description}</p>}
-  <time datetime={toISODateString(date)} class="card-date">{formatDate(date)}</time>
+<a
+  href={`/posts/${post.id}`}
+  aria-labelledby={titleId}
+  class:list={[
+    "featured-card",
+    "grain-surface",
+    `featured-card--tape-${tapeSide}`,
+    `featured-card--${tapeTone}`,
+  ]}
+>
+  <span class="washi-tape" aria-hidden="true"></span>
+  <span class="card-body">
+    <span class="card-meta">
+      {type && <TypeTag type={type} />}
+      <span class="card-date-column">
+        <time datetime={toISODateString(date)} class="card-date">{formatDate(date)}</time>
+      </span>
+    </span>
+    <h3 class="card-title" id={titleId}>{title}</h3>
+    {description && <span class="card-description">{description}</span>}
+  </span>
 </a>
 
 <style>
   .featured-card {
-    display: block;
+    --tape-matcha: repeating-linear-gradient(
+      45deg,
+      oklch(0.75 0.08 155 / 0.55) 0 6px,
+      oklch(0.85 0.05 155 / 0.35) 6px 12px
+    );
+    --tape-vermillion: repeating-linear-gradient(
+      45deg,
+      oklch(0.78 0.09 30 / 0.55) 0 6px,
+      oklch(0.85 0.05 30 / 0.35) 6px 12px
+    );
+    --tape-shadow: oklch(0 0 0 / 0.08);
+    position: relative;
+    display: flex;
+    min-height: 100%;
     background: var(--color-surface-alt);
     padding: var(--ma-wide);
-    border: 1px solid transparent;
-    border-left: 3px solid transparent;
+    border: 1px solid var(--color-border);
     border-radius: var(--ma-narrow);
+    box-shadow: var(--shadow-card);
     text-decoration: none;
     color: inherit;
-    transition: border-left-color var(--motion-duration-normal) var(--motion-easing-out);
-    container-type: inline-size;
+    overflow: visible;
+    isolation: isolate;
+    transition:
+      box-shadow var(--motion-duration-normal) var(--motion-easing-out),
+      transform var(--motion-duration-normal) var(--motion-easing-out);
   }
 
   @media (hover: hover) {
     .featured-card:hover {
-      border-left-color: var(--color-accent);
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-2px);
     }
   }
 
   .featured-card:focus-visible {
-    border-left-color: var(--color-accent);
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
@@ -50,30 +85,89 @@ const { title, description, date, type } = post.data;
     }
   }
 
+  :global(html[data-theme="nightfall"]) .featured-card {
+    --tape-matcha: repeating-linear-gradient(
+      45deg,
+      oklch(0.62 0.09 145 / 0.72) 0 6px,
+      oklch(0.72 0.06 145 / 0.48) 6px 12px
+    );
+    --tape-vermillion: repeating-linear-gradient(
+      45deg,
+      oklch(0.67 0.12 38 / 0.72) 0 6px,
+      oklch(0.76 0.07 38 / 0.48) 6px 12px
+    );
+    --tape-shadow: oklch(0 0 0 / 0.18);
+  }
+
+  .washi-tape {
+    position: absolute;
+    inset-block-start: -10px;
+    z-index: 2;
+    width: 90px;
+    height: 18px;
+    background: var(--tape-matcha);
+    box-shadow: 0 1px 2px var(--tape-shadow);
+    pointer-events: none;
+  }
+
+  .featured-card--vermillion .washi-tape {
+    background: var(--tape-vermillion);
+  }
+
+  .featured-card--tape-left .washi-tape {
+    inset-inline-start: 40px;
+    rotate: -6deg;
+  }
+
+  .featured-card--tape-right .washi-tape {
+    inset-inline-end: 60px;
+    rotate: 6deg;
+  }
+
+  .card-date-column,
+  .card-body {
+    min-width: 0;
+  }
+
+  .card-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--ma-narrow);
+    margin-block-end: var(--ma-narrow);
+  }
+
   .card-title {
     font-size: var(--type-lg);
     font-weight: 600;
     color: var(--color-text-primary);
-    margin-block-start: var(--ma-narrow);
+    margin-block-start: 0;
     line-height: var(--leading-lg);
   }
 
   .card-description {
+    display: -webkit-box;
     font-size: var(--type-sm);
     color: var(--color-text-secondary);
     line-height: var(--leading-sm);
     margin-block-start: var(--ma-narrow);
-    display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
   .card-date {
-    display: block;
+    display: inline-block;
     font-size: var(--type-xs);
     font-family: var(--font-mono);
-    color: var(--color-text-secondary);
-    margin-block-start: var(--ma-base);
+    color: var(--color-text-tertiary);
+    line-height: var(--leading-xs);
+    white-space: nowrap;
   }
 </style>

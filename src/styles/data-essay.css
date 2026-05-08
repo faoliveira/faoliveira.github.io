@@ -47,6 +47,30 @@
   max-width: 85ch;
 }
 
+/* Lead-island slot. Default rail matches the .prose 85ch column so a naked
+   <HeroImage slot="hero"> aligns with the body; <Full> and <Wide> opt out via
+   their own width contracts. */
+.data-essay-hero {
+  max-width: 85ch;
+  margin-inline: auto;
+  margin-block-end: var(--ma-spacious);
+}
+
+/* Header de-emphasis when the hero slot is filled. The visual hook above
+   replaces the matcha-rule separator and dominates the visual hierarchy, so
+   the header drops to byline weight. */
+.data-essay-header--with-hero {
+  margin-block-end: var(--ma-base);
+}
+
+.data-essay-header--with-hero .data-essay-title {
+  font-size: var(--type-2xl);
+}
+
+.data-essay-header--with-hero::after {
+  display: none;
+}
+
 /* Scrollytelling Section */
 .scrolly-section {
   display: flex;
@@ -95,7 +119,7 @@ html[data-theme="nightfall"] .scrolly-step {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* box-shadow is not token-based, so @property doesn't help — explicit transition (Story 1.4) */
+/* box-shadow isn't token-based, so @property can't animate it; transition explicitly. */
 html[data-theme].theme-animated .scrolly-step {
   transition: box-shadow var(--motion-duration-smooth) var(--motion-easing-ease);
 }

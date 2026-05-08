@@ -6,6 +6,7 @@ interface Props {
   posts?: Post[];
   showHeading?: boolean;
   headingText?: string;
+  decorativeSuffix?: string;
   emptyStateText?: string;
   viewAllHref?: string;
 }
@@ -14,6 +15,7 @@ const {
   posts: propPosts,
   showHeading = true,
   headingText = "All posts",
+  decorativeSuffix,
   emptyStateText = "Coming soon.",
   viewAllHref,
 } = Astro.props;
@@ -21,11 +23,15 @@ const posts = propPosts ?? (await getPublishedPosts());
 ---
 
 <section class="post-list">
-  {showHeading && <h2 class="section-label reveal">{headingText}</h2>}
+  {showHeading && (
+    <h2 class="section-label kb-section-label">
+      {headingText}{decorativeSuffix && <span aria-hidden="true">{` ${decorativeSuffix}`}</span>}
+    </h2>
+  )}
   {posts.length > 0 ? (
     <ul class="posts" role="list">
-      {posts.map((post) => (
-        <li class="reveal">
+      {posts.map((post, idx) => (
+        <li class:list={[idx > 0 && "reveal"]}>
           <PostRow post={post} />
         </li>
       ))}
@@ -34,18 +40,13 @@ const posts = propPosts ?? (await getPublishedPosts());
     <p class="empty-state">{emptyStateText}</p>
   )}
   {viewAllHref && (
-    <a href={viewAllHref} class="view-all reveal">View all posts &rarr;</a>
+    <a href={viewAllHref} class="view-all reveal">View all posts →</a>
   )}
 </section>
 
 <style>
-  .post-list {
-    /* No top margin needed when FeaturedGrid is present — its margin-block-end
-       plus Hero's padding-block-end already provide breathing room above. */
-  }
-
-  /* Keep the Hero -> PostList path explicit: the hero owns the dramatic
-     pause, so PostList adds no extra margin when FeaturedGrid is absent. */
+  /* When PostList directly follows Hero (no FeaturedGrid between them), the
+     hero's padding-block-end owns the pause; an extra top margin would double it. */
   :global(.hero + .post-list) {
     margin-block-start: 0;
   }

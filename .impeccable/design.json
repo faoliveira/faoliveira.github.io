@@ -1,0 +1,493 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-07T00:00:00Z",
+  "title": "Design System: felipeo.me — Koubou",
+  "extensions": {
+    "colorMeta": {
+      "surface": {
+        "role": "neutral",
+        "displayName": "Cream Surface",
+        "canonical": "oklch(0.96 0.012 80)",
+        "tonalRamp": [
+          "oklch(0.18 0.012 80)",
+          "oklch(0.30 0.012 80)",
+          "oklch(0.42 0.012 80)",
+          "oklch(0.55 0.012 80)",
+          "oklch(0.68 0.012 80)",
+          "oklch(0.80 0.012 80)",
+          "oklch(0.91 0.018 80)",
+          "oklch(0.96 0.012 80)"
+        ]
+      },
+      "surface-alt": {
+        "role": "neutral",
+        "displayName": "Cream Surface Alt",
+        "canonical": "oklch(0.91 0.018 80)",
+        "tonalRamp": [
+          "oklch(0.18 0.018 80)",
+          "oklch(0.30 0.018 80)",
+          "oklch(0.42 0.018 80)",
+          "oklch(0.55 0.018 80)",
+          "oklch(0.68 0.018 80)",
+          "oklch(0.80 0.018 80)",
+          "oklch(0.91 0.018 80)",
+          "oklch(0.96 0.012 80)"
+        ]
+      },
+      "code-surface": {
+        "role": "neutral",
+        "displayName": "Code Surface",
+        "canonical": "oklch(0.94 0.008 80)",
+        "tonalRamp": [
+          "oklch(0.18 0.008 80)",
+          "oklch(0.30 0.008 80)",
+          "oklch(0.42 0.008 80)",
+          "oklch(0.55 0.008 80)",
+          "oklch(0.68 0.008 80)",
+          "oklch(0.80 0.008 80)",
+          "oklch(0.94 0.008 80)",
+          "oklch(0.97 0.008 80)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Paper Border",
+        "canonical": "oklch(0.85 0.01 80)",
+        "tonalRamp": [
+          "oklch(0.18 0.01 80)",
+          "oklch(0.30 0.01 80)",
+          "oklch(0.42 0.01 80)",
+          "oklch(0.55 0.01 80)",
+          "oklch(0.68 0.01 80)",
+          "oklch(0.78 0.01 80)",
+          "oklch(0.85 0.01 80)",
+          "oklch(0.93 0.01 80)"
+        ]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Warm-Black Ink",
+        "canonical": "oklch(0.22 0.02 60)",
+        "tonalRamp": [
+          "oklch(0.16 0.02 60)",
+          "oklch(0.22 0.02 60)",
+          "oklch(0.32 0.02 60)",
+          "oklch(0.45 0.02 60)",
+          "oklch(0.55 0.015 60)",
+          "oklch(0.70 0.015 60)",
+          "oklch(0.85 0.012 60)",
+          "oklch(0.96 0.012 80)"
+        ]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Warm Gray Ink",
+        "canonical": "oklch(0.45 0.02 60)",
+        "tonalRamp": [
+          "oklch(0.16 0.02 60)",
+          "oklch(0.22 0.02 60)",
+          "oklch(0.32 0.02 60)",
+          "oklch(0.45 0.02 60)",
+          "oklch(0.55 0.015 60)",
+          "oklch(0.70 0.015 60)",
+          "oklch(0.85 0.012 60)",
+          "oklch(0.96 0.012 80)"
+        ]
+      },
+      "text-tertiary": {
+        "role": "neutral",
+        "displayName": "Warm Pale Ink",
+        "canonical": "oklch(0.55 0.015 60)",
+        "tonalRamp": [
+          "oklch(0.16 0.02 60)",
+          "oklch(0.22 0.02 60)",
+          "oklch(0.32 0.02 60)",
+          "oklch(0.45 0.02 60)",
+          "oklch(0.55 0.015 60)",
+          "oklch(0.70 0.015 60)",
+          "oklch(0.85 0.012 60)",
+          "oklch(0.96 0.012 80)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Matcha Ink",
+        "canonical": "oklch(0.45 0.10 155)",
+        "tonalRamp": [
+          "oklch(0.18 0.06 155)",
+          "oklch(0.28 0.08 155)",
+          "oklch(0.36 0.09 155)",
+          "oklch(0.45 0.10 155)",
+          "oklch(0.55 0.10 155)",
+          "oklch(0.65 0.10 155)",
+          "oklch(0.78 0.08 155)",
+          "oklch(0.92 0.04 155)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Matcha Ink (Hover)",
+        "canonical": "oklch(0.44 0.11 155)"
+      },
+      "accent-tint": {
+        "role": "primary",
+        "displayName": "Matcha Tint",
+        "canonical": "oklch(0.45 0.10 155 / 0.10)"
+      },
+      "margin-ink": {
+        "role": "neutral",
+        "displayName": "Margin Ink",
+        "canonical": "oklch(0.40 0.04 40)",
+        "tonalRamp": [
+          "oklch(0.18 0.04 40)",
+          "oklch(0.28 0.04 40)",
+          "oklch(0.40 0.04 40)",
+          "oklch(0.52 0.04 40)",
+          "oklch(0.65 0.035 40)",
+          "oklch(0.78 0.03 40)",
+          "oklch(0.88 0.02 40)",
+          "oklch(0.95 0.012 40)"
+        ]
+      },
+      "washi-matcha": {
+        "role": "tertiary",
+        "displayName": "Washi · Matcha",
+        "canonical": "oklch(0.75 0.08 155 / 0.55)"
+      },
+      "washi-vermillion": {
+        "role": "tertiary",
+        "displayName": "Washi · Vermillion",
+        "canonical": "oklch(0.78 0.09 30 / 0.55)"
+      },
+      "washi-amber": {
+        "role": "tertiary",
+        "displayName": "Washi · Amber",
+        "canonical": "oklch(0.78 0.09 65 / 0.55)"
+      },
+      "post-it-yellow": {
+        "role": "tertiary",
+        "displayName": "Post-It Yellow",
+        "canonical": "oklch(0.92 0.10 92)"
+      },
+      "stamp-red": {
+        "role": "tertiary",
+        "displayName": "Stamp Red",
+        "canonical": "oklch(0.52 0.16 25)"
+      },
+      "surface-night": {
+        "role": "neutral",
+        "displayName": "Indigo Surface (Nightfall)",
+        "canonical": "oklch(0.22 0.035 280)",
+        "tonalRamp": [
+          "oklch(0.10 0.035 280)",
+          "oklch(0.18 0.035 280)",
+          "oklch(0.22 0.035 280)",
+          "oklch(0.28 0.035 280)",
+          "oklch(0.40 0.030 280)",
+          "oklch(0.55 0.025 280)",
+          "oklch(0.72 0.020 280)",
+          "oklch(0.90 0.010 80)"
+        ]
+      },
+      "surface-alt-night": {
+        "role": "neutral",
+        "displayName": "Indigo Surface Alt (Nightfall)",
+        "canonical": "oklch(0.28 0.035 280)"
+      },
+      "text-primary-night": {
+        "role": "neutral",
+        "displayName": "Off-White Ink (Nightfall)",
+        "canonical": "oklch(0.90 0.01 80)"
+      },
+      "text-secondary-night": {
+        "role": "neutral",
+        "displayName": "Amber Ink (Nightfall)",
+        "canonical": "oklch(0.68 0.035 70)"
+      },
+      "accent-night": {
+        "role": "primary",
+        "displayName": "Matcha Lantern (Nightfall)",
+        "canonical": "oklch(0.62 0.10 155)"
+      },
+      "amber-night": {
+        "role": "secondary",
+        "displayName": "Lantern Amber",
+        "canonical": "oklch(0.75 0.14 70)",
+        "tonalRamp": [
+          "oklch(0.18 0.06 70)",
+          "oklch(0.28 0.08 70)",
+          "oklch(0.40 0.10 70)",
+          "oklch(0.52 0.12 70)",
+          "oklch(0.65 0.13 70)",
+          "oklch(0.75 0.14 70)",
+          "oklch(0.85 0.10 70)",
+          "oklch(0.95 0.05 70)"
+        ]
+      },
+      "amber-muted-night": {
+        "role": "secondary",
+        "displayName": "Amber Muted (Nightfall Halo)",
+        "canonical": "oklch(0.65 0.08 70)"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Homepage hero only — the bold typographic statement that lands the 5-second smile."
+      },
+      "headline": { "displayName": "Headline", "purpose": "h2 inside posts and page titles." },
+      "title": {
+        "displayName": "Title",
+        "purpose": "h3 / h4, featured-card titles, sub-section headers."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All reading prose. Cap line length at 62ch in .prose; never exceed 75ch."
+      },
+      "label": {
+        "displayName": "Label / Mono",
+        "purpose": "Section labels, tags, dates, file paths, code. JetBrains Mono uppercase tracked."
+      },
+      "script": {
+        "displayName": "Marginalia / Script",
+        "purpose": "Caveat — gutter notes only, rotated ±5°. Never used for content the reader needs to parse."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-rest",
+        "value": "0 1px 3px oklch(0 0 0 / 0.04)",
+        "purpose": "The breath under a featured card at rest. Almost invisible; signals 'this is liftable' without lifting."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 4px 12px oklch(0 0 0 / 0.08)",
+        "purpose": "Featured card on :hover, paired with translateY(-2px). Reads as pinned by the cursor, not floating."
+      },
+      {
+        "name": "polaroid-pin",
+        "value": "0 2px 5px rgba(0,0,0,0.10), 0 6px 18px rgba(0,0,0,0.08)",
+        "purpose": "Physical-object shadow on washi-taped polaroids — near + diffuse stack reads as an actual photograph pressed onto a page."
+      },
+      {
+        "name": "system-1-drop",
+        "value": "3px 3px 0 #1a1a1a",
+        "purpose": "1-bit retro Mac drop on the System-1 Currently widget. Skeuomorph; only this widget uses it."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-quick",
+        "value": "150ms",
+        "purpose": "Link hover, color shifts, micro-feedback."
+      },
+      {
+        "name": "duration-normal",
+        "value": "200ms",
+        "purpose": "Card lifts, page transition cross-fade."
+      },
+      {
+        "name": "duration-smooth",
+        "value": "300ms",
+        "purpose": "Nightfall token transition (color custom-property interpolation)."
+      },
+      {
+        "name": "duration-reveal",
+        "value": "400ms",
+        "purpose": "Scroll-driven entrance reveals — opacity 0→1, translateY 8px→0."
+      },
+      {
+        "name": "easing-out",
+        "value": "ease-out",
+        "purpose": "Default for all interactive entrances and hovers."
+      },
+      {
+        "name": "easing-in-out",
+        "value": "ease-in-out",
+        "purpose": "State changes that need symmetric in/out."
+      },
+      {
+        "name": "easing-ease",
+        "value": "ease",
+        "purpose": "Nightfall token transition (color blends naturally either direction)."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "480px", "purpose": "Minor type-scale adjustment, margin step." },
+      {
+        "name": "md",
+        "value": "768px",
+        "purpose": "Featured grid switches to 2-col; ToC repositions; margins step to --ma-wide."
+      },
+      {
+        "name": "lg",
+        "value": "1024px",
+        "purpose": "ToC becomes sticky sidebar; margins step to --ma-vast; hover states enabled."
+      },
+      {
+        "name": "xl",
+        "value": "1280px",
+        "purpose": "Max content container reached (--layout-max). Hero left margin-note translates outside the column to read as a true marginal annotation."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Accent Link",
+      "kind": "button",
+      "refersTo": "accent-link",
+      "description": "The site's only 'button' — text in matcha with a 1px underline. The reading surface contains zero button chrome.",
+      "html": "<a href=\"#\" class=\"ds-accent-link\">read the post</a>",
+      "css": ".ds-accent-link { color: var(--color-accent, oklch(0.45 0.10 155)); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; font-family: 'Sora', system-ui, sans-serif; font-weight: 400; transition: color 150ms ease-out; } .ds-accent-link:hover { color: var(--color-accent-hover, oklch(0.44 0.11 155)); } .ds-accent-link:focus-visible { outline: 2px solid var(--color-accent, oklch(0.45 0.10 155)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Type Tag",
+      "kind": "chip",
+      "refersTo": "type-tag",
+      "description": "Optional post-type label rendered only when frontmatter has type:. Mono caps with a thin border, never a pill.",
+      "html": "<span class=\"ds-type-tag\">DATA ESSAY</span>",
+      "css": ".ds-type-tag { display: inline-block; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.75rem; font-weight: 500; color: var(--color-text-tertiary, oklch(0.55 0.015 60)); letter-spacing: 0.14em; text-transform: uppercase; padding: 2px 6px; border: 1px solid currentColor; border-radius: 3px; background: transparent; }"
+    },
+    {
+      "name": "Section Label",
+      "kind": "custom",
+      "refersTo": "section-label",
+      "description": "FEATURED ——, RECENT ——, CURRENTLY ——. Mono uppercase tracked, with literal trailing em-dashes as a typographic glyph.",
+      "html": "<p class=\"ds-section-label\">FEATURED ——</p>",
+      "css": ".ds-section-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-text-secondary, oklch(0.45 0.02 60)); line-height: 1.5; margin: 0 0 24px 0; }"
+    },
+    {
+      "name": "Featured Card",
+      "kind": "card",
+      "refersTo": "featured-card",
+      "description": "Surface-alt bed with a washi-tape strip pinned at one corner. Sharp corners, 1px border, lifts on hover. Whole card is one anchor with aria-labelledby pointing at the title.",
+      "html": "<a href=\"#\" class=\"ds-featured-card\" aria-labelledby=\"ds-featured-title\"><span class=\"ds-washi-tape\" aria-hidden=\"true\"></span><span class=\"ds-card-meta\"><span class=\"ds-type-tag\">PROJECT</span><time class=\"ds-card-date\">Apr 02, 2026</time></span><h3 class=\"ds-card-title\" id=\"ds-featured-title\">An ESP32, a DHT22, and a stubborn Wi-Fi rejoin loop</h3><span class=\"ds-card-description\">Notes from a small sensor I built for the koubou shelf. The bug was in my head, not the radio.</span></a>",
+      "css": ".ds-featured-card { position: relative; display: flex; flex-direction: column; background: var(--color-surface-alt, oklch(0.91 0.018 80)); padding: 24px; border: 1px solid var(--color-border, oklch(0.85 0.01 80)); border-radius: 3px; box-shadow: 0 1px 3px oklch(0 0 0 / 0.04); text-decoration: none; color: var(--color-text-primary, oklch(0.22 0.02 60)); font-family: 'Sora', system-ui, sans-serif; transition: box-shadow 200ms ease-out, transform 200ms ease-out; } .ds-featured-card:hover { box-shadow: 0 4px 12px oklch(0 0 0 / 0.08); transform: translateY(-2px); } .ds-featured-card:focus-visible { outline: 2px solid var(--color-accent, oklch(0.45 0.10 155)); outline-offset: 2px; } .ds-washi-tape { position: absolute; top: -10px; left: 40px; width: 90px; height: 18px; background: repeating-linear-gradient(45deg, oklch(0.75 0.08 155 / 0.55) 0 6px, oklch(0.85 0.05 155 / 0.35) 6px 12px); box-shadow: 0 1px 2px oklch(0 0 0 / 0.08); rotate: -6deg; } .ds-card-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-bottom: 8px; } .ds-card-date { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.75rem; color: var(--color-text-tertiary, oklch(0.55 0.015 60)); } .ds-card-title { font-family: 'Sora', system-ui, sans-serif; font-size: 1.25rem; font-weight: 600; line-height: 1.5; margin: 0; color: var(--color-text-primary, oklch(0.22 0.02 60)); } .ds-card-description { display: -webkit-box; font-size: 0.875rem; color: var(--color-text-secondary, oklch(0.45 0.02 60)); line-height: 1.5; margin-top: 8px; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }"
+    },
+    {
+      "name": "Post Row",
+      "kind": "card",
+      "refersTo": "post-row",
+      "description": "Tabular post-list row: title + optional TypeTag + JetBrains Mono date, dotted divider above. Whole row is one anchor with aria-labelledby pointing at the title.",
+      "html": "<a href=\"#\" class=\"ds-post-row\" aria-labelledby=\"ds-row-title\"><span class=\"ds-post-title\" id=\"ds-row-title\">Final Fantasy Tactics, twenty-three years late</span><span class=\"ds-post-tag\"><span class=\"ds-type-tag\">REFLECTION</span></span><time class=\"ds-post-date\">Mar 21, 2026</time></a>",
+      "css": ".ds-post-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: baseline; gap: 16px; padding: 8px 0; border-top: 1px dotted var(--color-border, oklch(0.85 0.01 80)); text-decoration: none; color: var(--color-text-primary, oklch(0.22 0.02 60)); font-family: 'Sora', system-ui, sans-serif; } .ds-post-row:hover .ds-post-title { color: var(--color-accent, oklch(0.45 0.10 155)); } .ds-post-row:focus-visible { outline: 2px solid var(--color-accent, oklch(0.45 0.10 155)); outline-offset: 2px; } .ds-post-title { font-size: 1rem; min-width: 0; transition: color 150ms ease-out; } .ds-post-date { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.875rem; color: var(--color-text-secondary, oklch(0.45 0.02 60)); white-space: nowrap; }"
+    },
+    {
+      "name": "Margin Note",
+      "kind": "custom",
+      "refersTo": "margin-note",
+      "description": "Caveat handwriting in the gutter, rotated ±5°, drawn in margin-ink. Lives inside a real <aside> with aria-label, never display: contents.",
+      "html": "<aside class=\"ds-margin-note-host\" aria-label=\"Hero margin notes\"><span class=\"ds-margin-note ds-margin-note--left\">(the tabs are<br>a feature →)</span><span class=\"ds-margin-note ds-margin-note--right\">his name<br>is Nuno</span></aside>",
+      "css": ".ds-margin-note-host { position: relative; display: block; height: 0; } .ds-margin-note { position: absolute; font-family: 'Caveat', cursive; font-size: 1.125rem; line-height: 1.4; color: var(--color-margin-ink, oklch(0.40 0.04 40)); white-space: nowrap; } .ds-margin-note--left { left: 0; top: 8px; rotate: -3deg; } .ds-margin-note--right { right: 0; top: 32px; rotate: 4deg; color: var(--color-accent, oklch(0.45 0.10 155)); }"
+    },
+    {
+      "name": "Nightfall Toggle",
+      "kind": "button",
+      "refersTo": "nightfall-toggle",
+      "description": "Day/nightfall mode switch. Single ◐ glyph, role=switch, aria-checked. The only binary control on the site.",
+      "html": "<button type=\"button\" class=\"ds-nightfall-toggle\" role=\"switch\" aria-checked=\"false\" aria-label=\"Alternar modo noturno\">◐</button>",
+      "css": ".ds-nightfall-toggle { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; background: transparent; color: var(--color-text-secondary, oklch(0.45 0.02 60)); font-size: 1.125rem; line-height: 1; border: 1px solid transparent; border-radius: 3px; cursor: pointer; transition: color 150ms ease-out; } .ds-nightfall-toggle:hover { color: var(--color-text-primary, oklch(0.22 0.02 60)); } .ds-nightfall-toggle:focus-visible { outline: 2px solid var(--color-accent, oklch(0.45 0.10 155)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Code Inline",
+      "kind": "custom",
+      "refersTo": "code-inline",
+      "description": "Inline <code> on a code-surface tint. Slightly darker than the page, never gray.",
+      "html": "<p class=\"ds-prose-line\">install via <code class=\"ds-code-inline\">bun install astro</code> and you're set.</p>",
+      "css": ".ds-prose-line { font-family: 'Sora', system-ui, sans-serif; color: var(--color-text-primary, oklch(0.22 0.02 60)); margin: 0; } .ds-code-inline { background: var(--color-code-surface, oklch(0.94 0.008 80)); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.9em; padding: 0.15em 0.35em; border-radius: 3px; color: var(--color-text-primary, oklch(0.22 0.02 60)); }"
+    },
+    {
+      "name": "Nav (fa. wordmark)",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Persistent top nav. fa. wordmark with the period in matcha + page links + nightfall toggle. No hamburger, ever.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navegação principal\"><a href=\"/\" class=\"ds-nav-brand\">fa<span class=\"ds-nav-brand-dot\">.</span></a><ul class=\"ds-nav-list\"><li><a href=\"/\" class=\"ds-nav-link\" aria-current=\"page\">Home</a></li><li><a href=\"/posts\" class=\"ds-nav-link\">Posts</a></li><li><a href=\"/about\" class=\"ds-nav-link\">About</a></li><li><a href=\"/search\" class=\"ds-nav-link\">Search</a></li><li><button type=\"button\" class=\"ds-nightfall-toggle\" role=\"switch\" aria-checked=\"false\" aria-label=\"Alternar modo noturno\">◐</button></li></ul></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; font-family: 'Sora', system-ui, sans-serif; } .ds-nav-brand { color: var(--color-text-primary, oklch(0.22 0.02 60)); font-weight: 700; font-size: 1.25rem; text-decoration: none; letter-spacing: -0.01em; } .ds-nav-brand-dot { color: var(--color-accent, oklch(0.45 0.10 155)); } .ds-nav-list { display: flex; gap: 24px; align-items: center; list-style: none; padding: 0; margin: 0; } .ds-nav-link { color: var(--color-text-secondary, oklch(0.45 0.02 60)); text-decoration: none; font-size: 1rem; padding: 8px 0; transition: color 150ms ease-out; } .ds-nav-link:hover { color: var(--color-text-primary, oklch(0.22 0.02 60)); } .ds-nav-link[aria-current='page'] { color: var(--color-accent, oklch(0.45 0.10 155)); } .ds-nav-link:focus-visible, .ds-nav-brand:focus-visible { outline: 2px solid var(--color-accent, oklch(0.45 0.10 155)); outline-offset: 2px; } .ds-nightfall-toggle { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; background: transparent; color: var(--color-text-secondary, oklch(0.45 0.02 60)); font-size: 1.125rem; line-height: 1; border: 1px solid transparent; border-radius: 3px; cursor: pointer; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Koubou — a small workshop on cream paper.",
+    "overview": "A personal workshop, not a marketing site and never a dev-blog template. The page should read like a notebook page that survived a coffee: cream surface, warm-black ink, soft borders, mono in the captions, a Caveat note in the gutter, the occasional washi-taped feature card or eki-stamp. The Japanese craft DNA — Muji restraint, risograph warmth, ma spacing — is felt through paper, breathing room, and named scale, never announced through CJK glyphs or stereotype iconography. FA is Brazilian and doesn't read Japanese; performative kanji is forbidden. The site rejects every template tell that personal sites converge on: SaaS-cream landing pages, identical card grids, hero-metric templates, gradient text, 'Read more →' affordances, hamburger menus on desktop, dark-mode-by-inversion, newsletter modals. Restraint is the signal. One flower in a vase: the matcha accent shows up sparingly so it still lands when it appears.",
+    "keyCharacteristics": [
+      "Paper before pixels — cream surface (oklch(0.96 0.012 80)), never #fff.",
+      "Borders, not shadows — 1px lifts cards; shadows belong to things actually pinned (washi tape, polaroids, eki-stamps).",
+      "Marginalia in Caveat — a wink, an aside, never replacing meaning with handwriting.",
+      "Mono for metadata — JetBrains Mono on dates, tags, labels, code, file paths.",
+      "Ma is structure — every gap is a named token, never an arbitrary px.",
+      "Quiet by default — no auto-play motion, no parallax; motion responds to intent.",
+      "Nightfall is designed, not computed — warm indigo with amber lanterns, parallel to day."
+    ],
+    "rules": [
+      {
+        "name": "The One-Flower Rule",
+        "body": "No page renders more than three matcha-accent elements simultaneously in the viewport. :focus-visible rings are exempt — accessibility never counts against accent budget. If a fourth element wants accent, something else gives it up.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tinted-Neutral Rule",
+        "body": "No #000 and no #fff anywhere. Every neutral is tinted toward the warm hue family (60–80 day, 280 nightfall). A cool gray on this page would read as foreign object.",
+        "section": "colors"
+      },
+      {
+        "name": "The Marginalia-Never-Means Rule",
+        "body": "Washi tape, polaroid frames, post-it yellow, hanko red, and other atom hues are personality, not information. Never use them to indicate state, type, or status. The reader can ignore every marginalia hue and lose nothing.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three-Faces Rule",
+        "body": "Sora carries personality and prose; JetBrains Mono carries metadata; Caveat carries marginalia. Faces never trade jobs. Caveat in body copy is forbidden. Mono in headlines is forbidden. Sora on a date is forbidden.",
+        "section": "typography"
+      },
+      {
+        "name": "The 62ch Rule",
+        "body": "Reading prose is capped at 62ch (.prose max-width). Sustained reading lives in the comfort zone; longer measures degrade focus, shorter ones break rhythm.",
+        "section": "typography"
+      },
+      {
+        "name": "The Section-Label Em-Dash Exception",
+        "body": "Body copy bans em dashes. Section labels keep them — FEATURED ——, RECENT —— — because the trailing em-dashes are a typographic glyph, part of the label's silhouette, not punctuation in a sentence. They appear only in mono uppercase labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Borders-Not-Shadows Rule",
+        "body": "Containers lift via 1px borders and surface-alt tints. Shadows are reserved for objects that should feel physically pinned, taped, stamped, or hovered. A 'card with a shadow' without a physical metaphor is forbidden.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Glassmorphism Veto",
+        "body": "No backdrop-filter: blur() as decoration. No translucent glass cards. Translucency exists only on washi-tape semi-transparency (where the paper grain is the point) and on --color-accent-tint (where the alpha is the structural feature). Decorative blur is never the answer.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the matcha accent on ≤3 simultaneous elements per viewport (the One-Flower Rule). Focus rings exempt.",
+      "Do write all colors in oklch() and tint neutrals to hue 60–80 (day) or 280 (nightfall).",
+      "Do lift surfaces with 1px solid var(--color-border) and --color-surface-alt; reserve shadows for things physically pinned, taped, or stamped.",
+      "Do use Sora for prose, JetBrains Mono for metadata, Caveat strictly for marginalia. Three faces, three jobs.",
+      "Do snap every gap to a named --ma-* token. If a value isn't named, it doesn't ship.",
+      "Do cap reading prose at 62ch (.prose max-width).",
+      "Do rotate margin notes ±5° and place them in real <aside> landmarks with descriptive aria-label.",
+      "Do wrap card / row anchors with aria-labelledby pointing at the title id so screen readers read just the title, not the whole card.",
+      "Do design nightfall as a parallel palette (warm indigo + amber lantern), not as an inversion or auto-filter: invert(1).",
+      "Do respect prefers-reduced-motion: reduce at every motion tier; the nightfall toggle and page transitions degrade to instant swap.",
+      "Do verify WCAG 2.1 AA contrast on every text/surface pair in both modes before shipping."
+    ],
+    "donts": [
+      "Don't ship #000 or #fff anywhere — they read as foreign objects on cream.",
+      "Don't put kanji (or any CJK glyph) in surface UI. The koubou idea lives in design DNA, never in performative typography. (FA is Brazilian; visible kanji is the bazinga rule violation.)",
+      "Don't use Caveat for body copy, Mono for headlines, or Sora for dates. Three faces, three jobs.",
+      "Don't add SaaS-template patterns: card grids of identical icon+heading+text tiles, hero-metric blocks, gradient-text headlines, 'Read more →' affordances, Substack/Medium clones.",
+      "Don't add hamburger menus on desktop (or anywhere — the link list scales mobile-first).",
+      "Don't use side-stripe border-left/border-right >1px as an accent on cards, callouts, or alerts. Rewrite with a full border, a tint, or a leading icon.",
+      "Don't apply background-clip: text gradients to type. Solid color only; emphasis via weight or size.",
+      "Don't decorate with backdrop-filter: blur(). Glassmorphism is never the answer here.",
+      "Don't modal-as-first-thought. The site has zero modals; recovery flows (404, no-results) are inline.",
+      "Don't auto-play motion or parallax. Motion is reactive — a hover, a click, a toggle — never ambient.",
+      "Don't use newsletter modals, cookie banners, tracking beacons, or any anxiety-inducing chrome. Trust is manifested as absence.",
+      "Don't write em-dashes (or --) in body copy or UI strings — typographic AI-tell. Use commas, colons, semicolons, periods, or parentheses. The trailing —— in section labels is the only sanctioned use, because there it's a glyph silhouette, not punctuation.",
+      "Don't ship 'in the realm of', 'delve into', inflated symbolism, or rule-of-three flourishes. All copy follows humanizer anti-AI patterns.",
+      "Don't synthesize a 'dark mode' by inverting day-mode tokens. Nightfall has its own designed palette.",
+      "Don't display empty-state placeholder cards or 'coming soon' badges. The space contracts; absence is graceful."
+    ]
+  }
+}

@@ -7,11 +7,15 @@ const posts = await getFeaturedPosts();
 
 {posts.length > 0 && (
   <section class="featured-grid" aria-labelledby="featured-heading">
-    <h2 id="featured-heading" class="section-label reveal">Featured</h2>
+    <h2 id="featured-heading" class="section-label kb-section-label">Featured<span aria-hidden="true"> ——</span></h2>
     <div class="grid">
-      {posts.map((post) => (
+      {posts.map((post, index) => (
         <div class="reveal">
-          <FeaturedCard post={post} />
+          <FeaturedCard
+            post={post}
+            tapeSide={index % 2 === 0 ? "left" : "right"}
+            tapeTone={index % 2 === 0 ? "matcha" : "vermillion"}
+          />
         </div>
       ))}
     </div>
@@ -27,6 +31,15 @@ const posts = await getFeaturedPosts();
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--ma-wide);
+    align-items: stretch;
+  }
+
+  .grid > div {
+    display: flex;
+  }
+
+  .grid > div > :global(a) {
+    width: 100%;
   }
 
   /* 768px = var(--bp-md) — CSS custom properties can't be used in media query expressions */

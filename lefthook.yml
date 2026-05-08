@@ -5,3 +5,5 @@ pre-commit:
       run: bunx biome check --staged
     typecheck:
       run: bunx astro sync && bun run check
+    impeccable:
+      run: yes | npx impeccable detect --fast src/

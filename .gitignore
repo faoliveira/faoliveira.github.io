@@ -537,3 +537,4 @@ src/content/posts/drafts/
 ### Astro ###
 dist/
 .astro/
+.impeccable/probes/*

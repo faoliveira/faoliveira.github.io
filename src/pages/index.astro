@@ -1,12 +1,20 @@
 ---
+import { getEntry } from "astro:content";
 import FeaturedGrid from "@components/FeaturedGrid.astro";
 import Hero from "@components/Hero.astro";
 import PostList from "@components/PostList.astro";
+import CurrentlyWidget from "@islands/CurrentlyWidget.svelte";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getPublishedPosts } from "@modules/content";
 import { SITE_URL } from "@modules/seo";
 
-const recentPosts = await getPublishedPosts({ limit: 5, excludeFeatured: true });
+const recentPosts = await getPublishedPosts({ limit: 5 });
+
+const currentlyEntry = await getEntry("currently", "now");
+if (!currentlyEntry) {
+  throw new Error("Missing currently/now entry — see src/content/currently/now.json");
+}
+const currently = currentlyEntry.data;
 ---
 
 <BaseLayout title="fa." image={`${SITE_URL}/og/index.png`}>
@@ -14,8 +22,20 @@ const recentPosts = await getPublishedPosts({ limit: 5, excludeFeatured: true })
   <FeaturedGrid />
   <PostList
     posts={recentPosts}
-    headingText="Recent posts"
-    emptyStateText="No recent non-featured posts yet. Browse the archive."
-    viewAllHref="/posts"
+    headingText="Recent"
+    decorativeSuffix="——"
+    emptyStateText="Posts will land here when they exist."
+    viewAllHref="/posts/"
   />
+  <section class="kb-currently" aria-labelledby="currently-heading">
+    <h2 id="currently-heading" class="section-label kb-section-label">Currently<span aria-hidden="true"> ——</span></h2>
+    <CurrentlyWidget data={currently} client:visible />
+  </section>
 </BaseLayout>
+
+<style>
+  .kb-currently {
+    margin-block-start: var(--ma-spacious);
+    margin-block-end: var(--ma-vast);
+  }
+</style>

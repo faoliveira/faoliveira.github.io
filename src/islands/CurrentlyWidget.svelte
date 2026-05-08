@@ -2,8 +2,17 @@
 import type { CurrentlyData } from "@modules/currently/schema";
 import { onDestroy, onMount, untrack } from "svelte";
 import { type AudioSource, type AudioState, createAudioSource } from "./lib/audio-source";
+import type { LoopHandle } from "./lib/NunotchiGame.svelte";
 import NunotchiGame from "./lib/NunotchiGame.svelte";
 import { lookupCommand } from "./lib/nuno-commands";
+import {
+  applyOfflineDecay,
+  loadState,
+  type NunotchiState,
+  DEFAULTS as PET_DEFAULTS,
+  saveState,
+  tickDecay,
+} from "./lib/nunotchi-state";
 
 interface Props {
   data: CurrentlyData;
@@ -24,12 +33,11 @@ interface Win {
   open: boolean;
 }
 
+const getStorage = (): Storage | null =>
+  typeof localStorage !== "undefined" ? localStorage : null;
+
 // ── Game state ───────────────────────────────────────────────────────────────
-let hp = $state(3);
-let hunger = $state(2);
-let energy = $state(48);
-let age = $state(4);
-let walks = $state(2);
+let pet = $state<NunotchiState>({ ...PET_DEFAULTS });
 let busy = $state<Mood | null>(null);
 let msg = $state(untrack(() => data.mood));
 
@@ -39,6 +47,12 @@ let lastCommand = $state<{ q: string; reply: string } | null>(null);
 // ── Boot / hatch ─────────────────────────────────────────────────────────────
 let booting = $state(true);
 let hatchFrame = $state(0);
+let mounted = $state(false);
+let reduced = $state(false);
+
+// ── Loop pause/resume + visibility tracking ──────────────────────────────────
+let loopHandle = $state<LoopHandle | null>(null);
+let docVisible = $state(true);
 
 // ── Terminal state ───────────────────────────────────────────────────────────
 let askInput = $state("");
@@ -68,6 +82,8 @@ function focusWin(id: WinId) {
   topZ += 1;
   wins[id].z = topZ;
 }
+// Drag is decorative repositioning — window position carries no information.
+// Keyboard users reach every action via close buttons, in-window controls, and the terminal.
 function startDrag(e: PointerEvent, id: WinId) {
   if (e.button !== 0) return;
   dragId = id;
@@ -109,39 +125,42 @@ function resetDesktop() {
 function animate(label: Mood, after?: () => void) {
   busy = label;
   msg = label === "eat" ? "nom nom" : `${label}!`;
-  setTimeout(() => {
+  const finish = () => {
     busy = null;
     after?.();
     msg = "idle · loaf";
-  }, 900);
+    saveState(getStorage(), pet, Date.now());
+  };
+  if (reduced) queueMicrotask(finish);
+  else setTimeout(finish, 900);
 }
 function feed() {
   if (busy) return;
   animate("eat", () => {
-    hunger = Math.max(0, hunger - 1);
-    hp = Math.min(4, hp + 1);
+    pet.hunger = Math.max(0, pet.hunger - 1);
+    pet.hp = Math.min(4, pet.hp + 1);
   });
 }
 function play() {
   if (busy) return;
   animate("play", () => {
-    hp = Math.min(4, hp + 1);
-    hunger = Math.min(4, hunger + 1);
-    energy = Math.max(0, energy - 6);
+    pet.hp = Math.min(4, pet.hp + 1);
+    pet.hunger = Math.min(4, pet.hunger + 1);
+    pet.energy = Math.max(0, pet.energy - 6);
   });
 }
 function walk() {
   if (busy) return;
   animate("walk", () => {
-    hp = Math.min(4, hp + 1);
-    walks += 1;
-    energy = Math.max(0, energy - 12);
+    pet.hp = Math.min(4, pet.hp + 1);
+    pet.walks += 1;
+    pet.energy = Math.max(0, pet.energy - 12);
   });
 }
 function nap() {
   if (busy) return;
   animate("sleep", () => {
-    energy = Math.min(100, energy + 25);
+    pet.energy = Math.min(100, pet.energy + 25);
   });
 }
 function runAction(action: "feed" | "play" | "walk" | "nap" | null) {
@@ -168,7 +187,6 @@ let audio: AudioSource | null = null;
 let audioMounted = $state(false);
 let audioState = $state<AudioState>({ playing: false, position: 0, duration: 0 });
 let audioHost = $state<HTMLDivElement | undefined>(undefined);
-let pollTimer: ReturnType<typeof setInterval> | undefined;
 
 async function ensureAudio() {
   if (audio || data.music.source.kind === "none") return;
@@ -217,9 +235,20 @@ async function seekFromBar(e: PointerEvent) {
 
 // ── Lifecycle ────────────────────────────────────────────────────────────────
 let clockTimer: ReturnType<typeof setInterval>;
-let hatchTimer: ReturnType<typeof setInterval>;
+let hatchTimer: ReturnType<typeof setInterval> | undefined;
+let decayTimer: ReturnType<typeof setInterval> | undefined;
+let onVisibility: (() => void) | undefined;
+let onPageHide: (() => void) | undefined;
 
 onMount(() => {
+  mounted = true;
+  reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  docVisible = document.visibilityState === "visible";
+
+  // Persistence: hydrate pet from localStorage and apply offline decay.
+  const loaded = loadState(getStorage());
+  pet = applyOfflineDecay(loaded.state, Date.now());
+
   const updateClock = () => {
     const d = new Date();
     const h = d.getHours();
@@ -232,32 +261,75 @@ onMount(() => {
   updateClock();
   clockTimer = setInterval(updateClock, 30_000);
 
-  hatchTimer = setInterval(() => {
-    hatchFrame += 1;
-    if (hatchFrame >= 4) {
-      clearInterval(hatchTimer);
-      booting = false;
-    }
-  }, 600);
+  if (reduced) {
+    hatchFrame = 4;
+    booting = false;
+  } else {
+    hatchTimer = setInterval(() => {
+      hatchFrame += 1;
+      if (hatchFrame >= 4) {
+        if (hatchTimer) clearInterval(hatchTimer);
+        booting = false;
+      }
+    }, 600);
+  }
 
-  // Poll audio position while playing for the progress bar.
-  pollTimer = setInterval(() => {
-    if (audio && audioMounted && audioState.playing) {
-      audioState = audio.getState();
-    }
-  }, 1000);
+  onVisibility = () => {
+    docVisible = document.visibilityState === "visible";
+    if (!docVisible) saveState(getStorage(), pet, Date.now());
+  };
+  onPageHide = () => {
+    saveState(getStorage(), pet, Date.now());
+  };
+  document.addEventListener("visibilitychange", onVisibility);
+  window.addEventListener("pagehide", onPageHide);
 });
 
 onDestroy(() => {
   clearInterval(clockTimer);
-  clearInterval(hatchTimer);
-  if (pollTimer) clearInterval(pollTimer);
+  if (hatchTimer) clearInterval(hatchTimer);
+  if (decayTimer) clearInterval(decayTimer);
+  if (onVisibility) document.removeEventListener("visibilitychange", onVisibility);
+  if (onPageHide) window.removeEventListener("pagehide", onPageHide);
   audio?.destroy();
 });
 
+// Poll audio position only while the tab is visible and audio is actually playing.
+// Audio "state"/"end" events keep audioState.playing in sync, so the effect re-runs
+// when playback stops or the tab hides, releasing the 1Hz wake.
+$effect(() => {
+  if (!docVisible || !audioState.playing || !audioMounted || !audio) return;
+  const src = audio;
+  const id = setInterval(() => {
+    audioState = src.getState();
+  }, 1000);
+  return () => clearInterval(id);
+});
+
+// ── Pause / resume the Kontra loop + run the active-time decay tick ──────────
+$effect(() => {
+  const open = wins.nunotchi.open;
+  const visible = docVisible;
+  if (!open || !visible) {
+    loopHandle?.pause();
+    if (decayTimer) {
+      clearInterval(decayTimer);
+      decayTimer = undefined;
+    }
+    return;
+  }
+  loopHandle?.resume();
+  if (!decayTimer) {
+    decayTimer = setInterval(() => {
+      pet = tickDecay(pet, 60_000);
+      saveState(getStorage(), pet, Date.now());
+    }, 60_000);
+  }
+});
+
 // ── Derived display helpers ──────────────────────────────────────────────────
-const hearts = $derived("♥".repeat(hp) + "♡".repeat(4 - hp));
-const hungerBar = $derived("█".repeat(4 - hunger) + "░".repeat(hunger));
+const hearts = $derived("♥".repeat(pet.hp) + "♡".repeat(4 - pet.hp));
+const hungerBar = $derived("█".repeat(4 - pet.hunger) + "░".repeat(pet.hunger));
 const trackLine = $derived(`${data.music.title} — ${data.music.artist}`);
 const readingLine = $derived(`${data.reading.title} — ${data.reading.author}`);
 const audioDuration = $derived(audioState.duration || 0);
@@ -310,7 +382,7 @@ const playable = $derived(data.music.source.kind !== "none");
             <div><dt>music</dt><dd>{data.music.artist.toLowerCase()} · {data.music.title.toLowerCase()}</dd></div>
             <div><dt>tabs</dt><dd>{data.tabs} (halp)</dd></div>
             <div><dt>status</dt><dd>{data.status}</dd></div>
-            <div><dt>nuno</dt><dd>{hearts} · ⚡{energy}% · {walks} walks today</dd></div>
+            <div><dt>nuno</dt><dd>{hearts} · ⚡{pet.energy}% · {pet.walks} walks today</dd></div>
           </dl>
           <div class="curr-cmd" aria-live="polite">
             {#if lastCommand}
@@ -376,7 +448,7 @@ const playable = $derived(data.music.source.kind !== "none");
               audioState = audio.getState();
             }}
           >
-            <div style:inset={`0 ${(1 - audioRatio) * 100}% 0 0`}></div>
+            <div style:transform={`scaleX(${audioRatio})`}></div>
           </div>
           <div class="np-times">
             <span>{audioMounted ? fmtTime(audioPos) : "0:00"}</span>
@@ -435,22 +507,26 @@ const playable = $derived(data.music.source.kind !== "none");
           <div class="lcd" data-mood={busy ?? "idle"}>
             <div class="lcd-status">
               <span aria-label="happiness">{hearts}</span>
-              <span>age {age}</span>
+              <span>age {pet.age}</span>
             </div>
 
             {#if booting}
               <div class="lcd-boot">
-                <img
-                  src="/sprites/eggs.png"
-                  alt="hatching egg"
-                  class="egg-sprite"
-                  style:--frame={hatchFrame}
-                />
-                <div class="boot-label">hatching · {hatchFrame}/4</div>
+                {#if mounted}
+                  <img
+                    src="/sprites/eggs.png"
+                    alt="hatching egg"
+                    class="egg-sprite"
+                    style:--frame={hatchFrame}
+                  />
+                  <div class="boot-label">hatching · {hatchFrame}/4</div>
+                {:else}
+                  <div class="boot-label">loading…</div>
+                {/if}
               </div>
             {:else}
               <div class="lcd-stage">
-                <NunotchiGame pose={busy ?? "idle"} width={234} height={70} />
+                <NunotchiGame pose={busy ?? "idle"} width={234} height={70} bind:loopHandle />
               </div>
               <div class="lcd-msg">{msg}</div>
             {/if}
@@ -470,8 +546,8 @@ const playable = $derived(data.music.source.kind !== "none");
           </div>
 
           <div class="game-meta">
-            <span>walks today: <b>{walks}</b></span>
-            <span>energy: <b>{energy}%</b></span>
+            <span>walks today: <b>{pet.walks}</b></span>
+            <span>energy: <b>{pet.energy}%</b></span>
           </div>
         </div>
       </div>
@@ -480,8 +556,8 @@ const playable = $derived(data.music.source.kind !== "none");
     {#if wins.alert.open}
       <div
         class="paper-win alert"
-        role="alertdialog"
-        aria-label="Alert"
+        role="group"
+        aria-label="Walk reminder"
         style:left={`${wins.alert.x}px`}
         style:top={`${wins.alert.y}px`}
         style:z-index={wins.alert.z}
@@ -556,12 +632,15 @@ const playable = $derived(data.music.source.kind !== "none");
     --paper: oklch(0.97 0.012 82);
     --dot: color-mix(in oklch, var(--ink) 16%, transparent);
     --ink-soft: color-mix(in oklch, var(--ink) 25%, transparent);
+    /* Opaque text tones over --paper. WCAG-checkable: no opacity composite. */
+    --ink-secondary: color-mix(in oklch, var(--ink) 70%, var(--paper));
+    --ink-tertiary: color-mix(in oklch, var(--ink) 55%, var(--paper));
     --winShadow: 3px 3px 0 var(--ink);
     color: var(--ink);
     font-family: var(--font-mono);
     border: 1.5px solid var(--ink);
     background: color-mix(in oklch, var(--paper) 92%, var(--ink));
-    box-shadow: var(--shadow-card-hover, 0 8px 24px rgba(0,0,0,0.08));
+    box-shadow: var(--shadow-card-hover);
   }
   :global(html[data-theme="nightfall"]) .widget-frame {
     --ink: oklch(0.92 0.02 80);
@@ -584,6 +663,7 @@ const playable = $derived(data.music.source.kind !== "none");
   .widget-title { text-transform: uppercase; color: var(--color-text-secondary); }
   .widget-toolbar-actions { display: flex; gap: 6px; }
   .tb {
+    position: relative;
     background: var(--paper);
     border: 1.5px solid var(--ink);
     color: var(--ink);
@@ -592,6 +672,15 @@ const playable = $derived(data.music.source.kind !== "none");
     padding: 2px 8px;
     cursor: pointer;
     border-radius: 6px;
+  }
+  /* Visual stays small to fit retro toolbar; hit area expands vertically to clear WCAG 2.5.8 (24px). */
+  .tb::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -4px;
+    bottom: -4px;
   }
   .tb:hover { background: var(--ink); color: var(--paper); }
   .tb:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
@@ -648,6 +737,14 @@ const playable = $derived(data.music.source.kind !== "none");
     cursor: pointer;
     flex-shrink: 0;
   }
+  .close { position: relative; }
+  /* Visual stays 11px to honour the System-1 chrome; hit area expands to 25×25. */
+  /* Pseudo overflow into win-body is masked by later DOM siblings — no accidental closes. */
+  .close::before {
+    content: "";
+    position: absolute;
+    inset: -7px;
+  }
   .close:hover { background: var(--ink); }
   .close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
   .zoom { cursor: default; }
@@ -666,12 +763,12 @@ const playable = $derived(data.music.source.kind !== "none");
     gap: 4px;
     line-height: 1.4;
   }
-  .curr-fields > div { display: grid; grid-template-columns: 56px 1fr; gap: 8px; }
+  .curr-fields > div { display: grid; grid-template-columns: 72px 1fr; gap: 8px; }
   .curr-fields dt {
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    opacity: 0.55;
+    color: var(--ink-tertiary);
     align-self: center;
   }
   .curr-fields dd { margin: 0; word-break: break-word; }
@@ -679,7 +776,7 @@ const playable = $derived(data.music.source.kind !== "none");
     margin-top: 8px;
     padding-top: 6px;
     border-top: 1px dashed var(--ink-soft);
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.4;
     display: flex;
     flex-wrap: wrap;
@@ -688,12 +785,12 @@ const playable = $derived(data.music.source.kind !== "none");
   }
   .cmd-prompt { color: var(--color-accent); font-weight: 700; }
   .cmd-q { font-weight: 600; }
-  .cmd-arrow { opacity: 0.6; }
-  .cmd-reply { opacity: 0.85; }
-  .cmd-hint { opacity: 0.55; font-style: italic; }
+  .cmd-arrow { color: var(--ink-tertiary); }
+  .cmd-reply { color: var(--ink-secondary); }
+  .cmd-hint { color: var(--ink-tertiary); font-style: italic; }
 
   /* ── Now Playing ── */
-  .np-controls { display: flex; gap: 6px; align-items: center; font-size: 10px; }
+  .np-controls { display: flex; gap: 6px; align-items: center; font-size: 11px; }
   .np-track {
     margin-left: 4px;
     flex: 1;
@@ -714,16 +811,19 @@ const playable = $derived(data.music.source.kind !== "none");
   .np-progress:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
   .np-progress > div {
     position: absolute;
+    inset: 0;
     background: var(--ink);
-    transition: inset 0.4s linear;
+    transform-origin: left center;
+    transition: transform 0.4s linear;
   }
   .np-times {
     margin-top: 4px;
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
+    font-size: 11px;
+    color: var(--ink-secondary);
   }
-  .preview-tag { opacity: 0.6; font-style: italic; }
+  .preview-tag { color: var(--ink-tertiary); font-style: italic; }
   .audio-host {
     position: absolute;
     width: 1px;
@@ -737,7 +837,7 @@ const playable = $derived(data.music.source.kind !== "none");
 
   /* ── Reading ── */
   .reading-body { font-size: 11px; line-height: 1.5; }
-  .muted { opacity: 0.7; }
+  .muted { color: var(--ink-secondary); }
 
   /* ── Nunotchi ── */
   .lcd {
@@ -754,23 +854,25 @@ const playable = $derived(data.music.source.kind !== "none");
     inset: 4px 6px auto 6px;
     display: flex;
     justify-content: space-between;
-    font-size: 9px;
+    font-size: 11px;
+    line-height: 1;
     z-index: 2;
   }
   .lcd-stage {
     position: absolute;
-    inset: 18px 0 14px 0;
+    inset: 20px 0 16px 0;
     display: flex;
     align-items: flex-end;
     justify-content: center;
   }
   .lcd-msg {
     position: absolute;
-    bottom: 2px;
+    bottom: 3px;
     left: 6px;
     right: 6px;
-    font-size: 9px;
-    opacity: 0.7;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--ink-secondary);
     text-align: center;
   }
 
@@ -792,14 +894,14 @@ const playable = $derived(data.music.source.kind !== "none");
     transform: scale(2);
     transform-origin: center;
   }
-  .boot-label { font-size: 9px; opacity: 0.7; letter-spacing: 0.1em; }
+  .boot-label { font-size: 11px; color: var(--ink-secondary); letter-spacing: 0.1em; }
 
   .hunger-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 6px;
-    font-size: 9px;
+    font-size: 11px;
   }
   .hunger-row .bar { letter-spacing: 1px; font-family: var(--font-mono); }
 
@@ -812,9 +914,9 @@ const playable = $derived(data.music.source.kind !== "none");
   .game-meta {
     display: flex;
     justify-content: space-between;
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 6px;
-    opacity: 0.85;
+    color: var(--ink-secondary);
   }
 
   /* ── Alert ── */
@@ -843,6 +945,7 @@ const playable = $derived(data.music.source.kind !== "none");
 
   /* ── Paper buttons ── */
   .paper-btn {
+    position: relative;
     border: 1.5px solid var(--ink);
     background: var(--paper);
     color: var(--ink);
@@ -852,6 +955,15 @@ const playable = $derived(data.music.source.kind !== "none");
     font-weight: 700;
     cursor: pointer;
     border-radius: 8px;
+  }
+  /* Vertical-only expansion: horizontal would steal taps from siblings in 4–6px gaps. */
+  .paper-btn::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -5px;
+    bottom: -5px;
   }
   .paper-btn.solid { background: var(--ink); color: var(--paper); }
   .paper-btn:hover:not(:disabled) {
@@ -960,11 +1072,11 @@ const playable = $derived(data.music.source.kind !== "none");
     color: var(--ink);
     min-width: 0;
   }
-  .ask-bar .enter { font-size: 9px; opacity: 0.6; letter-spacing: 0.1em; }
+  .ask-bar .enter { font-size: 9px; color: var(--ink-tertiary); letter-spacing: 0.1em; }
   .ask-reply {
     margin-top: 4px;
-    font-size: 10px;
-    color: var(--color-text-secondary);
+    font-size: 11px;
+    color: var(--ink-secondary);
   }
 
   /* ── Menu bar ── */

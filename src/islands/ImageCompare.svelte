@@ -44,15 +44,31 @@ function handlePointerMove(e: PointerEvent) {
 }
 
 function handleKeydown(e: KeyboardEvent) {
-  if (e.key === "ArrowLeft") position = Math.max(0, position - 5);
-  if (e.key === "ArrowRight") position = Math.min(100, position + 5);
-  if (e.key === "Home") {
-    e.preventDefault();
-    position = 0;
-  }
-  if (e.key === "End") {
-    e.preventDefault();
-    position = 100;
+  switch (e.key) {
+    case "ArrowLeft":
+      e.preventDefault();
+      position = Math.max(0, position - 5);
+      break;
+    case "ArrowRight":
+      e.preventDefault();
+      position = Math.min(100, position + 5);
+      break;
+    case "PageDown":
+      e.preventDefault();
+      position = Math.max(0, position - 10);
+      break;
+    case "PageUp":
+      e.preventDefault();
+      position = Math.min(100, position + 10);
+      break;
+    case "Home":
+      e.preventDefault();
+      position = 0;
+      break;
+    case "End":
+      e.preventDefault();
+      position = 100;
+      break;
   }
 }
 </script>

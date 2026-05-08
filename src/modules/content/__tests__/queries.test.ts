@@ -124,6 +124,19 @@ describe("getPublishedPosts()", () => {
     const posts = await getPublishedPosts();
     expect(posts).toEqual([]);
   });
+
+  it("applies the requested limit after descending date sort", async () => {
+    const posts = await getPublishedPosts({ limit: 2 });
+    expect(posts).toHaveLength(2);
+    expect(posts.map((post) => post.id)).toEqual(["2026-03-18-post-a", "2026-03-10-post-b"]);
+  });
+
+  it("can exclude featured posts for callers that request it", async () => {
+    const posts = await getPublishedPosts({ excludeFeatured: true });
+    expect(posts.every((post) => post.data.featured !== true)).toBe(true);
+    expect(posts.map((post) => post.id)).not.toContain("2026-03-18-post-a");
+    expect(posts.map((post) => post.id)).not.toContain("2026-02-01-post-c");
+  });
 });
 
 describe("getFeaturedPosts()", () => {

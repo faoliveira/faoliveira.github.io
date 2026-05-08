@@ -1,5 +1,4 @@
 ---
-// src/components/Nav.astro
 import LogoMark from "@components/LogoMark.astro";
 import NightfallToggle from "@components/NightfallToggle.astro";
 import { isActivePath, NAV_ITEMS } from "@modules/navigation";
@@ -51,8 +50,10 @@ const currentPath = Astro.url.pathname;
 
   nav {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    gap: var(--ma-base);
     padding-block: var(--ma-wide);
     max-width: var(--layout-max);
     margin-inline: auto;
@@ -107,7 +108,6 @@ const currentPath = Astro.url.pathname;
     }
   }
 
-  /* Hover micro-indicator: underline grows in on non-active links */
   @media (hover: hover) {
     .nav-link:hover {
       color: var(--color-accent);
@@ -118,13 +118,9 @@ const currentPath = Astro.url.pathname;
     }
   }
 
-  /* Active link: solid underline, always visible */
+  /* Active state is color-only by design — no underline, no background pill. */
   .nav-link[aria-current='page'] {
     color: var(--color-accent);
-  }
-
-  .nav-link[aria-current='page']::after {
-    transform: scaleX(1);
   }
 
   .nav-link:focus-visible {
@@ -133,10 +129,29 @@ const currentPath = Astro.url.pathname;
     border-radius: 2px;
   }
 
-  /* 480px: links fit at --ma-base gap down to 320px with 3 items at --type-sm */
+  /* 480px: links fit at --ma-base gap down to 320px with 4 items at --type-sm */
   @media (max-width: 480px) {
+    header {
+      padding-inline: var(--ma-base);
+    }
+
+    nav {
+      row-gap: var(--ma-narrow);
+    }
+
+    .nav-right {
+      flex: 1 1 100%;
+      justify-content: space-between;
+      gap: var(--ma-narrow);
+    }
+
     .links {
-      gap: var(--ma-base);
+      gap: var(--ma-thin);
+      min-width: 0;
+    }
+
+    .nav-link {
+      padding-inline: var(--ma-thin);
     }
   }
 </style>

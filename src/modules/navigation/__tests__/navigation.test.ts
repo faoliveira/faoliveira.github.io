@@ -2,14 +2,15 @@ import { describe, expect, it } from "vitest";
 import { isActivePath, NAV_ITEMS } from "../index";
 
 describe("NAV_ITEMS", () => {
-  it("has 3 items", () => {
-    expect(NAV_ITEMS).toHaveLength(3);
+  it("has 4 items", () => {
+    expect(NAV_ITEMS).toHaveLength(4);
   });
 
   it("has correct labels and hrefs", () => {
-    expect(NAV_ITEMS[0]).toEqual({ label: "posts", href: "/posts/" });
-    expect(NAV_ITEMS[1]).toEqual({ label: "about", href: "/about/" });
-    expect(NAV_ITEMS[2]).toEqual({ label: "search", href: "/search/" });
+    expect(NAV_ITEMS[0]).toEqual({ label: "Home", href: "/" });
+    expect(NAV_ITEMS[1]).toEqual({ label: "Posts", href: "/posts/" });
+    expect(NAV_ITEMS[2]).toEqual({ label: "About", href: "/about/" });
+    expect(NAV_ITEMS[3]).toEqual({ label: "Search", href: "/search/" });
   });
 });
 

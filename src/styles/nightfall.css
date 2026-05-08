@@ -1,6 +1,5 @@
-/* src/styles/nightfall.css */
-/* Nightfall mode token overrides — Story 1.5 */
-/* SYNC: noscript dark-mode fallback in BaseLayout.astro must match these values */
+/* Nightfall mode token overrides. */
+/* SYNC: noscript dark-mode fallback in BaseLayout.astro must match these values. */
 
 html[data-theme="nightfall"] {
   /* Grain texture — softer in nightfall, preserves softer-than-day relationship */
@@ -8,16 +7,15 @@ html[data-theme="nightfall"] {
   --texture-grain-tint: oklch(0.4 0.03 60 / 0.25);
   --texture-grain-opacity-elevated: 0.055;
 
-  /* Amber palette tokens — nightfall-only (Story 1.3)
-     Same hue family (70) as chochin glow in NightfallToggle.astro */
+  /* Nightfall-only amber palette — hue 70, same family as the chochin glow on NightfallToggle. */
   --color-amber: oklch(0.75 0.14 70);
   --color-amber-muted: oklch(0.65 0.08 70);
 
-  /* Surfaces: hue 270→280 (warm indigo) with slightly reduced chroma — Story 1.3 */
+  /* Surfaces: hue 270→280 (warm indigo) with slightly reduced chroma. */
   --color-surface: oklch(0.22 0.035 280);
   --color-surface-alt: oklch(0.28 0.035 280);
   --color-text-primary: oklch(0.9 0.01 80);
-  /* text-secondary: hue 80→70 (amber family), chroma 0.01→0.035 — Story 1.3 */
+  /* Secondary text shifts to hue 70 (amber family) with chroma 0.01 → 0.035. */
   --color-text-secondary: oklch(0.68 0.035 70);
   /* text-tertiary: intentionally neutral (hue 80) — used for disabled/placeholder states
      where warmth is inappropriate; not part of the amber warmth system */
@@ -27,10 +25,12 @@ html[data-theme="nightfall"] {
   --color-accent-tint: oklch(0.62 0.1 155 / 0.15);
   --color-border: oklch(0.3 0.025 280);
   --color-code-surface: oklch(0.18 0.035 280);
+  /* margin-ink: hue 70 keeps amber-warmth family of nightfall text-secondary; L 0.78 ≈ 7.4:1 contrast */
+  --color-margin-ink: oklch(0.78 0.05 70);
 }
 
-/* Smooth transition on theme toggle — only after user interaction, not on page load */
-/* All 10 registered color tokens transition together — no property snaps (Story 1.4) */
+/* Smooth transition on theme toggle — only after user interaction, not on page load.
+   All 11 registered color tokens transition together; tokens.css @property block is canonical. */
 html[data-theme].theme-animated {
   transition:
     --color-surface var(--motion-duration-smooth) var(--motion-easing-ease),
@@ -42,7 +42,8 @@ html[data-theme].theme-animated {
     --color-accent-hover var(--motion-duration-smooth) var(--motion-easing-ease),
     --color-accent-tint var(--motion-duration-smooth) var(--motion-easing-ease),
     --color-border var(--motion-duration-smooth) var(--motion-easing-ease),
-    --color-code-surface var(--motion-duration-smooth) var(--motion-easing-ease);
+    --color-code-surface var(--motion-duration-smooth) var(--motion-easing-ease),
+    --color-margin-ink var(--motion-duration-smooth) var(--motion-easing-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -67,6 +68,7 @@ html[data-theme].theme-animated {
     --color-accent-tint: rgb(74 171 126 / 0.15);
     --color-border: #302d42;
     --color-code-surface: #181538;
+    --color-margin-ink: #c9b88a;
     /* Amber palette tokens (hue 70 family) */
     --color-amber: #c9a03a;
     --color-amber-muted: #a88a50;

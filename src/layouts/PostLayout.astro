@@ -8,7 +8,6 @@ interface Props {
   title: string;
   description?: string;
   date: Date;
-  readingTime: number;
   type?: PostType;
   reading?: boolean;
   toc?: boolean;
@@ -20,7 +19,6 @@ const {
   title,
   description,
   date,
-  readingTime,
   type,
   reading = false,
   toc = false,
@@ -44,8 +42,6 @@ const isoDate = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padSt
       <h1>{title}</h1>
       <div class="post-meta">
         <time datetime={isoDate}>{formattedDate}</time>
-        <span class="meta-separator" aria-hidden="true">&middot;</span>
-        <span class="reading-time">{readingTime} min read</span>
         {type && (
           <>
             <span class="meta-separator" aria-hidden="true">&middot;</span>
@@ -71,7 +67,7 @@ const isoDate = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padSt
 
 <style>
   article {
-    max-width: 65ch;
+    max-width: 62ch;
   }
 
   .post-header {
@@ -83,7 +79,7 @@ const isoDate = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padSt
   }
 
   [data-post-type="nota-tecnica"] .post-header {
-    border-left: 3px solid var(--color-text-secondary);
+    border-left: 1px solid var(--color-text-secondary);
     padding-left: var(--ma-base);
   }
 
@@ -111,16 +107,11 @@ const isoDate = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padSt
     user-select: none;
   }
 
-  /* ── ToC grid layout ── */
   .post-with-toc {
     display: block;
   }
 
-  .toc-sidebar {
-    /* Mobile: sidebar renders before post-body in DOM, so it appears above content */
-  }
-
-  /* Ensure ToC anchor links have scroll offset regardless of reading mode (P2) */
+  /* Scroll offset applies regardless of reading mode so anchor links land below the nav. */
   .post-with-toc :is(h2, h3) {
     scroll-margin-top: var(--ma-spacious);
   }
@@ -141,7 +132,7 @@ const isoDate = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padSt
     .toc-sidebar {
       grid-column: 2;
       grid-row: 1;
-      align-self: start; /* Explicit: prevents stretch, required for position: sticky on .toc-desktop (P5) */
+      align-self: start; /* Required for position: sticky on .toc-desktop — stretch breaks it. */
     }
   }
 </style>

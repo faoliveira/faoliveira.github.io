@@ -57,6 +57,7 @@ function getExcerpt(post: Post): string {
               })
                 .format(post.data.date)
                 .toUpperCase();
+              const entryYear = post.data.date.getUTCFullYear();
               const isoDate = toISODateString(post.data.date);
               const excerpt = getExcerpt(post);
               return (
@@ -67,6 +68,7 @@ function getExcerpt(post: Post): string {
                   <time class="entry-date" datetime={isoDate}>
                     <span class="entry-month">{month}</span>
                     <span class="entry-day">{day}</span>
+                    <span class="entry-year">{entryYear}</span>
                   </time>
                   <div class="entry-content">
                     <span class="entry-title">{post.data.title}</span>
@@ -175,6 +177,13 @@ function getExcerpt(post: Post): string {
     transition: color var(--motion-duration-quick) var(--motion-easing-out);
   }
 
+  .entry-year {
+    font-size: var(--type-xs);
+    font-family: var(--font-mono);
+    color: var(--color-text-tertiary);
+    line-height: 1;
+  }
+
   /* Content */
   .entry-title {
     display: block;
@@ -197,7 +206,8 @@ function getExcerpt(post: Post): string {
 
   /* Hover states */
   @media (hover: hover) {
-    .entry-row:hover .entry-title {
+    .entry-row:hover .entry-title,
+    .entry-row:hover .entry-day {
       color: var(--color-accent);
     }
   }
@@ -227,6 +237,10 @@ function getExcerpt(post: Post): string {
       font-size: var(--type-sm);
       font-family: var(--font-mono);
       font-weight: 500;
+    }
+
+    .entry-year {
+      font-size: var(--type-sm);
     }
   }
 

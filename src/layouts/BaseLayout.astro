@@ -46,10 +46,10 @@ const themeScript = getThemeScript();
     <link rel="alternate" type="application/rss+xml" title="fa. RSS" href="/rss.xml" />
     <noscript>
       <style>
-        /* SYNC: these values must match tokens.css / nightfall.css — see D-38 */
+        /* SYNC: these values mirror tokens.css / nightfall.css; update all three together. */
         /* Duplicated tokens: --color-surface, --color-surface-alt, --color-text-primary,
            --color-text-secondary, --color-text-tertiary, --color-accent, --color-accent-hover,
-           --color-accent-tint, --color-border, --color-code-surface,
+           --color-accent-tint, --color-border, --color-code-surface, --color-margin-ink,
            --texture-grain-opacity, --texture-grain-tint, --texture-grain-opacity-elevated,
            --color-amber, --color-amber-muted */
         /* Hide JS-dependent UI — NightfallToggle requires JS to function */
@@ -67,6 +67,7 @@ const themeScript = getThemeScript();
             --color-accent-tint: oklch(0.62 0.1 155 / 0.15);
             --color-border: oklch(0.3 0.025 280);
             --color-code-surface: oklch(0.18 0.035 280);
+            --color-margin-ink: oklch(0.78 0.05 70);
             --texture-grain-opacity: 0.03;
             --texture-grain-tint: oklch(0.40 0.03 60 / 0.25);
             --texture-grain-opacity-elevated: 0.055;
@@ -88,6 +89,7 @@ const themeScript = getThemeScript();
               --color-accent-tint: rgb(74 171 126 / 0.15);
               --color-border: #302d42;
               --color-code-surface: #181538;
+              --color-margin-ink: #c9b88a;
               --texture-grain-opacity: 0.03;
               --texture-grain-tint: rgba(80, 75, 50, 0.25);
               --texture-grain-opacity-elevated: 0.055;

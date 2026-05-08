@@ -1,0 +1,47 @@
+---
+interface Props {
+  side: "left" | "right";
+  emphatic?: boolean;
+}
+const { side, emphatic = false } = Astro.props;
+---
+
+<span
+  class:list={[
+    "margin-note",
+    `margin-note--${side}`,
+    { "margin-note--emphatic": emphatic },
+  ]}
+>
+  <slot />
+</span>
+
+<style>
+  .margin-note {
+    display: inline-block;
+    font-family: var(--font-script);
+    font-size: clamp(13px, 1.25vw, 17px);
+    line-height: 1.15;
+    color: var(--color-margin-ink);
+  }
+
+  .margin-note--left {
+    transform: rotate(-3deg);
+  }
+
+  .margin-note--right {
+    transform: rotate(2deg);
+  }
+
+  .margin-note--emphatic {
+    color: var(--color-accent);
+  }
+
+  @media (forced-colors: active) {
+    .margin-note {
+      color: CanvasText;
+      transform: none;
+      forced-color-adjust: none;
+    }
+  }
+</style>

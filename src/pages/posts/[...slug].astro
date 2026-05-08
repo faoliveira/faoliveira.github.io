@@ -4,7 +4,7 @@ import DataEssayLayout from "@layouts/DataEssayLayout.astro";
 import LogLayout from "@layouts/LogLayout.astro";
 import PostLayout from "@layouts/PostLayout.astro";
 import ProjectLayout from "@layouts/ProjectLayout.astro";
-import { calculateReadingTime, getPublishedPosts } from "@modules/content";
+import { getPublishedPosts } from "@modules/content";
 import { SITE_URL } from "@modules/seo";
 
 export async function getStaticPaths() {
@@ -64,9 +64,8 @@ const ogImage = post.data.og_image || `${SITE_URL}/og/${post.id}.png`;
     title={post.data.title}
     description={post.data.description}
     date={post.data.date}
-    readingTime={calculateReadingTime(post.body ?? "")}
     type={post.data.type}
-    reading={post.data.reading}
+    reading={post.data.reading || !post.data.type || post.data.type === "reflection"}
     toc={post.data.toc}
     headings={headings}
     image={ogImage}

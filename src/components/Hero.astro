@@ -1,10 +1,21 @@
 ---
+import MarginNote from "@components/MarginNote.astro";
 ---
 
 <section class="hero" aria-labelledby="hero-heading">
-  <h1 id="hero-heading">Seventeen tabs open and a restless dog.</h1>
-  <div class="hero-rule" aria-hidden="true"></div>
-  <p class="subtitle">Writing about projects, data, and things I noticed that I couldn't leave alone.</p>
+  <div class="hero-headline">
+    <h1 id="hero-heading">Seventeen tabs open and a restless dog.</h1>
+    <div class="hero-rule" aria-hidden="true"></div>
+    <aside class="hero-notes" aria-label="Hero margin notes">
+      <MarginNote side="left">
+        (the tabs are<br />a feature →)
+      </MarginNote>
+      <MarginNote side="right" emphatic>
+        his name<br />is Nuno
+      </MarginNote>
+    </aside>
+  </div>
+  <p class="subtitle">A workshop site about projects, data, and things I noticed and couldn't leave alone.</p>
 </section>
 
 <style>
@@ -20,15 +31,19 @@
   }
 
   .hero {
+    position: relative;
     padding-block-start: var(--ma-breath);
     padding-block-end: var(--ma-silence);
     text-align: center;
     animation: hero-entrance var(--motion-duration-reveal) var(--motion-easing-out) both;
   }
 
-  .hero h1,
-  .subtitle {
-    max-width: 55ch;
+  /* Narrow column anchors the title block + margin notes so notes hug the title
+     corners regardless of viewport width. Without it, notes drift to the edges
+     of main (1280px) while the title fits on one line, leaving them stranded. */
+  .hero-headline {
+    position: relative;
+    max-width: 40rem;
     margin-inline: auto;
   }
 
@@ -37,6 +52,7 @@
     font-weight: 800;
     line-height: var(--leading-4xl);
     color: var(--color-text-primary);
+    text-wrap: balance;
   }
 
   .hero-rule {
@@ -48,14 +64,46 @@
   }
 
   .subtitle {
+    max-width: 55ch;
+    margin-inline: auto;
     margin-block-start: 0;
+    margin-block-end: 0;
     font-size: var(--type-md);
     color: var(--color-text-secondary);
+  }
+
+  /* :global() pierces Astro's scoping so these rules reach the child component's class. */
+  .hero-headline :global(.margin-note) {
+    position: absolute;
+  }
+
+  /* Notes sit flush against the title corners so they read as annotations of
+     the title, not stranded marginalia floating in empty space. */
+  .hero-headline :global(.margin-note--left) {
+    left: 0;
+    top: 0;
+    transform: translateX(-100%) rotate(-3deg);
+    transform-origin: top right;
+  }
+
+  .hero-headline :global(.margin-note--right) {
+    right: 0;
+    top: var(--ma-vast);
+    transform: translateX(100%) rotate(2deg);
+    transform-origin: top left;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .hero {
       animation: none;
+    }
+  }
+
+  /* Below --bp-md (768px), marginalia reads as stray labels rather than notes; hide it.
+     Literal px because custom properties don't resolve inside @media expressions. */
+  @media (max-width: 767.98px) {
+    .hero-notes {
+      display: none;
     }
   }
 </style>

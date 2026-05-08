@@ -45,7 +45,9 @@ export default defineConfig({
     mdx(),
     sitemap({
       filter: (page) =>
-        page !== "https://felipeo.me/404/" && !page.startsWith("https://felipeo.me/design-system/"),
+        page !== "https://felipeo.me/404/" &&
+        page !== "https://felipeo.me/currently/" &&
+        !page.startsWith("https://felipeo.me/design-system/"),
     }),
     svelte(),
   ],

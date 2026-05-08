@@ -1,24 +1,12 @@
-/* src/styles/tokens.css */
-/* SYNC: noscript dark-mode fallback in BaseLayout.astro must match these values */
-/* SYNC: design-system.astro line 9 hardcodes --color-surface-alt value as a display label — update on every token change */
+/* SYNC: noscript dark-mode fallback in BaseLayout.astro must match these values. */
 
-/* ── @property registrations for animatable color tokens (Story 1.4) ── */
-/* Enables smooth nightfall transitions via CSS custom property interpolation */
-/* SYNC: @property initial-values MUST match :root day-mode values below — update both together */
+/* @property registrations enable smooth nightfall transitions via custom-property interpolation.
+   SYNC: @property initial-values MUST match the :root day-mode values below — update both together. */
 
-/*
- * Accent restraint audit, Story 1.5.
- * "One flower in a vase": accent stays sparse so it still lands when it appears.
- * Keep accent for sanctioned uses only: prose links, active nav indicator
- * ([aria-current='page']), :focus-visible outlines, code-group active tab,
- * ToC current section, pagination links, footnote refs, blockquote border,
- * skip link, and embed CTAs.
- * Non-sanctioned uses removed here: TypeTag, PostRow full-row hover,
- * LogoMark hover, NightfallToggle hover border/color, 404 display number,
- * search glyph/title decoration, and log entry-day hover.
- * Viewport rule: no page should show more than 3 simultaneous accent-colored
- * elements in a viewport. Accessibility focus indicators are exempt.
- */
+/* "One flower in a vase": --color-accent stays sparse so it lands when it appears.
+   Sanctioned uses: prose links, active nav indicator, :focus-visible outlines, active code-group
+   tab, current ToC mark, pagination, footnote refs, blockquote rule, skip link, embed CTAs.
+   No more than 3 simultaneous accent elements per viewport (focus rings exempt). See DESIGN.md §2. */
 @property --color-surface {
   syntax: "<color>";
   inherits: true;
@@ -52,7 +40,7 @@
 @property --color-accent {
   syntax: "<color>";
   inherits: true;
-  initial-value: oklch(0.5 0.1 155);
+  initial-value: oklch(0.45 0.1 155);
 }
 
 @property --color-accent-hover {
@@ -64,7 +52,7 @@
 @property --color-accent-tint {
   syntax: "<color>";
   inherits: true;
-  initial-value: oklch(0.5 0.1 155 / 0.1);
+  initial-value: oklch(0.45 0.1 155 / 0.1);
 }
 
 @property --color-border {
@@ -79,6 +67,12 @@
   initial-value: oklch(0.94 0.008 80);
 }
 
+@property --color-margin-ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.4 0.04 40);
+}
+
 :root {
   /* ── Colors: Day Mode (oklch) ── */
   --color-surface: oklch(0.96 0.012 80);
@@ -88,11 +82,12 @@
   --color-text-primary: oklch(0.22 0.02 60);
   --color-text-secondary: oklch(0.45 0.02 60);
   --color-text-tertiary: oklch(0.55 0.015 60);
-  --color-accent: oklch(0.5 0.1 155);
+  --color-accent: oklch(0.45 0.1 155);
   --color-accent-hover: oklch(0.44 0.11 155);
-  --color-accent-tint: oklch(0.5 0.1 155 / 0.1);
+  --color-accent-tint: oklch(0.45 0.1 155 / 0.1);
   --color-border: oklch(0.85 0.01 80);
   --color-code-surface: oklch(0.94 0.008 80);
+  --color-margin-ink: oklch(0.4 0.04 40);
 
   /* ── Accessibility ── */
   --touch-target-min: 44px; /* WCAG 2.5.8 minimum touch target */
@@ -142,10 +137,10 @@
 
   /* ── Layout ── */
   /* Shared max-width for nav, main content, footer, and all aligned containers.
-     Intentionally set to --bp-xl (1280px): the wide spacing between logo and
-     nav links is a deliberate design choice — airy, breathing room consistent
-     with the koubou philosophy. */
-  --layout-max: var(--bp-xl);
+     1080px keeps the page in a paper-like measure — narrow enough that text
+     blocks and the Currently widget feel composed, wide enough for two-up
+     featured cards. */
+  --layout-max: 1080px;
 }
 
 /* ── Fallback: browsers without oklch() support (Safari <15.4, Chrome <111) ── */
@@ -162,5 +157,6 @@
     --color-accent-tint: rgb(43 142 101 / 0.1);
     --color-border: #d4cfc6;
     --color-code-surface: #ece8e0;
+    --color-margin-ink: #5f4d3a;
   }
 }

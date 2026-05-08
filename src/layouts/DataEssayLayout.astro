@@ -24,11 +24,21 @@ const month = new Intl.DateTimeFormat("en-US", {
   .format(date)
   .toUpperCase();
 const year = date.getUTCFullYear();
+
+const hasHero = Astro.slots.has("hero");
+const headerClass = hasHero
+  ? "data-essay-header data-essay-header--with-hero"
+  : "data-essay-header";
 ---
 
 <BaseLayout title={title} description={description} type="article" image={image}>
   <article class="data-essay-article" data-post-type="data-essay">
-    <header class="data-essay-header">
+    {hasHero && (
+      <div class="data-essay-hero">
+        <slot name="hero" />
+      </div>
+    )}
+    <header class={headerClass}>
       <h1 class="data-essay-title">{title}</h1>
       {description && <p class="data-essay-description">{description}</p>}
       <div class="data-essay-meta">
@@ -42,7 +52,7 @@ const year = date.getUTCFullYear();
     </div>
 
     <footer class="back-link-footer">
-      <a href="/posts/" class="back-link">&larr; all posts</a>
+      <a href="/posts/" class="back-link">← all posts</a>
     </footer>
   </article>
 </BaseLayout>
