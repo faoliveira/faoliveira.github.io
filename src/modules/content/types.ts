@@ -12,7 +12,7 @@ const BaseFields = {
   tags: z.array(z.string()).default([]),
   draft: z.boolean().default(false),
   description: z.string().optional(),
-  reading: z.boolean().default(false),
+  reading: z.boolean().optional(),
   toc: z.boolean().default(false),
   og_image: z.string().min(1).startsWith("/").optional(),
 };
@@ -34,9 +34,33 @@ const ProjectFields = {
   canvasMode: z.enum(["interactive", "prose"]).default("prose").optional(),
 };
 
+/**
+ * Data-essay-layout fields — only consumed by [...slug].astro's data-essay
+ * branch to forward into <DataEssayLayout slot="hero" />. Optional so
+ * non-data-essay posts can omit it; type-gating happens at the route layer
+ * (the same conditional-render pattern ProjectFields fields use).
+ */
+const DataEssayFields = {
+  hero: z
+    .object({
+      src: z
+        .string()
+        .min(1)
+        .refine((s) => s.startsWith("/") || s.startsWith("https://"), {
+          message: "hero.src must be an absolute path (/...) or an HTTPS URL",
+        }),
+      alt: z.string().min(1),
+      caption: z.string().min(1).optional(),
+      width: z.number().int().positive().optional(),
+      height: z.number().int().positive().optional(),
+    })
+    .optional(),
+};
+
 export const PostSchema = z.object({
   ...BaseFields,
   ...ProjectFields,
+  ...DataEssayFields,
 });
 
 export type PostType = NonNullable<z.infer<typeof PostSchema>["type"]>;

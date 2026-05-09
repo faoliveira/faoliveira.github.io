@@ -1,5 +1,6 @@
 ---
 import { render } from "astro:content";
+import HeroImage from "@components/content/HeroImage.astro";
 import DataEssayLayout from "@layouts/DataEssayLayout.astro";
 import LogLayout from "@layouts/LogLayout.astro";
 import PostLayout from "@layouts/PostLayout.astro";
@@ -24,15 +25,40 @@ const ogImage = post.data.og_image || `${SITE_URL}/og/${post.id}.png`;
 ---
 
 {isDataEssay ? (
-  <DataEssayLayout
-    title={post.data.title}
-    description={post.data.description}
-    date={post.data.date}
-    type={post.data.type}
-    image={ogImage}
-  >
-    <Content />
-  </DataEssayLayout>
+  /* Frontmatter hero src is a string path; local optimized assets via import() must be authored inline in MDX. */
+  /* Two layout invocations on purpose: Astro registers the named slot at compile time
+     whenever it sees `slot="hero"` in the JSX tree, so {cond && <X slot="hero" />} still
+     makes Astro.slots.has("hero") return true in DataEssayLayout. The slot reference has
+     to be absent from the rendered branch, not merely guarded by a falsy conditional. */
+  post.data.hero ? (
+    <DataEssayLayout
+      title={post.data.title}
+      description={post.data.description}
+      date={post.data.date}
+      type={post.data.type}
+      image={ogImage}
+    >
+      <HeroImage
+        slot="hero"
+        src={post.data.hero.src}
+        alt={post.data.hero.alt}
+        caption={post.data.hero.caption}
+        width={post.data.hero.width}
+        height={post.data.hero.height}
+      />
+      <Content />
+    </DataEssayLayout>
+  ) : (
+    <DataEssayLayout
+      title={post.data.title}
+      description={post.data.description}
+      date={post.data.date}
+      type={post.data.type}
+      image={ogImage}
+    >
+      <Content />
+    </DataEssayLayout>
+  )
 ) : isProject ? (
   <ProjectLayout
     title={post.data.title}
@@ -65,7 +91,7 @@ const ogImage = post.data.og_image || `${SITE_URL}/og/${post.id}.png`;
     description={post.data.description}
     date={post.data.date}
     type={post.data.type}
-    reading={post.data.reading || !post.data.type || post.data.type === "reflection"}
+    reading={post.data.reading ?? (!post.data.type || post.data.type === "reflection")}
     toc={post.data.toc}
     headings={headings}
     image={ogImage}

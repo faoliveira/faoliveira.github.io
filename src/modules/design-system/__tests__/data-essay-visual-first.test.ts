@@ -67,7 +67,19 @@ describe("Story 1.9 — data-essay visual-first contract (Direction A)", () => {
 
   describe("Theme token hygiene (AC 13, 16)", () => {
     it("data-essay.css contains no hex color literals", () => {
-      expect(dataEssayCss).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+      expect(dataEssayCss).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
+    });
+
+    it("data-essay.css contains no rgb/rgba color literals", () => {
+      expect(dataEssayCss).not.toMatch(/rgba?\(/i);
+    });
+
+    it("data-essay.css contains no hsl/hsla color literals", () => {
+      expect(dataEssayCss).not.toMatch(/hsla?\(/i);
+    });
+
+    it("data-essay.css contains no oklch/oklab/lab/lch/color() literals", () => {
+      expect(dataEssayCss).not.toMatch(/\b(oklch|oklab|lab|lch|color)\(/i);
     });
   });
 
@@ -75,5 +87,43 @@ describe("Story 1.9 — data-essay visual-first contract (Direction A)", () => {
     it("data-essay.css does not declare a kb-prose class", () => {
       expect(dataEssayCss).not.toMatch(/\.kb-prose\b/);
     });
+  });
+});
+
+describe("Routing — hero forwarding (Story 1.23)", () => {
+  it("[...slug].astro reads post.data.hero from frontmatter", () => {
+    expect(slugPageSource).toMatch(/post\.data\.hero/);
+  });
+
+  it('[...slug].astro forwards <HeroImage slot="hero" /> when hero is set', () => {
+    // Anchor the slot attribute inside a single <HeroImage ...> tag — non-greedy
+    // [^>]*? prevents matching across unrelated elements.
+    expect(slugPageSource).toMatch(/<HeroImage\b[^>]*?\bslot="hero"/);
+  });
+
+  it("hero forwarding lives inside the isDataEssay branch", () => {
+    const dataEssayBranch = slugPageSource.match(/isDataEssay \? \([\s\S]*?<\/DataEssayLayout>/);
+    expect(dataEssayBranch).not.toBeNull();
+    if (!dataEssayBranch) return;
+    expect(dataEssayBranch[0]).toContain("<HeroImage");
+    expect(dataEssayBranch[0]).toContain('slot="hero"');
+  });
+
+  it("hero forwarding does NOT appear in the isProject, isLog, or default branches", () => {
+    const projectBranch = slugPageSource.match(/isProject \? \([\s\S]*?<\/ProjectLayout>/);
+    const logBranch = slugPageSource.match(/isLog \? \([\s\S]*?<\/LogLayout>/);
+    const defaultBranch = slugPageSource.match(/: \(\s*<PostLayout[\s\S]*?<\/PostLayout>/);
+
+    expect(projectBranch).not.toBeNull();
+    expect(logBranch).not.toBeNull();
+    expect(defaultBranch).not.toBeNull();
+    if (!projectBranch || !logBranch || !defaultBranch) return;
+
+    expect(projectBranch[0]).not.toContain("<HeroImage");
+    expect(projectBranch[0]).not.toContain('slot="hero"');
+    expect(logBranch[0]).not.toContain("<HeroImage");
+    expect(logBranch[0]).not.toContain('slot="hero"');
+    expect(defaultBranch[0]).not.toContain("<HeroImage");
+    expect(defaultBranch[0]).not.toContain('slot="hero"');
   });
 });
