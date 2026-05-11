@@ -1,39 +1,95 @@
 ---
+import NunoDoodle from "@components/NunoDoodle.astro";
 import SearchBox from "@components/SearchBox.astro";
+import WashiTape from "@components/WashiTape.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Page not found — fa." description="This page doesn't exist. The rest of the site does, though.">
-  <section class="not-found">
-    <div class="content">
-      <div class="number-wrapper" id="number-wrapper">
-        <div
-          class="display-number"
-          id="display-number"
-          aria-hidden="true"
-          title="click me"
-        >404</div>
-        <!-- aria-hidden: visual only — live region below handles screen reader updates -->
-        <span class="collect-badge" id="collect-badge" aria-hidden="true"></span>
+<BaseLayout
+  title="Page not found — fa."
+  description="The page isn't here. The workshop is, though."
+  noindex={true}
+>
+  <section class="not-found" aria-labelledby="not-found-heading">
+    <div class="not-found-insert">
+      <div class="not-found-binding" aria-hidden="true"></div>
+
+      <div class="not-found-tape" aria-hidden="true">
+        <WashiTape tone="matcha" width={90} height={18} rotate={-3} />
       </div>
-      <!-- Debounced announcement for click counter — prevents screen reader spam -->
-      <span class="sr-only" id="collect-live" aria-live="polite"></span>
 
-      <h1 class="heading" id="heading">This page doesn't exist.</h1>
+      <div class="not-found-header">
+        <span class="not-found-label">insert 04 · page —</span>
+        <span class="not-found-code">404</span>
+      </div>
 
-      <p class="body-text body-text--last">
-        You ended up here. Broken link, probably. Or a URL typed slightly wrong.
-        Maybe someone sent you here on purpose, which is its own thing.
-        The workshop is still here. The dog too.
+      <h1 id="not-found-heading" class="not-found-voice">
+        This page hasn't been written yet.
+      </h1>
+
+      <p class="not-found-body">
+        The workshop keeps a notebook. Some pages have ideas, some are blank
+        waiting for the right evening. This is one of those.
       </p>
 
-      <div class="search-wrapper">
-        <SearchBox autofocus />
+      <div class="not-found-ruled">
+        <div class="not-found-note-left">
+          <span class="not-found-handwritten not-found-handwritten--left">
+            (a page is not lost.<br />it was just never filled.)
+          </span>
+        </div>
+        <div class="not-found-note-right">
+          <span class="not-found-handwritten not-found-handwritten--right">
+            é sempre mais fácil achar<br />o chinelo do que o dinheiro.
+          </span>
+        </div>
       </div>
 
-      <nav class="recovery" aria-label="Recovery navigation">
-        <a href="/" class="link-primary">Go home</a>
+      <div class="not-found-nuno-section">
+        <NunoDoodle size={80} class="not-found-nuno-img" />
+        <div class="not-found-nuno-text">
+          <p class="not-found-nuno-name">Nuno, deputized.</p>
+          <p class="not-found-nuno-meta">
+            certified good boy · search radius: approximately this block
+          </p>
+        </div>
+      </div>
+
+      <div class="not-found-divider" aria-hidden="true"></div>
+
+      <p class="not-found-section-label">Items pressed between pages ——</p>
+      <p class="not-found-pressed-note">
+        <span class="not-found-handwritten">(nothing yet. he is thinking.)</span>
+      </p>
+
+      <div class="not-found-divider" aria-hidden="true"></div>
+
+      <p class="not-found-section-label">Or, while he works ——</p>
+      <nav class="not-found-escapes" aria-label="Recovery navigation">
+        <a class="not-found-escape" href="/">
+          <span class="not-found-escape-arrow" aria-hidden="true">→</span>
+          back to the workshop
+        </a>
+        <a class="not-found-escape" href="/posts/">
+          <span class="not-found-escape-arrow" aria-hidden="true">→</span>
+          read the recent posts
+        </a>
       </nav>
+
+      <section
+        class="not-found-recovery"
+        aria-labelledby="recovery-heading"
+      >
+        <h2 id="recovery-heading" class="sr-only">
+          Find what you were looking for
+        </h2>
+        <SearchBox autofocus={false} />
+      </section>
+
+      <div class="not-found-paw" aria-hidden="true">
+        <span class="not-found-paw-prints">🐾 🐾 🐾 🐾 🐾 🐾</span>
+        <span class="not-found-paw-text">(he went that way)</span>
+      </div>
     </div>
   </section>
 </BaseLayout>
@@ -46,311 +102,261 @@ import BaseLayout from "@layouts/BaseLayout.astro";
     padding-block: var(--ma-spacious);
   }
 
-  .content {
-    max-width: 65ch;
-    margin-inline: auto;
-    padding-inline: clamp(var(--ma-base), 5vw, var(--ma-vast));
-    text-align: center;
-  }
-
-  /*
-   * Float animation lives on .number-wrapper, squish on .display-number.
-   * This prevents float from restarting at 0% when animationend fires for squish.
-   */
-  .number-wrapper {
+  .not-found-insert {
     position: relative;
-    display: inline-block;
-    margin-block-end: var(--ma-broad);
-    animation: float 4s ease-in-out infinite;
-    will-change: transform;
+    max-width: 680px;
+    width: 100%;
+    margin-inline: auto;
+    padding: var(--ma-broad) clamp(var(--ma-base), 5vw, var(--ma-vast))
+      var(--ma-broad) clamp(var(--ma-base), 5vw, var(--ma-vast));
+    padding-inline-start: calc(
+      clamp(var(--ma-base), 5vw, var(--ma-vast)) + 28px
+    );
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card-hover);
+    border-radius: 0px;
   }
 
-  .display-number {
-    font-size: clamp(var(--type-4xl), 18vw, 9rem);
-    font-weight: 800;
-    line-height: 1;
-    color: var(--color-text-secondary);
-    letter-spacing: -0.02em;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .display-number.clicked {
-    animation: squish 150ms ease-out forwards;
-  }
-
-  .collect-badge {
+  .not-found-binding {
     position: absolute;
-    inset-inline-end: -0.5rem;
-    inset-block-start: -0.5rem;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 28px;
+    background: var(--color-surface-alt);
+    border-inline-end: 1px solid var(--color-border);
+    border-start-start-radius: 0px;
+    border-end-start-radius: 0px;
+  }
+
+  .not-found-tape {
+    position: absolute;
+    inset-block-start: -0.75rem;
+    inset-inline-end: 2rem;
+  }
+
+  .not-found-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--ma-narrow);
+    margin-block-end: var(--ma-thin);
+  }
+
+  .not-found-label {
+    font-family: var(--font-mono);
     font-size: var(--type-xs);
-    font-weight: 700;
-    color: var(--color-surface);
-    background: var(--color-accent);
-    border-radius: 999px;
-    padding: var(--ma-hair) var(--ma-narrow);
-    opacity: 0;
-    transform: scale(0.6);
-    transition:
-      opacity var(--motion-duration-normal) var(--motion-easing-out),
-      transform var(--motion-duration-normal) var(--motion-easing-out);
-    pointer-events: none;
-    white-space: nowrap;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
 
-  .collect-badge.visible {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-  }
-
-  @keyframes squish {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.88); }
-    100% { transform: scale(1); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .number-wrapper {
-      animation: none;
-      will-change: auto;
-    }
-    .display-number.clicked {
-      animation: none;
-    }
-  }
-
-  .heading {
+  .not-found-code {
+    font-family: var(--font-sans);
     font-size: var(--type-3xl);
+    color: var(--color-accent);
+    line-height: 1;
+  }
+
+  .not-found-voice {
+    font-size: clamp(var(--type-2xl), 4vw, var(--type-3xl));
     font-weight: 800;
     color: var(--color-text-primary);
-    margin-block-end: var(--ma-wide);
-    transition: opacity var(--motion-duration-smooth) var(--motion-easing-out);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-block-end: var(--ma-narrow);
   }
 
-  .body-text {
+  .not-found-body {
+    font-family: var(--font-sans);
     font-size: var(--type-md);
-    line-height: 1.7;
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    margin-block-end: var(--ma-broad);
+    max-width: 52ch;
+  }
+
+  .not-found-ruled {
+    position: relative;
+    min-height: 180px;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0 27px,
+      var(--color-border) 27px 28px
+    );
+    padding: 14px 20px 18px;
+    margin-block-end: var(--ma-broad);
+    border-radius: 0px;
+  }
+
+  .not-found-note-left {
+    position: absolute;
+    inset-block-start: 44px;
+    inset-inline-start: 14px;
+  }
+
+  .not-found-note-right {
+    position: absolute;
+    inset-block-start: 110px;
+    inset-inline-end: 14px;
+  }
+
+  .not-found-handwritten {
+    font-family: var(--font-script);
+    font-size: clamp(13px, 1.25vw, 17px);
+    line-height: 1.15;
+    color: var(--color-margin-ink);
+  }
+
+  .not-found-handwritten--right {
+    color: var(--color-accent);
+  }
+  .not-found-nuno-section {
+    display: flex;
+    align-items: center;
+    gap: var(--ma-wide);
+    padding: var(--ma-narrow) var(--ma-base);
+    margin-block-end: var(--ma-broad);
+    border: 1px solid var(--color-border);
+    border-radius: 0px;
+  }
+
+  .not-found-nuno-text {
+    flex: 1;
+  }
+
+  .not-found-nuno-name {
+    font-family: var(--font-script);
+    font-size: var(--type-xl);
+    color: var(--color-text-primary);
+    line-height: 1.2;
+    margin-block-end: var(--ma-hair);
+  }
+
+  .not-found-nuno-meta {
+    font-family: var(--font-mono);
+    font-size: var(--type-sm);
     color: var(--color-text-secondary);
+    line-height: 1.4;
+  }
+
+  .not-found-divider {
+    height: 1px;
+    background: var(--color-border);
     margin-block-end: var(--ma-wide);
   }
 
-  .body-text--last {
+  .not-found-section-label {
+    font-family: var(--font-mono);
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-block-end: var(--ma-narrow);
+  }
+
+  .not-found-pressed-note {
     margin-block-end: var(--ma-broad);
   }
 
-  .search-wrapper {
+
+  .not-found-escapes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--ma-narrow) var(--ma-wide);
     margin-block-end: var(--ma-broad);
-    text-align: start;
   }
 
-  .recovery {
+  .not-found-escape {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--ma-wide);
-    justify-content: center;
     align-items: center;
-  }
-
-  .link-primary {
+    gap: var(--ma-thin);
     color: var(--color-accent);
-    font-weight: 700;
     font-size: var(--type-base);
-    text-decoration: underline;
-    transition:
-      color var(--motion-duration-quick) var(--motion-easing-out),
-      text-decoration-color var(--motion-duration-quick) var(--motion-easing-out);
+    text-decoration: none;
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
   }
 
-  .link-secondary {
+  .not-found-escape-arrow {
     color: var(--color-text-secondary);
-    font-size: var(--type-base);
-    text-decoration: underline;
-    transition:
-      color var(--motion-duration-quick) var(--motion-easing-out),
-      text-decoration-color var(--motion-duration-quick) var(--motion-easing-out);
-  }
-
-  .link-tertiary {
-    color: var(--color-text-secondary);
-    font-size: var(--type-base);
-    text-decoration: underline;
-    transition:
-      color var(--motion-duration-quick) var(--motion-easing-out),
-      text-decoration-color var(--motion-duration-quick) var(--motion-easing-out);
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
   }
 
   @media (hover: hover) {
-    .link-primary:hover { color: var(--color-accent-hover); }
-    .link-secondary:hover { color: var(--color-text-primary); }
-    .link-tertiary:hover { color: var(--color-text-primary); }
-    .display-number:hover { color: var(--color-text-primary); }
+    .not-found-escape:hover {
+      color: var(--color-accent-hover);
+    }
+    .not-found-escape:hover .not-found-escape-arrow {
+      color: var(--color-accent);
+    }
   }
 
+  .not-found-recovery {
+    margin-block-end: var(--ma-broad);
+  }
+
+  .not-found-recovery :global(.search-input:hover) {
+    border-block-end-color: var(--color-accent);
+  }
+
+  .not-found-paw {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ma-wide);
+    margin-block-start: var(--ma-wide);
+  }
+
+  .not-found-paw-prints {
+    font-size: var(--type-base);
+    color: var(--color-text-tertiary);
+    opacity: 0.5;
+    letter-spacing: var(--ma-narrow);
+  }
+
+  .not-found-paw-text {
+    font-family: var(--font-script);
+    font-size: var(--type-lg);
+    color: var(--color-text-tertiary);
+  }
+
+  @media (max-width: 1023.98px) {
+    .not-found-tape,
+    .not-found-note-left,
+    .not-found-note-right {
+      display: none;
+    }
+  }
+
+  @media (max-width: 639.98px) {
+    .not-found-nuno-section {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ma-narrow);
+    }
+    .not-found-escapes {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .not-found-escape {
+      transition: none;
+    }
+    .not-found-escape-arrow {
+      transition: none;
+    }
+  }
 </style>
 
 <script>
   ;(() => {
-    // Cast to HTMLElement — IDs are defined in this template.
-    // The runtime guard below handles the defensive case (e.g. future template refactor).
-    const num = document.getElementById("display-number") as HTMLElement;
-    const wrapper = document.getElementById("number-wrapper") as HTMLElement;
-    const badge = document.getElementById("collect-badge") as HTMLElement;
-    const heading = document.getElementById("heading") as HTMLElement;
-    const liveRegion = document.getElementById("collect-live") as HTMLElement;
-
-    if (!num || !wrapper || !badge || !heading || !liveRegion) return;
-
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-    const supportsWAAPI = typeof Element.prototype.animate === "function";
-
-    // Read motion token from CSS custom properties; fall back to 300ms if unavailable
-    const styles = getComputedStyle(document.documentElement);
-    const dSmooth = parseFloat(styles.getPropertyValue('--motion-duration-smooth')) || 300;
-
-    // Milestone progression: Cookie Clicker / billionaire arc
-    const milestones: Record<number, string> = {
-      5:  "five. you are doing this by hand.",
-      15: "fifteen. still you, still the same button.",
-      30: "thirty. this is what compounding looks like up close.",
-      50: "fifty. at some point it stops being about the errors.",
-      75: "seventy-five. the number keeps going. you just have to keep showing up.",
-      80: "eighty. you have an origin story now.",
-      90: "ninety. the explaining is behind you.",
-      95: "ninety-five. five more. just five.",
-    };
-
-    let count = 0;
-    let busy = false;
-    let liveTimer: ReturnType<typeof setTimeout> | undefined;
-    // Stores flee() timeout IDs so they can be cleared on View Transition navigation (D-15)
-    const fleeTimers: ReturnType<typeof setTimeout>[] = [];
-
-    function spawnFloat() {
-      if (reduced || !supportsWAAPI) return;
-      const el = document.createElement("span");
-      el.setAttribute("aria-hidden", "true");
-      el.textContent = "+1";
-      Object.assign(el.style, {
-        position: "absolute",
-        insetInlineStart: "50%",
-        insetBlockStart: "0",
-        fontWeight: "700",
-        fontSize: "var(--type-xs)",
-        color: "var(--color-accent)",
-        pointerEvents: "none",
-        whiteSpace: "nowrap",
-        zIndex: "10",
-      });
-      wrapper.appendChild(el);
-      const anim = el.animate(
-        [
-          { opacity: 1, transform: "translateX(-50%) translateY(0)" },
-          { opacity: 0, transform: "translateX(-50%) translateY(-3rem)" },
-        ],
-        { duration: 800, easing: "ease-out", fill: "forwards" }
-      );
-      anim.onfinish = () => el.remove();
+    function focusOnFinePointer() {
+      if (!matchMedia("(pointer: fine)").matches) return;
+      const input = document.getElementById(
+        "search-input",
+      ) as HTMLInputElement | null;
+      input?.focus();
     }
-
-    function flee() {
-      busy = true;
-      num.style.cursor = "default";
-      heading.textContent = "ok wait—";
-
-      if (reduced) {
-        // No animation — instant reset for reduced-motion users
-        num.textContent = "404";
-        heading.textContent = "anyway.";
-        badge.classList.remove("visible");
-        clearTimeout(liveTimer);
-        liveRegion.textContent = "";
-        count = 0;
-        busy = false;
-        num.style.cursor = "pointer";
-        return;
-      }
-
-      fleeTimers.push(setTimeout(() => {
-        // Guard: DOM may be gone if navigation happened
-        if (!document.body.contains(wrapper)) return;
-        // Slide left — the direction it was always going
-        wrapper.style.animation = "none";
-        wrapper.style.transition = "transform 1.2s ease-in, opacity 0.8s ease-in 0.4s";
-        wrapper.style.transform = "translateX(-200vw)";
-        wrapper.style.opacity = "0";
-        heading.textContent = "this is fine";
-
-        fleeTimers.push(setTimeout(() => {
-          // Guard: DOM may be gone if navigation happened
-          if (!document.body.contains(wrapper)) return;
-          // Teleport back with no transition
-          // Force reflow so transition: none takes effect before transform reset
-          wrapper.style.transition = "none";
-          void wrapper.offsetWidth;
-          wrapper.style.transform = "translateX(0)";
-          wrapper.style.opacity = "1";
-          num.textContent = "...";
-          badge.classList.remove("visible");
-          clearTimeout(liveTimer);
-          liveRegion.textContent = "";
-
-          fleeTimers.push(setTimeout(() => {
-            // Guard: DOM may be gone if navigation happened
-            if (!document.body.contains(num)) return;
-            num.textContent = "404";
-            wrapper.style.animation = "";
-            wrapper.style.transition = ""; // clear inline override — restore CSS control
-            heading.textContent = "anyway.";
-            count = 0;
-            busy = false;
-            num.style.cursor = "pointer";
-            // All timers completed normally — clear the list
-            fleeTimers.length = 0;
-          }, dSmooth * 4)); // 1200ms at 300ms base
-        }, dSmooth * 6)); // 1800ms at 300ms base
-      }, dSmooth * 2)); // 600ms at 300ms base
-    }
-
-    // D-15: Clear flee() timers on View Transition navigation to prevent stale DOM manipulation
-    document.addEventListener('astro:before-swap', () => {
-      for (const id of fleeTimers) clearTimeout(id);
-      fleeTimers.length = 0;
-    }, { once: true });
-
-    num.addEventListener("click", () => {
-      if (busy) return;
-      count++;
-
-      // Visual badge update — immediate
-      badge.textContent = `×${count} errors`;
-      badge.classList.add("visible");
-
-      // Debounced live region — avoids screen reader announcement on every rapid click
-      clearTimeout(liveTimer);
-      liveTimer = setTimeout(() => {
-        liveRegion.textContent = `${count} errors collected`;
-      }, 500);
-
-      spawnFloat();
-
-      // Squish via class — float runs independently on .number-wrapper so it won't restart
-      const removeClicked = () => num.classList.remove("clicked");
-      num.classList.add("clicked");
-      num.addEventListener("animationend", removeClicked, { once: true });
-      setTimeout(removeClicked, 200); // fallback: animationend may not fire in hidden tabs
-
-      if (milestones[count]) {
-        heading.textContent = milestones[count];
-      }
-
-      if (count >= 100) {
-        flee();
-      }
-    });
+    focusOnFinePointer();
+    document.addEventListener("astro:page-load", focusOnFinePointer);
   })();
 </script>

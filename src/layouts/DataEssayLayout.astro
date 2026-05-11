@@ -32,7 +32,7 @@ const headerClass = hasHero
 ---
 
 <BaseLayout title={title} description={description} type="article" image={image}>
-  <article class="data-essay-article" data-post-type="data-essay">
+  <article class="data-essay-article" data-post-type="data-essay" data-pagefind-body>
     {hasHero && (
       <div class="data-essay-hero">
         <slot name="hero" />

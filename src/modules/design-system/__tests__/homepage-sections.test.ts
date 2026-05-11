@@ -7,7 +7,7 @@ import indexSource from "../../../pages/index.astro?raw";
 
 describe("Homepage sections — Story 1.5 contract", () => {
   it("renders the canonical Featured label and preserves the zero-feature guard", () => {
-    expect(featuredGridSource).toContain('Featured<span aria-hidden="true"> ——</span>');
+    expect(featuredGridSource).toContain("Featured ——</h2>");
     expect(featuredGridSource).toContain("posts.length > 0 &&");
   });
 
@@ -39,7 +39,6 @@ describe("Homepage sections — Story 1.5 contract", () => {
   it("requests the full recent stream and renders the canonical Recent label", () => {
     expect(indexSource).toContain("getPublishedPosts({ limit: 5 })");
     expect(indexSource).not.toContain("excludeFeatured");
-    expect(indexSource).toContain('headingText="Recent"');
-    expect(indexSource).toContain('decorativeSuffix="——"');
+    expect(indexSource).toContain('headingText="Recent ——"');
   });
 });

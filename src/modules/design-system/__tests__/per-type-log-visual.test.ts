@@ -66,13 +66,19 @@ describe("Story 1.10 — log per-type visual contract (Direction A — Nikki rat
     it("LogLayout.astro <style> block contains no hex color literals", () => {
       const styleMatch = logLayoutSource.match(/<style[^>]*>([\s\S]*?)<\/style>/);
       expect(styleMatch).not.toBeNull();
-      expect(styleMatch?.[1]).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+      expect(styleMatch?.[1]).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
     });
   });
 
-  describe("Class-name stability — anti-pattern guard (AC 16)", () => {
+  describe("Class-name stability — anti-pattern guard (AC 9, 16)", () => {
     it("LogLayout.astro does not introduce a kb-prose class", () => {
       expect(logLayoutSource).not.toMatch(/\bkb-prose\b/);
+    });
+
+    it("LogLayout.astro does not import any marginalia atom (AC 9)", () => {
+      expect(logLayoutSource).not.toMatch(
+        /\b(WashiTape|Polaroid|EkiStamp|MarginNote|PaperClip|Hanko|NunoDoodle)\b/,
+      );
     });
   });
 

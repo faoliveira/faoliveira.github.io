@@ -18,9 +18,11 @@ interface Props {
   data: CurrentlyData;
   /** Show the dev/preview toolbar above the desktop. */
   dev?: boolean;
+  /** Compact mode for homepage — smaller surface, tighter layout. */
+  compact?: boolean;
 }
 
-let { data, dev = false }: Props = $props();
+let { data, dev = false, compact = false }: Props = $props();
 
 type Mood = "idle" | "eat" | "play" | "walk" | "sleep";
 type WinId = "currently" | "nowplaying" | "reading" | "nunotchi" | "alert";
@@ -111,6 +113,24 @@ function onDragEnd() {
 }
 function closeWin(id: WinId) {
   wins[id].open = false;
+  // Redirect focus to the matching desktop icon, or the surface as fallback.
+  const iconMap: Record<string, string> = {
+    nunotchi: "Nuno",
+    reading: "Reading",
+    nowplaying: "Music",
+  };
+  const label = iconMap[id];
+  if (label && surface) {
+    const icons = surface.querySelectorAll(".icon-btn");
+    for (const btn of icons) {
+      if (btn.querySelector(".icon-label")?.textContent?.trim() === label) {
+        (btn as HTMLElement).focus();
+        break;
+      }
+    }
+  } else if (surface) {
+    surface.focus();
+  }
 }
 function toggleWin(id: WinId) {
   wins[id].open = !wins[id].open;
@@ -119,6 +139,20 @@ function toggleWin(id: WinId) {
 function resetDesktop() {
   wins = structuredClone(initialWins);
   topZ = 20;
+  repositionWindows();
+}
+
+function repositionWindows() {
+  if (!surface) return;
+  const sw = surface.getBoundingClientRect().width;
+  if (sw >= 680) return;
+
+  const pad = 10;
+  wins.currently = { ...wins.currently, x: pad, y: 12 };
+  wins.nowplaying = { ...wins.nowplaying, x: pad, y: 170 };
+  wins.reading = { ...wins.reading, x: pad, y: 310 };
+  wins.nunotchi = { ...wins.nunotchi, x: pad, y: 420 };
+  wins.alert = { ...wins.alert, x: pad + 20, y: 130 };
 }
 
 // ── Game actions (also reachable from terminal commands) ─────────────────────
@@ -218,6 +252,14 @@ function fmtTime(s: number): string {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
+function fmtSpoken(s: number): string {
+  if (!Number.isFinite(s) || s < 0) return "0 seconds";
+  const m = Math.floor(s / 60);
+  const r = Math.floor(s % 60);
+  if (m === 0) return `${r} seconds`;
+  return `${m} minute${m === 1 ? "" : "s"} ${r} seconds`;
+}
+
 async function seekFromBar(e: PointerEvent) {
   if (!playable) return;
   e.stopPropagation();
@@ -239,15 +281,22 @@ let hatchTimer: ReturnType<typeof setInterval> | undefined;
 let decayTimer: ReturnType<typeof setInterval> | undefined;
 let onVisibility: (() => void) | undefined;
 let onPageHide: (() => void) | undefined;
+let resizeObserver: ResizeObserver | undefined;
 
 onMount(() => {
-  mounted = true;
   reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   docVisible = document.visibilityState === "visible";
 
-  // Persistence: hydrate pet from localStorage and apply offline decay.
+  // Persistence: hydrate pet from localStorage and apply offline decay
+  // BEFORE flipping the SSR branch off, so the egg-hatch frame never paints
+  // with the default pet during the gap between mount and load.
   const loaded = loadState(getStorage());
   pet = applyOfflineDecay(loaded.state, Date.now());
+  mounted = true;
+  repositionWindows();
+
+  resizeObserver = new ResizeObserver(() => repositionWindows());
+  if (surface) resizeObserver.observe(surface);
 
   const updateClock = () => {
     const d = new Date();
@@ -292,6 +341,7 @@ onDestroy(() => {
   if (onVisibility) document.removeEventListener("visibilitychange", onVisibility);
   if (onPageHide) window.removeEventListener("pagehide", onPageHide);
   audio?.destroy();
+  resizeObserver?.disconnect();
 });
 
 // Poll audio position only while the tab is visible and audio is actually playing.
@@ -340,7 +390,7 @@ const playable = $derived(data.music.source.kind !== "none");
 
 <svelte:window onpointermove={onDragMove} onpointerup={onDragEnd} />
 
-<div class="widget-frame" data-busy={busy}>
+<div class="widget-frame" data-busy={busy} data-compact={compact}>
   {#if dev}
     <div class="widget-toolbar">
       <span class="widget-title">System-1 paper · widget preview</span>
@@ -358,6 +408,7 @@ const playable = $derived(data.music.source.kind !== "none");
     bind:this={surface}
     role="region"
     aria-label="System-1 paper desktop"
+		tabindex="-1"
   >
     {#if wins.currently.open}
       <div
@@ -427,7 +478,12 @@ const playable = $derived(data.music.source.kind !== "none");
               {audioState.playing ? "⏸" : "▶"}
             </button>
             <button type="button" class="paper-btn" aria-label="Skip" disabled={!playable} onclick={() => audio?.seek(audioDuration - 1)}>▶▶</button>
-            <span class="np-track" title={trackLine}>{trackLine}</span>
+				<span class="np-track" title={trackLine}>
+					<span class="np-track-scroll">
+						<span>{trackLine}</span>
+						<span aria-hidden="true">{trackLine}</span>
+					</span>
+				</span>
           </div>
           <div
             class="np-progress"
@@ -437,6 +493,7 @@ const playable = $derived(data.music.source.kind !== "none");
             aria-valuemin={0}
             aria-valuemax={Math.max(1, Math.round(audioDuration))}
             aria-valuenow={Math.round(audioPos)}
+            aria-valuetext={`${fmtSpoken(audioPos)} of ${fmtSpoken(audioDuration)}`}
             tabindex={playable ? 0 : -1}
             onpointerdown={seekFromBar}
             onkeydown={(e) => {
@@ -588,13 +645,13 @@ const playable = $derived(data.music.source.kind !== "none");
         <span class="icon-label">Nuno</span>
       </button>
       <button type="button" class="icon-btn" onclick={() => toggleWin("reading")}>
-        <span class="icon folder" aria-hidden="true"></span>
-        <span class="icon-label">Posts</span>
+		<span class="icon folder" aria-hidden="true"></span>
+		<span class="icon-label">Reading</span>
       </button>
-      <button type="button" class="icon-btn" onclick={() => toggleWin("nowplaying")}>
-        <span class="icon image" aria-hidden="true"></span>
-        <span class="icon-label">Music</span>
-      </button>
+		<button type="button" class="icon-btn" onclick={() => toggleWin("nowplaying")}>
+			<span class="icon music" aria-hidden="true"></span>
+			<span class="icon-label">Music</span>
+		</button>
       <button type="button" class="icon-btn" aria-label="Trash (empty)" disabled>
         <span class="icon trash" aria-hidden="true"></span>
         <span class="icon-label">Trash</span>
@@ -634,7 +691,7 @@ const playable = $derived(data.music.source.kind !== "none");
     --ink-soft: color-mix(in oklch, var(--ink) 25%, transparent);
     /* Opaque text tones over --paper. WCAG-checkable: no opacity composite. */
     --ink-secondary: color-mix(in oklch, var(--ink) 70%, var(--paper));
-    --ink-tertiary: color-mix(in oklch, var(--ink) 55%, var(--paper));
+	--ink-tertiary: color-mix(in oklch, var(--ink) 70%, var(--paper));
     --winShadow: 3px 3px 0 var(--ink);
     color: var(--ink);
     font-family: var(--font-mono);
@@ -692,8 +749,13 @@ const playable = $derived(data.music.source.kind !== "none");
     background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
     background-size: 4px 4px;
     overflow: hidden;
-    touch-action: none;
+    /* Allow vertical page scroll over the surface; title-bars own their own
+       drag pointer-capture and set touch-action: none locally. */
+    touch-action: pan-y;
   }
+	.widget-frame[data-compact="true"] .surface {
+		height: clamp(480px, 55vh, 580px);
+	}
 
   .paper-win {
     position: absolute;
@@ -714,6 +776,7 @@ const playable = $derived(data.music.source.kind !== "none");
     border-bottom: 1.5px solid var(--ink);
     cursor: grab;
     user-select: none;
+    touch-action: none;
   }
   .title-bar:active { cursor: grabbing; }
   .title {
@@ -791,13 +854,25 @@ const playable = $derived(data.music.source.kind !== "none");
 
   /* ── Now Playing ── */
   .np-controls { display: flex; gap: 6px; align-items: center; font-size: 11px; }
-  .np-track {
-    margin-left: 4px;
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+	.np-track {
+		margin-left: 4px;
+		flex: 1;
+		overflow: hidden;
+		position: relative;
+		white-space: nowrap;
+	}
+	.np-track-scroll {
+		display: inline-flex;
+		white-space: nowrap;
+		animation: marquee-scroll 12s linear infinite;
+	}
+	.np-track-scroll span {
+		padding-right: 2em;
+	}
+	@keyframes marquee-scroll {
+		0% { transform: translateX(0); }
+		100% { transform: translateX(-50%); }
+	}
   .np-progress {
     margin-top: 8px;
     height: 10px;
@@ -1022,6 +1097,27 @@ const playable = $derived(data.music.source.kind !== "none");
     background-size: 6px 6px;
     background-position: 0 0, 3px 0;
   }
+	.icon.music {
+		background: var(--paper);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.icon.music::before {
+		content: "";
+		width: 14px;
+		height: 14px;
+		border: 1.5px solid var(--ink);
+		border-radius: 50%;
+	}
+	.icon.music::after {
+		content: "";
+		width: 4px;
+		height: 4px;
+		background: var(--ink);
+		border-radius: 50%;
+		position: absolute;
+	}
   .icon.trash {
     width: 22px;
     height: 24px;
@@ -1096,8 +1192,12 @@ const playable = $derived(data.music.source.kind !== "none");
   }
 
   @media (max-width: 720px) {
-    .surface { height: 80vh; }
-    .ask-bar { width: calc(100% - 32px); }
-    .desktop-icons { left: 12px; gap: 12px; }
+	.surface { height: clamp(640px, 85vh, 800px); }
+	.ask-bar { width: calc(100% - 32px); }
+	.desktop-icons { left: 12px; gap: 12px; }
+	.paper-btn { padding: 5px 12px; font-size: 11px; }
+	.paper-btn::before { inset: -6px; }
+	.close::before { inset: -10px; }
+	.close, .zoom { width: 14px; height: 14px; }
   }
 </style>

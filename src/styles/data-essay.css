@@ -107,16 +107,11 @@
   border-radius: 8px;
   opacity: 0.95;
   margin-bottom: 80vh;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-elevated);
 }
 
 .scrolly-step:last-child {
   margin-bottom: var(--ma-spacious);
-}
-
-/* Nightfall adjustments */
-html[data-theme="nightfall"] .scrolly-step {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* box-shadow isn't token-based, so @property can't animate it; transition explicitly. */

@@ -2,7 +2,7 @@ pre-commit:
   parallel: false
   commands:
     lint:
-      run: bunx biome check --staged
+      run: bunx biome check --write --staged
     typecheck:
       run: bunx astro sync && bun run check
     impeccable:

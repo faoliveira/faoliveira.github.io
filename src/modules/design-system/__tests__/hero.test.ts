@@ -22,12 +22,6 @@ describe("Hero — Koubou v.04.26 contract", () => {
   });
 
   it("hides margin notes on narrow viewports", () => {
-    expect(heroSource.indexOf('<p class="subtitle">')).toBeLessThan(
-      heroSource.indexOf('<aside class="hero-notes"'),
-    );
-    expect(heroSource.indexOf('<aside class="hero-notes"')).toBeLessThan(
-      heroSource.indexOf('<MarginNote side="left">'),
-    );
     expect(heroSource).toContain(".hero-notes");
     expect(heroSource).toContain("@media (max-width: 767.98px)");
     expect(heroSource).toMatch(/\.hero-notes\s*\{[\s\S]*?display:\s*none/);

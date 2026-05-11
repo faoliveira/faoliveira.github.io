@@ -1,0 +1,30 @@
+---
+interface Props {
+  tone?: "matcha" | "vermillion";
+  width?: number;
+  height?: number;
+  rotate?: number;
+}
+const { tone = "matcha", width = 90, height = 18, rotate = 0 } = Astro.props;
+const inlineStyle = `width: ${width}px; height: ${height}px; rotate: ${rotate}deg;`;
+---
+
+<span
+  class:list={["washi-tape", `washi-tape--${tone}`]}
+  aria-hidden="true"
+  style={inlineStyle}
+></span>
+
+<style>
+  .washi-tape {
+    display: inline-block;
+    box-shadow: 0 1px 2px var(--tape-shadow);
+    pointer-events: none;
+  }
+  .washi-tape--matcha {
+    background: var(--tape-matcha);
+  }
+  .washi-tape--vermillion {
+    background: var(--tape-vermillion);
+  }
+</style>

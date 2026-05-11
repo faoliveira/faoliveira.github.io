@@ -7,16 +7,14 @@ const posts = await getFeaturedPosts();
 
 {posts.length > 0 && (
   <section class="featured-grid" aria-labelledby="featured-heading">
-    <h2 id="featured-heading" class="section-label kb-section-label">Featured<span aria-hidden="true"> ——</span></h2>
+    <h2 id="featured-heading" class="section-label kb-section-label">Featured ——</h2>
     <div class="grid">
       {posts.map((post, index) => (
-        <div class="reveal">
-          <FeaturedCard
-            post={post}
-            tapeSide={index % 2 === 0 ? "left" : "right"}
-            tapeTone={index % 2 === 0 ? "matcha" : "vermillion"}
-          />
-        </div>
+        <FeaturedCard
+          post={post}
+          tapeSide={index % 2 === 0 ? "left" : "right"}
+          tapeTone={index % 2 === 0 ? "matcha" : "vermillion"}
+        />
       ))}
     </div>
   </section>
@@ -34,11 +32,7 @@ const posts = await getFeaturedPosts();
     align-items: stretch;
   }
 
-  .grid > div {
-    display: flex;
-  }
-
-  .grid > div > :global(a) {
+  .grid > :global(a) {
     width: 100%;
   }
 

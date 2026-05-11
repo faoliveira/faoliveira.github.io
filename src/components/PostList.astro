@@ -6,7 +6,6 @@ interface Props {
   posts?: Post[];
   showHeading?: boolean;
   headingText?: string;
-  decorativeSuffix?: string;
   emptyStateText?: string;
   viewAllHref?: string;
 }
@@ -15,7 +14,6 @@ const {
   posts: propPosts,
   showHeading = true,
   headingText = "All posts",
-  decorativeSuffix,
   emptyStateText = "Coming soon.",
   viewAllHref,
 } = Astro.props;
@@ -24,14 +22,12 @@ const posts = propPosts ?? (await getPublishedPosts());
 
 <section class="post-list">
   {showHeading && (
-    <h2 class="section-label kb-section-label">
-      {headingText}{decorativeSuffix && <span aria-hidden="true">{` ${decorativeSuffix}`}</span>}
-    </h2>
+    <h2 class="section-label kb-section-label">{headingText}</h2>
   )}
   {posts.length > 0 ? (
     <ul class="posts" role="list">
-      {posts.map((post, idx) => (
-        <li class:list={[idx > 0 && "reveal"]}>
+      {posts.map((post) => (
+        <li>
           <PostRow post={post} />
         </li>
       ))}
@@ -40,7 +36,7 @@ const posts = propPosts ?? (await getPublishedPosts());
     <p class="empty-state">{emptyStateText}</p>
   )}
   {viewAllHref && (
-    <a href={viewAllHref} class="view-all reveal">View all posts →</a>
+    <a href={viewAllHref} class="view-all">View all posts →</a>
   )}
 </section>
 
@@ -71,7 +67,7 @@ const posts = propPosts ?? (await getPublishedPosts());
   }
 
   .empty-state {
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
   }
 
   .view-all {

@@ -9,11 +9,10 @@ interface Props {
 
 const { post } = Astro.props;
 const { title, date, type } = post.data;
-const titleId = `post-title-${post.id}`;
 ---
 
-<a href={`/posts/${post.id}`} class="post-row" aria-labelledby={titleId}>
-  <span class="post-title" id={titleId}>{title}</span>
+<a href={`/posts/${post.id}`} class="post-row">
+  <span class="post-title">{title}</span>
   {type && <TypeTag type={type} />}
   <time datetime={toISODateString(date)} class="post-date">{formatDate(date)}</time>
 </a>
@@ -66,5 +65,9 @@ const titleId = `post-title-${post.id}`;
       grid-template-columns: minmax(0, 1fr);
       gap: var(--ma-thin);
     }
+
+	  .post-row :global(.type-tag) {
+	    justify-self: start;
+	  }
   }
 </style>

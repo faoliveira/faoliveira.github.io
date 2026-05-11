@@ -24,7 +24,7 @@ function getExcerpt(post: Post): string {
     .replace(/[#*_`~>!|]/g, "") // strip remaining markdown punctuation
     .replace(/\s+/g, " ")
     .trim();
-  return plain.length > 160 ? `${plain.slice(0, 160).replace(/\s\S*$/, "")}…` : plain;
+  return plain.length > 160 ? `${plain.slice(0, 160).replace(/\s+\S*$/, "")}…` : plain;
 }
 ---
 
@@ -122,8 +122,9 @@ function getExcerpt(post: Post): string {
   .year-label {
     font-family: var(--font-mono);
     font-size: var(--type-xs);
-    color: var(--color-text-tertiary);
-    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.14em;
     white-space: nowrap;
   }
 

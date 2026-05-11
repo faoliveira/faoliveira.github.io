@@ -1,0 +1,668 @@
+---
+import NunoDoodle from "@components/NunoDoodle.astro";
+import WashiTape from "@components/WashiTape.astro";
+
+const suggestions = ["esp32", "home server", "nuno"];
+
+const nunoSearches = [
+  "where is the ball",
+  "cheese",
+  "why did he leave",
+  "sunbeam location: 3pm",
+  "is it walk time",
+  "the other sock",
+  "bark frequency chart",
+];
+---
+
+<div class="workshop-search">
+  <div class="search-prompt">
+    <span class="prompt-slash" aria-hidden="true">/</span>
+    <input
+      id="workshop-search-input"
+      class="search-input"
+      type="text"
+      placeholder="type to search…"
+      autocomplete="off"
+      autocapitalize="off"
+      aria-label="Search"
+      aria-autocomplete="list"
+      aria-controls="workshop-search-results"
+      aria-describedby="workshop-search-status"
+    />
+    <span class="search-hint" aria-hidden="true">press / to focus</span>
+    <button id="workshop-search-clear" class="search-clear" type="button" aria-label="Clear search">
+      ESC ×
+    </button>
+  </div>
+
+  <div id="workshop-search-results" class="search-results" role="region" aria-live="polite" hidden></div>
+  <div id="workshop-search-status" class="search-status" aria-live="polite"></div>
+</div>
+
+<div class="search-suggestions">
+  <p class="suggestions-label">or try one of these →</p>
+  <div class="suggestions-list">
+    {suggestions.map((s, i) => (
+      <button
+        type="button"
+        class="suggestion-chip"
+        data-suggestion={s}
+		data-rotate={[-1, 0.5, 1][i % 3]}
+      >
+        <span class="suggestion-slash" aria-hidden="true">/</span> {s}
+      </button>
+    ))}
+  </div>
+</div>
+
+<div class="nuno-search-card" hidden>
+  <div class="nuno-search-tape">
+<WashiTape width={72} height={18} rotate={4} tone="matcha"></WashiTape>
+  </div>
+  <div class="nuno-search-header">
+    <NunoDoodle size={34} color="var(--color-text-secondary)" tongue={false}></NunoDoodle>
+    <div class="nuno-search-header-text">
+      <span class="nuno-search-title">Nuno also searched for —</span>
+      <span class="nuno-search-subtitle">no results returned. he is undeterred.</span>
+    </div>
+  </div>
+  <ul class="nuno-search-list">
+    {nunoSearches.map((s) => (
+      <li class="nuno-search-item">
+        <span class="nuno-search-slash">/</span>
+        <span class="nuno-search-query">{s}</span>
+        <span class="nuno-search-count">0</span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<script>
+  import { SEARCH_CONFIG } from '@modules/search/index.ts';
+
+  ;(() => {
+    const input = document.getElementById('workshop-search-input') as HTMLInputElement | null;
+    const resultsEl = document.getElementById('workshop-search-results') as HTMLElement | null;
+    const statusEl = document.getElementById('workshop-search-status') as HTMLElement | null;
+    const clearBtn = document.getElementById('workshop-search-clear') as HTMLButtonElement | null;
+    const hintEl = document.querySelector('.search-hint') as HTMLElement | null;
+    const suggestionsWrap = document.querySelector('.search-suggestions') as HTMLElement | null;
+    const nunoCardEl = document.querySelector('.nuno-search-card') as HTMLElement | null;
+
+    if (!input || !resultsEl || !statusEl) return;
+
+    function showNuno() { nunoCardEl?.removeAttribute('hidden'); }
+    function hideNuno() { nunoCardEl?.setAttribute('hidden', ''); }
+
+    type ResultData = {
+      url: string;
+      meta: { title: string };
+      excerpt: string;
+    };
+
+    type PagefindModule = {
+      options: (opts: Record<string, unknown>) => Promise<void>;
+      init: () => Promise<void>;
+      debouncedSearch: (
+        term: string,
+        opts: Record<string, unknown>,
+        debounce: number
+      ) => Promise<{ results: Array<{ data: () => Promise<ResultData> }> } | null>;
+    };
+
+    function escapeHtml(s: string): string {
+      return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function sanitizeExcerpt(html: string): string {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const walk = (node: Node): string => {
+        if (node.nodeType === Node.TEXT_NODE) return escapeHtml(node.textContent ?? '');
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as Element;
+          const children = Array.from(el.childNodes).map(walk).join('');
+          if (el.tagName === 'MARK') return `<mark>${children}</mark>`;
+          return children;
+        }
+        return '';
+      };
+      return Array.from(doc.body.childNodes).map(walk).join('');
+    }
+
+    function isSafeUrl(url: string): boolean {
+      return url.startsWith('/') && !url.startsWith('//');
+    }
+
+    let pagefindPromise: Promise<PagefindModule | null> | null = null;
+
+    function loadPagefind(): Promise<PagefindModule | null> {
+      if (pagefindPromise) return pagefindPromise;
+      pagefindPromise = (async () => {
+        try {
+          const specifier = '/pagefind/pagefind.js';
+          const pf = (await import(/* @vite-ignore */ specifier)) as PagefindModule;
+          await pf.options({ excerptLength: SEARCH_CONFIG.excerptLength });
+          await pf.init();
+          return pf;
+        } catch {
+          pagefindPromise = Promise.resolve(null);
+          return null;
+        }
+      })();
+      return pagefindPromise;
+    }
+
+    function showResults(html: string) {
+      resultsEl!.innerHTML = html;
+      resultsEl!.removeAttribute('hidden');
+    }
+
+    function hideResults() {
+      resultsEl!.innerHTML = '';
+      resultsEl!.setAttribute('hidden', '');
+      statusEl!.textContent = '';
+      hideNuno();
+    }
+
+    function renderUnavailable() {
+      showResults(`
+        <div class="no-results">
+          <p>Search index isn't ready. Browse instead?</p>
+          <div class="no-results-links">
+            <a href="/posts/">Browse posts</a>
+            <a href="/">Go home</a>
+          </div>
+        </div>
+      `);
+      hideNuno();
+    }
+
+    function renderNoResults(query: string) {
+      const safeQuery = escapeHtml(query);
+      showResults(`
+        <div class="no-results">
+          <p>Nothing for "${safeQuery}".</p>
+          <div class="no-results-links">
+            <a href="/posts/">Browse posts</a>
+            <a href="/">Go home</a>
+          </div>
+        </div>
+      `);
+      statusEl!.textContent = `No results for ${query}`;
+      showNuno();
+    }
+
+    function renderItems(items: ResultData[], query: string) {
+      const html = items
+        .map((item) => {
+          const safeUrl = isSafeUrl(item.url) ? item.url : '/';
+          const safeTitle = escapeHtml(item.meta.title);
+          const safeExcerpt = sanitizeExcerpt(item.excerpt);
+          return `
+            <a href="${safeUrl}" class="result-item">
+              <div class="result-title">${safeTitle}</div>
+              <div class="result-excerpt">${safeExcerpt}</div>
+            </a>
+          `;
+        })
+        .join('');
+      showResults(html);
+      statusEl!.textContent = `${items.length} result${items.length === 1 ? '' : 's'} for ${query}`;
+      hideNuno();
+    }
+
+    async function runSearch(term: string) {
+      const trimmed = term.trim();
+      if (!trimmed) {
+        hideResults();
+        if (hintEl) hintEl.textContent = 'press / to focus';
+        if (suggestionsWrap) suggestionsWrap.removeAttribute('hidden');
+        return;
+      }
+
+      if (suggestionsWrap) suggestionsWrap.setAttribute('hidden', '');
+
+      const pf = await loadPagefind();
+      if (!pf) {
+        renderUnavailable();
+        return;
+      }
+
+      const search = await pf.debouncedSearch(trimmed, {}, SEARCH_CONFIG.debounceMs);
+      if (search === null) return;
+
+      if (hintEl) hintEl.textContent = '↵ open first result';
+
+      if (search.results.length === 0) {
+        renderNoResults(trimmed);
+        return;
+      }
+
+      const items = await Promise.all(
+        search.results.slice(0, SEARCH_CONFIG.maxResults).map((r: { data: () => Promise<ResultData> }) => r.data())
+      );
+      renderItems(items, trimmed);
+    }
+
+    input.addEventListener('input', () => {
+      runSearch(input.value);
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      input.value = '';
+      hideResults();
+      if (hintEl) hintEl.textContent = 'press / to focus';
+      if (suggestionsWrap) suggestionsWrap.removeAttribute('hidden');
+      input.focus();
+    });
+
+    input.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        hideResults();
+        input.value = '';
+        if (hintEl) hintEl.textContent = 'press / to focus';
+        if (suggestionsWrap) suggestionsWrap.removeAttribute('hidden');
+        input.focus();
+        return;
+      }
+    });
+
+    // Suggestion chips
+    document.querySelectorAll('.suggestion-chip').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const suggestion = (btn as HTMLElement).dataset.suggestion || '';
+        input.value = suggestion;
+        runSearch(suggestion);
+        input.focus();
+      });
+    });
+
+    // Global / shortcut — capture phase to beat browser quick-find
+    const slashHandler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isTyping = target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      );
+      if (
+        (e.key === '/' || e.code === 'Slash') &&
+        !isTyping &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        input.focus();
+      }
+    };
+    window.addEventListener('keydown', slashHandler, true);
+
+    // Cleanup
+    document.addEventListener('astro:before-swap', () => {
+      window.removeEventListener('keydown', slashHandler, true);
+    }, { once: true });
+  })();
+</script>
+
+<style>
+  .workshop-search {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--ma-base) var(--ma-wide);
+    cursor: text;
+  }
+
+  .workshop-search:hover,
+  .workshop-search:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .workshop-search {
+      transition: border-color var(--motion-duration-quick) var(--motion-easing-out);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .workshop-search:hover,
+    .workshop-search:focus-within {
+      border-color: Highlight;
+    }
+  }
+
+  .search-prompt {
+    display: flex;
+    align-items: center;
+		gap: var(--ma-narrow);
+    position: relative;
+    z-index: 1;
+  }
+
+  .prompt-slash {
+    font-family: var(--font-mono);
+		font-size: var(--type-lg);
+    color: var(--color-accent);
+    line-height: 1;
+  }
+
+  .search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-mono);
+		font-size: var(--type-xl);
+    color: var(--color-text-primary);
+    padding: 0;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  .search-input::placeholder {
+    color: var(--color-text-tertiary);
+    opacity: 0.7;
+  }
+
+  .search-input:focus,
+  .search-input:focus-visible {
+    outline: none;
+  }
+
+  .search-clear {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+		font-size: var(--type-xs);
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.1em;
+    padding: 6px 8px;
+    min-height: 36px;
+    white-space: nowrap;
+  }
+
+  .search-clear:hover {
+    color: var(--color-text-primary);
+  }
+
+  .search-hint {
+    font-family: var(--font-mono);
+    font-size: var(--type-xs);
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 600px) {
+    .search-hint {
+      display: none;
+    }
+  }
+
+  .search-results {
+    margin-top: var(--ma-base);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .search-results[hidden] {
+    display: none;
+  }
+
+  .search-status {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .search-results :global(.result-item) {
+    display: block;
+    padding: var(--ma-base) 0;
+    border-block-start: 1px dotted var(--color-border);
+    text-decoration: none;
+    color: var(--color-text-primary);
+  }
+
+  .search-results :global(.result-item:first-child) {
+    border-block-start: none;
+    padding-block-start: var(--ma-narrow);
+  }
+
+  @media (hover: hover) {
+    .search-results :global(.result-item:hover) :global(.result-title) {
+      color: var(--color-accent);
+    }
+  }
+
+  .search-results :global(.result-item:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .search-results :global(.result-item[aria-selected="true"]) :global(.result-title) {
+    color: var(--color-accent);
+  }
+
+  .search-results :global(.result-title) {
+    font-family: var(--font-sans);
+    font-size: var(--type-md);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-block-end: var(--ma-hair);
+    color: inherit;
+  }
+
+  .search-results :global(.result-excerpt) {
+    font-family: var(--font-sans);
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .search-results :global(.result-excerpt mark) {
+    background: var(--color-accent-tint);
+    color: var(--color-text-primary);
+    padding: 0 3px;
+    border-radius: var(--radius-md);
+  }
+
+  .search-results :global(.no-results) {
+    text-align: center;
+    padding: var(--ma-wide) 0 var(--ma-narrow);
+  }
+
+  .search-results :global(.no-results p) {
+    font-size: var(--type-base);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--ma-narrow);
+  }
+
+  .search-results :global(.no-results-links) {
+    display: flex;
+    gap: var(--ma-base);
+    justify-content: center;
+  }
+
+  .search-results :global(.no-results-links a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .search-results :global(.search-unavailable) {
+    text-align: center;
+    padding: var(--ma-wide);
+    color: var(--color-text-tertiary);
+    font-family: var(--font-mono);
+    font-size: var(--type-xs);
+  }
+
+  /* Suggestions */
+  .search-suggestions {
+    margin-top: 22px;
+  }
+
+  .search-suggestions[hidden] {
+    display: none;
+  }
+
+  .suggestions-label {
+    font-family: var(--font-hand);
+		font-size: var(--type-xs);
+    color: var(--color-text-tertiary);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+	.suggestions-list {
+		display: flex;
+		flex-wrap: nowrap;
+		gap: var(--ma-thin) var(--ma-wide);
+		align-items: baseline;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.suggestions-list::-webkit-scrollbar {
+		display: none;
+	}
+
+  .suggestion-chip {
+    font-family: var(--font-mono);
+		font-size: var(--type-xs);
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+		padding: 5px 10px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+    box-decoration-break: clone;
+    transition: border-color 140ms ease, color 140ms ease, transform 140ms ease;
+  }
+
+  .suggestion-slash {
+    color: var(--color-accent);
+  }
+
+  .suggestion-chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-text-primary);
+  }
+
+  .suggestion-chip:active {
+    border-color: var(--color-accent-hover);
+  }
+
+  .suggestion-chip:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .suggestion-chip[data-rotate="-1"] { transform: rotate(-2deg); }
+    .suggestion-chip[data-rotate="0.5"] { transform: rotate(1deg); }
+    .suggestion-chip[data-rotate="1"] { transform: rotate(2deg); }
+    .suggestion-chip:hover { transform: rotate(0deg) translateY(-1px); }
+  }
+
+  /* Nuno also searched card */
+  .nuno-search-card {
+		margin-top: var(--ma-broad);
+		padding: var(--ma-wide) var(--ma-wide);
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    position: relative;
+  }
+
+
+  .nuno-search-tape {
+    position: absolute;
+    top: -10px;
+    right: 22px;
+  }
+
+  .nuno-search-header {
+    display: flex;
+    align-items: center;
+		gap: var(--ma-narrow);
+		margin-bottom: var(--ma-narrow);
+  }
+
+  .nuno-search-title {
+    font-family: var(--font-hand);
+		font-size: var(--type-xl);
+    line-height: 1;
+    display: block;
+    color: var(--color-text-primary);
+  }
+
+  .nuno-search-subtitle {
+    font-family: var(--font-mono);
+		font-size: var(--type-xs);
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+    display: block;
+  }
+
+  .nuno-search-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+		gap: var(--ma-hair) var(--ma-wide);
+  }
+
+  .nuno-search-item {
+    font-family: var(--font-mono);
+		font-size: var(--type-xs);
+    color: var(--color-text-primary);
+    display: flex;
+		gap: var(--ma-narrow);
+    align-items: baseline;
+  }
+
+  .nuno-search-slash {
+    color: var(--color-text-tertiary);
+  }
+
+  .nuno-search-query {
+    text-decoration: line-through;
+    text-decoration-color: var(--color-text-secondary);
+    text-decoration-thickness: 1px;
+  }
+
+  .nuno-search-count {
+    color: var(--color-text-tertiary);
+    margin-left: auto;
+  }
+
+  @media (max-width: 480px) {
+    .search-input {
+		font-size: var(--type-md);
+    }
+
+    .nuno-search-list {
+      grid-template-columns: 1fr;
+    }
+
+		.suggestion-chip {
+			font-size: 0.625rem;
+			padding: 3px 6px;
+		}
+
+		.suggestions-list {
+			gap: var(--ma-thin) var(--ma-narrow);
+		}
+  }
+</style>

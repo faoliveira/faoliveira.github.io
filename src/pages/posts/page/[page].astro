@@ -30,6 +30,14 @@ interface Props {
 }
 
 const { posts, currentPage, totalPages } = Astro.props;
+
+const byYear = new Map<number, Post[]>();
+for (const post of posts) {
+  const year = post.data.date.getUTCFullYear();
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)?.push(post);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
 ---
 
 <BaseLayout title={`Posts — Page ${currentPage} — fa.`}>
@@ -37,7 +45,13 @@ const { posts, currentPage, totalPages } = Astro.props;
     <h1>Posts</h1>
     <p class="tagline">Everything I couldn't leave alone, written down.</p>
   </header>
-  <PostList posts={posts} showHeading={false} />
+  {years.map((year) => (
+    <PostList
+      posts={byYear.get(year) ?? []}
+      headingText={`${year} ——`}
+      showHeading={true}
+    />
+  ))}
   <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/posts" />
 </BaseLayout>
 

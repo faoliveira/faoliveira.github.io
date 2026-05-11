@@ -71,22 +71,22 @@ describe("Story 1.8 — kb-prose reading layout contract", () => {
     });
   });
 
-  describe("Default-on derivation (AC 8)", () => {
-    it("derives reading prop default-on for reflection / untyped posts", () => {
+  describe("Default-on derivation (AC 8 + AC 9)", () => {
+    it("uses ?? so explicit reading: false wins over the implicit default", () => {
       const stripped = slugPageSource.replace(/\s+/g, " ");
-      expect(stripped).toMatch(/reading=\{post\.data\.reading/);
-      expect(stripped).toMatch(/!post\.data\.type/);
-      expect(stripped).toMatch(/post\.data\.type === "reflection"/);
+      expect(stripped).toMatch(
+        /reading=\{post\.data\.reading\s*\?\?\s*\(!post\.data\.type\s*\|\|\s*post\.data\.type\s*===\s*"reflection"\)\}/,
+      );
     });
   });
 
   describe("Theme token hygiene (AC 13)", () => {
     it("does not embed hex color literals inside typography.css", () => {
-      expect(typographySource).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+      expect(typographySource).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
     });
 
     it("does not embed hex color literals inside prose.css", () => {
-      expect(proseSource).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+      expect(proseSource).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
     });
   });
 

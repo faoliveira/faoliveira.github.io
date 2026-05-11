@@ -8,6 +8,14 @@ const PAGE_SIZE = 10;
 const allPosts = await getPublishedPosts();
 const totalPages = Math.ceil(allPosts.length / PAGE_SIZE);
 const posts = allPosts.slice(0, PAGE_SIZE) as Post[];
+
+const byYear = new Map<number, Post[]>();
+for (const post of posts) {
+  const year = post.data.date.getUTCFullYear();
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)?.push(post);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
 ---
 
 <BaseLayout title="Posts — fa.">
@@ -15,7 +23,13 @@ const posts = allPosts.slice(0, PAGE_SIZE) as Post[];
     <h1>Posts</h1>
     <p class="tagline">Everything I couldn't leave alone, written down.</p>
   </header>
-  <PostList posts={posts} showHeading={false} />
+  {years.map((year) => (
+    <PostList
+      posts={byYear.get(year) ?? []}
+      headingText={`${year} ——`}
+      showHeading={true}
+    />
+  ))}
   {totalPages > 1 && (
     <Pagination currentPage={1} totalPages={totalPages} basePath="/posts" />
   )}

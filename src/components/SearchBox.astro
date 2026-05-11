@@ -65,15 +65,12 @@ const { autofocus = false } = Astro.props;
     outline: none;
   }
 
-  .search-input:focus-visible {
-    border-block-end-color: var(--color-accent);
-  }
+	.search-input:focus-visible {
+		border-block-end-color: var(--color-accent);
+		border-block-end-width: 3px;
+		outline: none;
+	}
 
-  @media (hover: hover) {
-    .search-input:hover {
-      border-block-end-color: var(--color-accent);
-    }
-  }
 
   @media (forced-colors: active) {
     .search-input {
@@ -89,7 +86,7 @@ const { autofocus = false } = Astro.props;
   .search-backdrop {
     position: fixed;
     inset: 0;
-    background: oklch(0.1 0.01 60 / 0.3);
+		background: oklch(0.08 0.005 60 / 0.45);
     z-index: 9;
     cursor: default;
   }
@@ -171,7 +168,7 @@ const { autofocus = false } = Astro.props;
   .search-results :global(.result-excerpt mark) {
     background: var(--color-accent-tint);
     color: var(--color-accent);
-    border-radius: 2px;
+		border-radius: var(--radius-md);
     padding: 0 2px;
   }
 

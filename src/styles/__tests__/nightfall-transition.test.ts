@@ -66,7 +66,7 @@ describe("nightfall transition tokens", () => {
     const propertyInitialValues = getPropertyInitialValues(tokensCss);
     const rootValues = getRootValues(tokensCss);
 
-    expect(propertyInitialValues.size).toBe(11);
+    expect(propertyInitialValues.size).toBe(13);
 
     for (const [propertyName, initialValue] of propertyInitialValues) {
       expect(rootValues.get(propertyName)).toBe(initialValue);

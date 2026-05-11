@@ -271,7 +271,7 @@ Tabular post-list row: title + optional `TypeTag` + JetBrains Mono date, separat
 - **Style:** `display: grid` with title taking the flex column, tag and date pinned to the end. Padding `--ma-narrow` block, dotted top border in `--color-border`.
 - **Hover / Focus:** title color shifts to `--color-accent` (the `--color-accent-hover` deepening only happens on `.prose a:hover` since rows aren't prose). Transition 150ms ease-out.
 - **Mobile (<480px):** collapses to single column; title on top, tag and date stacked below.
-- **Anchor target:** `aria-labelledby={titleId}` (recent harden pass).
+- **Anchor target:** the entire row is one `<a>`. Natural link text (title + tag + date) serves as the accessible name.
 
 ### Inputs / Search
 Pagefind-backed search input on `/search` and the 404 page.
@@ -306,7 +306,7 @@ The single skeuomorphic component on the site. A paper-edition System-1 desktop 
 - **Do** snap every gap to a named `--ma-*` token. If a value isn't named, it doesn't ship.
 - **Do** cap reading prose at 62ch (`.prose` max-width).
 - **Do** rotate margin notes ±5° and place them in real `<aside>` landmarks with descriptive `aria-label`.
-- **Do** wrap card / row anchors with `aria-labelledby` pointing at the title id so screen readers read just the title, not the whole card.
+- **Do** wrap card anchors with `aria-labelledby` pointing at the title id so screen readers read just the title, not the whole card. Post rows use natural link text.
 - **Do** design nightfall as a parallel palette (warm indigo + amber lantern), not as an inversion or auto-`filter: invert(1)`.
 - **Do** respect `prefers-reduced-motion: reduce` at every motion tier; the nightfall toggle and page transitions degrade to instant swap.
 - **Do** verify WCAG 2.1 AA contrast on every text/surface pair in both modes before shipping.

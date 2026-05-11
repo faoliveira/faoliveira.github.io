@@ -42,10 +42,10 @@ describe("Homepage — Story 1.6 Currently widget integration", () => {
     expect(indexSource).not.toContain("client:load");
   });
 
-  it("renders an h2 with section-label kb-section-label classes and decorative em-dash hidden from a11y", () => {
+  it("renders an h2 with section-label kb-section-label classes and the literal Currently —— copy", () => {
     expect(indexSource).toContain('class="section-label kb-section-label"');
     expect(indexSource).toMatch(
-      /<h2\s+id="currently-heading"\s+class="section-label kb-section-label">Currently<span aria-hidden="true"> ——<\/span><\/h2>/,
+      /<h2\s+id="currently-heading"\s+class="section-label kb-section-label">Currently ——<\/h2>/,
     );
   });
 

@@ -50,8 +50,8 @@ const themeScript = getThemeScript();
         /* Duplicated tokens: --color-surface, --color-surface-alt, --color-text-primary,
            --color-text-secondary, --color-text-tertiary, --color-accent, --color-accent-hover,
            --color-accent-tint, --color-border, --color-code-surface, --color-margin-ink,
-           --texture-grain-opacity, --texture-grain-tint, --texture-grain-opacity-elevated,
-           --color-amber, --color-amber-muted */
+           --color-postit-yellow, --texture-grain-opacity, --texture-grain-tint,
+           --texture-grain-opacity-elevated, --color-amber, --color-amber-muted */
         /* Hide JS-dependent UI — NightfallToggle requires JS to function */
         #nightfall-toggle { display: none !important; }
         /* CSS-only dark mode fallback: respect prefers-color-scheme when JS is disabled */
@@ -68,6 +68,7 @@ const themeScript = getThemeScript();
             --color-border: oklch(0.3 0.025 280);
             --color-code-surface: oklch(0.18 0.035 280);
             --color-margin-ink: oklch(0.78 0.05 70);
+            --color-postit-yellow: oklch(0.85 0.09 92);
             --texture-grain-opacity: 0.03;
             --texture-grain-tint: oklch(0.40 0.03 60 / 0.25);
             --texture-grain-opacity-elevated: 0.055;
@@ -90,6 +91,7 @@ const themeScript = getThemeScript();
               --color-border: #302d42;
               --color-code-surface: #181538;
               --color-margin-ink: #c9b88a;
+              --color-postit-yellow: #d4c46a;
               --texture-grain-opacity: 0.03;
               --texture-grain-tint: rgba(80, 75, 50, 0.25);
               --texture-grain-opacity-elevated: 0.055;

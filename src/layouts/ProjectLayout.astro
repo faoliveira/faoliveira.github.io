@@ -36,7 +36,7 @@ const structuredData = buildProjectStructuredData({ title, description, repo, li
 
 <BaseLayout title={title} description={description} type="article" image={image}>
   <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(structuredData)} />
-  <article class="project-article" data-post-type="project">
+  <article class="project-article" data-post-type="project" data-pagefind-body>
 
     <header class="project-header">
       <!-- LEFT: title group -->
@@ -104,10 +104,6 @@ const structuredData = buildProjectStructuredData({ title, description, repo, li
     margin-block-end: var(--ma-wide);
   }
 
-  .title-group {
-    /* Optional: constrain width so it doesn't push HUD too far if title is long */
-  }
-
   .project-title {
     font-size: var(--type-2xl);
     font-weight: 700;
@@ -134,10 +130,6 @@ const structuredData = buildProjectStructuredData({ title, description, repo, li
     color: var(--color-text-secondary);
     white-space: nowrap;
     flex-shrink: 0;
-  }
-
-  .hud-item {
-    /* inherits font-family, font-size, color, white-space from .hud-stats */
   }
 
   .hud-link {
@@ -229,7 +221,6 @@ const structuredData = buildProjectStructuredData({ title, description, repo, li
       gap: var(--ma-base);
     }
     .hud-stats { align-items: flex-start; }
-    .cta-row { justify-content: flex-start; }
     .project-title { font-size: var(--type-xl); }
   }
 </style>

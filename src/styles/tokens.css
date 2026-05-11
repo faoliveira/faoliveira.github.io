@@ -73,6 +73,17 @@
   initial-value: oklch(0.4 0.04 40);
 }
 
+@property --color-postit-yellow {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.92 0.1 92);
+}
+@property --color-tongue {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: oklch(0.65 0.13 25);
+}
+
 :root {
   /* ── Colors: Day Mode (oklch) ── */
   --color-surface: oklch(0.96 0.012 80);
@@ -88,6 +99,21 @@
   --color-border: oklch(0.85 0.01 80);
   --color-code-surface: oklch(0.94 0.008 80);
   --color-margin-ink: oklch(0.4 0.04 40);
+  --color-postit-yellow: oklch(0.92 0.1 92);
+  --color-tongue: oklch(0.65 0.13 25);
+
+  /* ── Marginalia tape (consumed by FeaturedCard.astro + WashiTape.astro) ── */
+  --tape-matcha: repeating-linear-gradient(
+    45deg,
+    oklch(0.75 0.08 155 / 0.55) 0 6px,
+    oklch(0.85 0.05 155 / 0.35) 6px 12px
+  );
+  --tape-vermillion: repeating-linear-gradient(
+    45deg,
+    oklch(0.78 0.09 30 / 0.55) 0 6px,
+    oklch(0.85 0.05 30 / 0.35) 6px 12px
+  );
+  --tape-shadow: oklch(0 0 0 / 0.08);
 
   /* ── Accessibility ── */
   --touch-target-min: 44px; /* WCAG 2.5.8 minimum touch target */
@@ -127,6 +153,7 @@
   /* ── Shadow Tokens ── */
   --shadow-card: 0 1px 3px oklch(0 0 0 / 0.04);
   --shadow-card-hover: 0 4px 12px oklch(0 0 0 / 0.08);
+  --shadow-elevated: 0 10px 30px oklch(0 0 0 / 0.1);
   /* ── Breakpoints ── */
   /* NOTE: CSS custom properties do not resolve inside @media conditions.
      Use these values in JS/component logic only — write literal px in media queries. */
@@ -158,5 +185,18 @@
     --color-border: #d4cfc6;
     --color-code-surface: #ece8e0;
     --color-margin-ink: #5f4d3a;
+    --color-postit-yellow: #ece38a;
+    --color-tongue: #c96c6c;
+    --tape-matcha: repeating-linear-gradient(
+      45deg,
+      rgb(150 195 165 / 0.55) 0 6px,
+      rgb(195 215 200 / 0.35) 6px 12px
+    );
+    --tape-vermillion: repeating-linear-gradient(
+      45deg,
+      rgb(220 165 145 / 0.55) 0 6px,
+      rgb(225 195 180 / 0.35) 6px 12px
+    );
+    --tape-shadow: rgb(0 0 0 / 0.08);
   }
 }

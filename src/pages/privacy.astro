@@ -1,4 +1,5 @@
 ---
+import MarginNote from "@components/MarginNote.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 ---
 
@@ -6,29 +7,94 @@ import BaseLayout from "@layouts/BaseLayout.astro";
   title="Privacy — fa."
   description="What this site tracks and what it doesn't."
 >
-  <article class="prose">
-    <h1>Privacy</h1>
+  <div class="privacy-spread">
+    <article class="prose">
+      <aside class="gutter-note" aria-label="Privacy margin note">
+        <MarginNote side="left">I check this about once a life</MarginNote>
+      </aside>
 
-    <p>
-      This site uses <a href="https://www.goatcounter.com">GoatCounter</a> for analytics.
-      Each visit records the page path, referrer, browser and OS, screen size, and the
-      country your IP maps to. The IP itself is discarded. No cookies, no fingerprinting,
-      no trail that follows you anywhere else.
-    </p>
+      <p class="section-label kb-section-label">Transparency ——</p>
+      <h1>Privacy</h1>
 
-    <p>
-      I check it occasionally to understand what gets read. Sometimes I find out nobody
-      read a thing, which is its own kind of useful information.
-    </p>
+      <p>
+        This site uses <a href="https://www.goatcounter.com">GoatCounter</a> for analytics.
+        Each visit records the page path, referrer, browser and OS, screen size, and the
+        country your IP maps to. The IP itself is discarded. No cookies, no fingerprinting,
+        no trail that follows you anywhere else.
+      </p>
 
-    <p>
-      To opt out, visit any page on this site with <code>#toggle-goatcounter</code> at the
-      end of the URL. A dialog will confirm the change. The preference is saved in your
-      browser's localStorage and persists across visits.
-    </p>
+      <p>
+        I check it occasionally to understand what gets read. Sometimes I find out nobody
+        read a thing, which is its own kind of useful information.
+      </p>
 
-    <p>
-      Full policy at <a href="https://www.goatcounter.com/help/privacy">goatcounter.com/help/privacy</a>.
-    </p>
-  </article>
+      <h2>How to opt out</h2>
+
+      <p>
+        To opt out, visit any page on this site with <kbd>#toggle-goatcounter</kbd> at the
+        end of the URL. A dialog will confirm the change. The preference is saved in your
+        browser's localStorage and persists across visits.
+      </p>
+
+      <p>
+        Full policy at <a href="https://www.goatcounter.com/help/privacy">goatcounter.com/help/privacy</a>.
+      </p>
+
+      <p class="privacy-exit">
+        <a href="/">Back to the workshop →</a>
+      </p>
+    </article>
+  </div>
 </BaseLayout>
+
+<style>
+  .privacy-spread {
+    position: relative;
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    min-height: 600px;
+  }
+
+  .privacy-spread > .prose {
+    max-width: 62ch;
+    margin-block: var(--ma-spacious) var(--ma-vast);
+    margin-inline: auto;
+    padding-inline: var(--ma-base);
+    position: relative;
+    z-index: 2;
+  }
+
+  .gutter-note {
+    position: absolute;
+    left: 0;
+    top: 14.5rem;
+    transform: translateX(calc(-100% - var(--ma-wide)));
+    pointer-events: auto;
+  }
+
+  @media (max-width: 1023.98px) {
+    .gutter-note {
+      display: none;
+    }
+    .privacy-spread {
+      min-height: 0;
+    }
+  }
+
+  .privacy-exit {
+    margin-block-start: var(--ma-broad);
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .privacy-exit a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .privacy-exit a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+</style>

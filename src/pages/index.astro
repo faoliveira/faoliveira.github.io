@@ -22,20 +22,27 @@ const currently = currentlyEntry.data;
   <FeaturedGrid />
   <PostList
     posts={recentPosts}
-    headingText="Recent"
-    decorativeSuffix="——"
+    headingText="Recent ——"
     emptyStateText="Posts will land here when they exist."
     viewAllHref="/posts/"
   />
   <section class="kb-currently" aria-labelledby="currently-heading">
-    <h2 id="currently-heading" class="section-label kb-section-label">Currently<span aria-hidden="true"> ——</span></h2>
-    <CurrentlyWidget data={currently} client:visible />
+    <h2 id="currently-heading" class="section-label kb-section-label">Currently ——</h2>
+		<CurrentlyWidget data={currently} compact={true} client:visible />
+    <noscript>
+      <p class="kb-currently-noscript">This section uses an interactive widget that requires JavaScript.</p>
+    </noscript>
   </section>
 </BaseLayout>
 
 <style>
   .kb-currently {
     margin-block-start: var(--ma-spacious);
-    margin-block-end: var(--ma-vast);
+  }
+
+  .kb-currently-noscript {
+    font-size: var(--type-sm);
+    color: var(--color-text-secondary);
+    margin-block-start: var(--ma-base);
   }
 </style>

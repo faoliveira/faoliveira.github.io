@@ -1,5 +1,6 @@
 ---
-import SearchBox from "@components/SearchBox.astro";
+import MarginNote from "@components/MarginNote.astro";
+import WorkshopSearch from "@components/WorkshopSearch.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 ---
 
@@ -7,33 +8,24 @@ import BaseLayout from "@layouts/BaseLayout.astro";
   <section class="search-page" aria-labelledby="search-heading">
     <div class="search-stage">
 
-      <div class="shelf-mark" aria-hidden="true">
-        <span class="mark-glyph font-japanese">間</span>
+					<div class="search-hero">
+<p class="section-label kb-section-label">Search the workshop ——</p>
+						<h1 id="search-heading" class="search-title">
+							Find something.
+						</h1>
+						<p class="search-subtitle">
+							Title, tag, or a loose idea.
+						</p>
+						<MarginNote side="left">
+							try a word.<br />
+							any word.<br />
+							<em>(even 'dog'.)</em>
+						</MarginNote>
+					</div>
+
+      <div class="search-workshop">
+        <WorkshopSearch />
       </div>
-
-      <header class="search-header">
-        <h1 id="search-heading" class="search-title">
-          <span class="title-line">It's all here</span>
-          <span class="title-line title-line--accent">somewhere.</span>
-        </h1>
-        <p class="search-subtitle">
-          Posts, half-finished ideas, things I wrote at 2 a.m. and somehow published.
-          <br aria-hidden="true" />
-          Type a word.
-        </p>
-      </header>
-
-      <div class="search-field">
-        <SearchBox autofocus />
-        <noscript><p class="noscript-notice">Search requires JavaScript to be enabled.</p></noscript>
-      </div>
-
-      <footer class="search-hint">
-        <p>
-          <span class="hint-key" aria-hidden="true">/</span>
-          <span class="hint-label">You can also press <kbd>/</kbd> from any page.</span>
-        </p>
-      </footer>
 
     </div>
   </section>
@@ -41,170 +33,80 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 
 <style>
   .search-page {
-    display: grid;
-    place-items: center;
-    min-height: 70vh;
     padding-block: var(--ma-spacious) var(--ma-breath);
   }
 
   .search-stage {
     width: 100%;
-    max-width: 60ch;
+    max-width: 720px;
     margin-inline: auto;
     padding-inline: clamp(var(--ma-base), 5vw, var(--ma-vast));
-    text-align: center;
+    position: relative;
   }
 
-  /* ── Ma glyph — workshop signature ── */
-
-  .shelf-mark {
-    margin-block-end: var(--ma-broad);
+  .search-hero {
+		margin-bottom: var(--ma-wide);
+    position: relative;
   }
 
-  .mark-glyph {
-    display: inline-block;
-    font-size: clamp(var(--type-3xl), 8vw, var(--type-4xl));
-    color: var(--color-text-tertiary);
-    line-height: 1;
-    user-select: none;
-    letter-spacing: 0.05em;
-  }
 
-  /* ── Heading — split lines for rhythm ── */
-
-  .search-header {
-    margin-block-end: var(--ma-broad);
-  }
 
   .search-title {
-    margin: 0;
-    font-size: clamp(var(--type-2xl), 5vw, var(--type-3xl));
+    font-size: clamp(var(--type-2xl), 5vw, 40px);
     font-weight: 800;
-    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+    line-height: 1.1;
     color: var(--color-text-primary);
   }
 
-  .title-line {
-    display: block;
-  }
-
-  .title-line--accent {
-    color: var(--color-text-secondary);
-    font-style: italic;
-  }
-
   .search-subtitle {
-    margin-block-start: var(--ma-base);
-    font-size: var(--type-md);
-    line-height: 1.65;
+    font-size: 16px;
     color: var(--color-text-secondary);
-    max-width: 48ch;
-    margin-inline: auto;
-  }
-
-  /* ── Search input wrapper ── */
-
-  .search-field {
-    position: relative;
-    text-align: start;
-    margin-block-end: var(--ma-spacious);
-    /* Stacking context above .search-hint (follows in DOM order) */
-    z-index: 1;
-    isolation: isolate;
-  }
-
-  /* ── Keyboard shortcut hint ── */
-
-  .search-hint {
-    color: var(--color-text-tertiary);
-    font-size: var(--type-sm);
-    font-family: var(--font-mono);
-    letter-spacing: 0.02em;
-  }
-
-  .search-hint p {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--ma-narrow);
     margin: 0;
+    line-height: 1.55;
   }
 
-  .hint-key {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.6em;
-    height: 1.6em;
-    border: 1px solid var(--color-border);
-    border-radius: var(--ma-thin);
-    font-size: var(--type-sm);
-    font-weight: 600;
-    color: var(--color-text-tertiary);
-    line-height: 1;
+  .search-hero :global(.margin-note) {
+    position: absolute;
   }
 
-  .hint-label {
-    color: var(--color-text-secondary);
+  .search-hero :global(.margin-note--left) {
+    left: 0;
+    top: 0;
+    transform: translateX(-100%) rotate(-3deg);
+    padding-right: var(--ma-breath);
+    transform-origin: top right;
   }
 
-  .hint-label kbd {
-    font-family: inherit;
-    font-weight: 600;
+  .search-workshop {
+		margin-top: var(--ma-wide);
   }
 
-  /* ── Entrance choreography ── */
-
-  @media (prefers-reduced-motion: no-preference) {
-    .shelf-mark {
-      animation: drift var(--motion-duration-reveal) var(--motion-easing-out) both;
+  @media (max-width: 1024px) {
+    .search-hero :global(.margin-note) {
+      position: static;
+      transform: none;
+      margin-bottom: 12px;
     }
 
-    .search-header {
-      animation: rise var(--motion-duration-reveal) var(--motion-easing-out) 80ms both;
-    }
-
-    .search-field {
-      animation: rise var(--motion-duration-reveal) var(--motion-easing-out) 160ms both;
-    }
-
-    .search-hint {
-      animation: rise var(--motion-duration-reveal) var(--motion-easing-out) 260ms both;
-    }
-
-    @keyframes rise {
-      from {
-        opacity: 0;
-        translate: 0 var(--ma-base);
-      }
-    }
-
-    @keyframes drift {
-      from {
-        opacity: 0;
-        translate: 0 calc(-1 * var(--ma-narrow));
-        scale: 0.92;
-      }
+  @media (max-width: 767.98px) {
+    .search-hero :global(.margin-note) {
+      display: none;
     }
   }
-
-  .noscript-notice {
-    margin-block-start: var(--ma-base);
-    font-size: var(--type-sm);
-    color: var(--color-text-secondary);
-    text-align: center;
-  }
-
-  /* ── Mobile ── */
 
   @media (max-width: 480px) {
     .search-page {
       padding-block: var(--ma-broad) var(--ma-spacious);
-      min-height: 60vh;
     }
 
-    .search-subtitle br {
-      display: none;
+    .search-title {
+      font-size: var(--type-xl);
+    }
+
+    .search-subtitle {
+      font-size: var(--type-sm);
     }
   }
 </style>

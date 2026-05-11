@@ -118,9 +118,9 @@ describe("Story 1.11 â€” project per-type visual contract (Direction A + B-2c â€
   });
 
   describe("Canvas-mode prose width â€” B-2c (in prose.css) (AC 7, 17)", () => {
-    it("prose.css carries the [data-post-type=project] canvas-mode 65ch override", () => {
+    it("prose.css carries the [data-post-type=project] canvas-mode 65ch override centered with margin-inline auto", () => {
       expect(proseCss).toMatch(
-        /\[data-post-type="project"\][\s\S]*?\.canvas-container\[data-canvas-mode="prose"\][\s\S]*?\.prose[\s\S]*?\{[^}]*max-width:\s*65ch/,
+        /\[data-post-type="project"\][\s\S]*?\.canvas-container\[data-canvas-mode="prose"\][\s\S]*?\.prose[\s\S]*?\{[^}]*max-width:\s*65ch[^}]*margin-inline:\s*auto/,
       );
     });
 
@@ -165,7 +165,7 @@ describe("Story 1.11 â€” project per-type visual contract (Direction A + B-2c â€
     it("ProjectLayout.astro <style> block contains no hex color literals", () => {
       const styleMatch = projectLayoutSource.match(/<style[^>]*>([\s\S]*?)<\/style>/);
       expect(styleMatch).not.toBeNull();
-      expect(styleMatch?.[1]).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+      expect(styleMatch?.[1]).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
     });
   });
 
