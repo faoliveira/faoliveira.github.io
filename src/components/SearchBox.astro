@@ -16,9 +16,11 @@ const { autofocus = false } = Astro.props;
     type="search"
     class="search-input"
     placeholder="Search posts…"
+    role="combobox"
     aria-label="Search posts"
     aria-controls="search-results"
     aria-autocomplete="list"
+    aria-expanded="false"
     autocomplete="off"
     spellcheck="false"
     autofocus={autofocus || undefined}
@@ -115,10 +117,41 @@ const { autofocus = false } = Astro.props;
     overflow-y: auto;
     max-height: 60vh;
     z-index: 10;
+    transform-origin: top center;
   }
 
   .search-results[hidden] {
     display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .search-results[data-entering] {
+      animation: search-panel-in var(--motion-duration-normal) var(--motion-easing-out) both;
+    }
+
+    .search-results[data-entering] :global(.result-item) {
+      animation: search-item-in var(--motion-duration-normal) var(--motion-easing-out) both;
+      animation-delay: calc(var(--i, 0) * 35ms);
+    }
+
+    .search-results[data-entering] :global(.no-results),
+    .search-results[data-entering] :global(.search-unavailable) {
+      animation: search-item-in var(--motion-duration-normal) var(--motion-easing-out) both;
+    }
+
+    @keyframes search-panel-in {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes search-item-in {
+      from {
+        opacity: 0;
+        transform: translateY(3px);
+      }
+    }
   }
 
   /* All result/state styles scoped under .search-results to prevent ClientRouter leakage */
@@ -199,8 +232,12 @@ const { autofocus = false } = Astro.props;
   .search-results :global(.search-unavailable) {
     padding: var(--ma-wide) var(--ma-base);
     text-align: center;
+  }
+
+  .search-results :global(.search-unavailable p) {
     font-size: var(--type-sm);
     color: var(--color-text-secondary);
+    margin-block-end: var(--ma-narrow);
   }
 
 </style>
@@ -293,7 +330,10 @@ const { autofocus = false } = Astro.props;
 
     // --- Result rendering ---
 
+    let enteringTimer: number | null = null;
+
     function showResults(html: string, isListbox = false) {
+      const wasHidden = resultsEl.hasAttribute('hidden');
       resultsEl.innerHTML = html;
       if (isListbox) {
         resultsEl.setAttribute('role', 'listbox');
@@ -301,26 +341,52 @@ const { autofocus = false } = Astro.props;
         resultsEl.removeAttribute('role');
       }
       resultsEl.removeAttribute('hidden');
+      input.setAttribute('aria-expanded', 'true');
       backdropEl?.removeAttribute('hidden');
+      if (wasHidden) {
+        // Trigger entrance animation only on hidden→visible. Re-renders during typing
+        // swap content without re-animating items.
+        if (enteringTimer !== null) window.clearTimeout(enteringTimer);
+        resultsEl.setAttribute('data-entering', '');
+        enteringTimer = window.setTimeout(() => {
+          resultsEl.removeAttribute('data-entering');
+          enteringTimer = null;
+        }, 450);
+      }
     }
 
     function hideResults() {
+      if (enteringTimer !== null) {
+        window.clearTimeout(enteringTimer);
+        enteringTimer = null;
+      }
       resultsEl.innerHTML = '';
       resultsEl.removeAttribute('role');
+      resultsEl.removeAttribute('data-entering');
       resultsEl.setAttribute('hidden', '');
+      input.setAttribute('aria-expanded', 'false');
       backdropEl?.setAttribute('hidden', '');
       statusEl.textContent = '';
     }
 
     function renderUnavailable() {
-      showResults(`<div class="search-unavailable">Search unavailable right now.</div>`);
+      showResults(`
+        <div class="search-unavailable">
+          <p>Search index didn't load.</p>
+          <div class="no-results-links">
+            <a href="/posts/">Browse posts</a>
+            <a href="/">Go home</a>
+          </div>
+        </div>
+      `);
+      statusEl.textContent = 'Search index unavailable';
     }
 
     function renderNoResults(query: string) {
       const safeQuery = escapeHtml(query);
       showResults(`
         <div class="no-results">
-          <p>Nothing for "${safeQuery}".</p>
+          <p>No match for "${safeQuery}". The workshop is small.</p>
           <div class="no-results-links">
             <a href="/posts/">Browse posts</a>
             <a href="/">Go home</a>
@@ -344,6 +410,7 @@ const { autofocus = false } = Astro.props;
           role="option"
           aria-selected="false"
           id="result-option-${i}"
+          style="--i: ${i};"
         >
           <div class="result-title">${safeTitle}</div>
           <div class="result-excerpt">${safeExcerpt}</div>
@@ -356,9 +423,50 @@ const { autofocus = false } = Astro.props;
       statusEl.textContent = `${items.length} result${items.length === 1 ? '' : 's'} for ${query}`;
     }
 
+    // Pagefind does bidirectional prefix matching: query "kou" finds "koubou"
+    // (good — find-as-you-type) AND query "testesddvxzdf" finds "test" (bad —
+    // tiny indexed prefix of a long gibberish query). Filter results so each
+    // mark either fully covers the query (kou → koubou, query is a prefix of
+    // the word) OR the mark spans at least 75% of the query (koubous → koubou:
+    // minor typo passes; testesddvxzdf → test: gibberish drops).
+    function hasSubstantialMatch(excerpt: string, query: string): boolean {
+      // Query: split on whitespace, strip OUTER punctuation only — keeps inner
+      // hyphens / underscores so "kou-bou" stays literal and won't pass when
+      // the content only has "koubou".
+      const queryWords = query
+        .toLowerCase()
+        .split(/\s+/)
+        .map((w) => w.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
+        .filter((w) => w.length >= 2);
+      if (queryWords.length === 0) return false;
+      // Marks: Pagefind strips inner punctuation when indexing, so normalize the
+      // mark side fully (e.g. "Koubou." → "koubou").
+      const marks = Array.from(excerpt.matchAll(/<mark>([^<]+)<\/mark>/g))
+        .map((m) => m[1].toLowerCase().replace(/[^\p{L}\p{N}]/gu, ''))
+        .filter((m) => m.length >= 2);
+      if (marks.length === 0) return false;
+      // AND logic: every queryword must match at least one mark via direction-
+      // aware prefix (find-as-you-type) or query-superset (≥ 75% covered).
+      for (const qw of queryWords) {
+        let matched = false;
+        for (const m of marks) {
+          if (qw.length <= m.length) {
+            if (m.startsWith(qw)) { matched = true; break; }
+          } else if (qw.startsWith(m) && m.length / qw.length >= 0.75) {
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) return false;
+      }
+      return true;
+    }
+
     async function runSearch(term: string) {
       const trimmed = term.trim();
-      if (!trimmed) {
+      // Min length 2: blocks single-letter queries like "a" that match
+      // common stop-words via Pagefind's prefix fallback.
+      if (trimmed.length < 2) {
         hideResults();
         return;
       }
@@ -380,7 +488,12 @@ const { autofocus = false } = Astro.props;
       const items = await Promise.all(
         search.results.slice(0, SEARCH_CONFIG.maxResults).map((r: { data: () => Promise<ResultData> }) => r.data())
       );
-      renderItems(items, trimmed);
+      const substantial = items.filter((item) => hasSubstantialMatch(item.excerpt, trimmed));
+      if (substantial.length === 0) {
+        renderNoResults(trimmed);
+        return;
+      }
+      renderItems(substantial, trimmed);
     }
 
     // --- Keyboard navigation ---

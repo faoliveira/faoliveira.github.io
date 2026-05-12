@@ -63,7 +63,7 @@ const nunoSearches = [
   <div class="nuno-search-header">
     <NunoDoodle size={34} color="var(--color-text-secondary)" tongue={false}></NunoDoodle>
     <div class="nuno-search-header-text">
-      <span class="nuno-search-title">Nuno also searched for —</span>
+      <span class="nuno-search-title">Nuno tried these too.</span>
       <span class="nuno-search-subtitle">no results returned. he is undeterred.</span>
     </div>
   </div>
@@ -92,8 +92,29 @@ const nunoSearches = [
 
     if (!input || !resultsEl || !statusEl) return;
 
-    function showNuno() { nunoCardEl?.removeAttribute('hidden'); }
-    function hideNuno() { nunoCardEl?.setAttribute('hidden', ''); }
+    let nunoEnteringTimer: number | null = null;
+
+    function showNuno() {
+      if (!nunoCardEl) return;
+      const wasHidden = nunoCardEl.hasAttribute('hidden');
+      nunoCardEl.removeAttribute('hidden');
+      if (wasHidden) {
+        if (nunoEnteringTimer !== null) window.clearTimeout(nunoEnteringTimer);
+        nunoCardEl.setAttribute('data-entering', '');
+        nunoEnteringTimer = window.setTimeout(() => {
+          nunoCardEl.removeAttribute('data-entering');
+          nunoEnteringTimer = null;
+        }, 500);
+      }
+    }
+    function hideNuno() {
+      if (nunoEnteringTimer !== null) {
+        window.clearTimeout(nunoEnteringTimer);
+        nunoEnteringTimer = null;
+      }
+      nunoCardEl?.removeAttribute('data-entering');
+      nunoCardEl?.setAttribute('hidden', '');
+    }
 
     type ResultData = {
       url: string;
@@ -158,22 +179,42 @@ const nunoSearches = [
       return pagefindPromise;
     }
 
+    let resultsEnteringTimer: number | null = null;
+
     function showResults(html: string) {
+      const wasHidden = resultsEl!.hasAttribute('hidden');
       resultsEl!.innerHTML = html;
       resultsEl!.removeAttribute('hidden');
+      if (wasHidden) {
+        if (resultsEnteringTimer !== null) window.clearTimeout(resultsEnteringTimer);
+        resultsEl!.setAttribute('data-entering', '');
+        resultsEnteringTimer = window.setTimeout(() => {
+          resultsEl!.removeAttribute('data-entering');
+          resultsEnteringTimer = null;
+        }, 500);
+      }
     }
 
     function hideResults() {
+      if (resultsEnteringTimer !== null) {
+        window.clearTimeout(resultsEnteringTimer);
+        resultsEnteringTimer = null;
+      }
       resultsEl!.innerHTML = '';
+      resultsEl!.removeAttribute('data-entering');
       resultsEl!.setAttribute('hidden', '');
       statusEl!.textContent = '';
       hideNuno();
     }
 
+    function setHint(text: string) {
+      if (hintEl) hintEl.textContent = text;
+    }
+
     function renderUnavailable() {
       showResults(`
         <div class="no-results">
-          <p>Search index isn't ready. Browse instead?</p>
+          <p>Search index didn't load. Try browsing posts.</p>
           <div class="no-results-links">
             <a href="/posts/">Browse posts</a>
             <a href="/">Go home</a>
@@ -187,7 +228,7 @@ const nunoSearches = [
       const safeQuery = escapeHtml(query);
       showResults(`
         <div class="no-results">
-          <p>Nothing for "${safeQuery}".</p>
+          <p>No match for "${safeQuery}".</p>
           <div class="no-results-links">
             <a href="/posts/">Browse posts</a>
             <a href="/">Go home</a>
@@ -200,12 +241,12 @@ const nunoSearches = [
 
     function renderItems(items: ResultData[], query: string) {
       const html = items
-        .map((item) => {
+        .map((item, i) => {
           const safeUrl = isSafeUrl(item.url) ? item.url : '/';
           const safeTitle = escapeHtml(item.meta.title);
           const safeExcerpt = sanitizeExcerpt(item.excerpt);
           return `
-            <a href="${safeUrl}" class="result-item">
+            <a href="${safeUrl}" class="result-item" style="--i: ${i};">
               <div class="result-title">${safeTitle}</div>
               <div class="result-excerpt">${safeExcerpt}</div>
             </a>
@@ -217,37 +258,86 @@ const nunoSearches = [
       hideNuno();
     }
 
+    // Pagefind does bidirectional prefix matching: query "kou" finds "koubou"
+    // (good — find-as-you-type) AND query "testesddvxzdf" finds "test" (bad —
+    // tiny indexed prefix of a long gibberish query). Filter results so each
+    // mark either fully covers the query (kou → koubou, query is a prefix of
+    // the word) OR the mark spans at least 75% of the query (koubous → koubou:
+    // minor typo passes; testesddvxzdf → test: gibberish drops).
+    function hasSubstantialMatch(excerpt: string, query: string): boolean {
+      // Query: split on whitespace, strip OUTER punctuation only — keeps inner
+      // hyphens / underscores so "kou-bou" stays literal and won't pass when
+      // the content only has "koubou".
+      const queryWords = query
+        .toLowerCase()
+        .split(/\s+/)
+        .map((w) => w.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
+        .filter((w) => w.length >= 2);
+      if (queryWords.length === 0) return false;
+      // Marks: Pagefind strips inner punctuation when indexing, so normalize the
+      // mark side fully (e.g. "Koubou." → "koubou").
+      const marks = Array.from(excerpt.matchAll(/<mark>([^<]+)<\/mark>/g))
+        .map((m) => m[1].toLowerCase().replace(/[^\p{L}\p{N}]/gu, ''))
+        .filter((m) => m.length >= 2);
+      if (marks.length === 0) return false;
+      // AND logic: every queryword must match at least one mark via direction-
+      // aware prefix (find-as-you-type) or query-superset (≥ 75% covered).
+      for (const qw of queryWords) {
+        let matched = false;
+        for (const m of marks) {
+          if (qw.length <= m.length) {
+            if (m.startsWith(qw)) { matched = true; break; }
+          } else if (qw.startsWith(m) && m.length / qw.length >= 0.75) {
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) return false;
+      }
+      return true;
+    }
+
     async function runSearch(term: string) {
       const trimmed = term.trim();
-      if (!trimmed) {
+      // Min length 2: blocks single-letter queries like "a" that match
+      // common stop-words via Pagefind's prefix fallback.
+      if (trimmed.length < 2) {
         hideResults();
-        if (hintEl) hintEl.textContent = 'press / to focus';
+        setHint('press / to focus');
         if (suggestionsWrap) suggestionsWrap.removeAttribute('hidden');
         return;
       }
 
       if (suggestionsWrap) suggestionsWrap.setAttribute('hidden', '');
+      setHint('looking…');
 
       const pf = await loadPagefind();
       if (!pf) {
         renderUnavailable();
+        setHint('index not ready');
         return;
       }
 
       const search = await pf.debouncedSearch(trimmed, {}, SEARCH_CONFIG.debounceMs);
       if (search === null) return;
 
-      if (hintEl) hintEl.textContent = '↵ open first result';
-
       if (search.results.length === 0) {
         renderNoResults(trimmed);
+        setHint('try fewer words');
         return;
       }
 
       const items = await Promise.all(
         search.results.slice(0, SEARCH_CONFIG.maxResults).map((r: { data: () => Promise<ResultData> }) => r.data())
       );
-      renderItems(items, trimmed);
+      const substantial = items.filter((item) => hasSubstantialMatch(item.excerpt, trimmed));
+      if (substantial.length === 0) {
+        renderNoResults(trimmed);
+        setHint('try fewer words');
+        return;
+      }
+      renderItems(substantial, trimmed);
+      setHint('↵ open first result');
     }
 
     input.addEventListener('input', () => {
@@ -257,7 +347,7 @@ const nunoSearches = [
     clearBtn?.addEventListener('click', () => {
       input.value = '';
       hideResults();
-      if (hintEl) hintEl.textContent = 'press / to focus';
+      setHint('press / to focus');
       if (suggestionsWrap) suggestionsWrap.removeAttribute('hidden');
       input.focus();
     });
@@ -266,7 +356,7 @@ const nunoSearches = [
       if (e.key === 'Escape') {
         hideResults();
         input.value = '';
-        if (hintEl) hintEl.textContent = 'press / to focus';
+        setHint('press / to focus');
         if (suggestionsWrap) suggestionsWrap.removeAttribute('hidden');
         input.focus();
         return;
@@ -416,6 +506,41 @@ const nunoSearches = [
 
   .search-results[hidden] {
     display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .search-results[data-entering] {
+      animation: workshop-results-in var(--motion-duration-normal) var(--motion-easing-out) both;
+    }
+
+    .search-results[data-entering] :global(.result-item) {
+      animation: workshop-item-in var(--motion-duration-normal) var(--motion-easing-out) both;
+      animation-delay: calc(var(--i, 0) * 40ms);
+    }
+
+    .search-results[data-entering] :global(.no-results),
+    .search-results[data-entering] :global(.search-unavailable) {
+      animation: workshop-item-in var(--motion-duration-normal) var(--motion-easing-out) both;
+    }
+
+    .nuno-search-card[data-entering] {
+      animation: workshop-results-in var(--motion-duration-smooth) var(--motion-easing-out) both;
+      animation-delay: 80ms;
+    }
+
+    @keyframes workshop-results-in {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+    }
+
+    @keyframes workshop-item-in {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+    }
   }
 
   .search-status {

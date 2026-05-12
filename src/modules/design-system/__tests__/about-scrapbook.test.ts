@@ -139,9 +139,13 @@ describe("Polaroid — atom contract", () => {
 });
 
 describe("WashiTape — atom contract", () => {
-  it("consumes the global --tape-matcha and --tape-vermillion tokens", () => {
-    expect(washiTapeSource).toContain("var(--tape-matcha)");
-    expect(washiTapeSource).toContain("var(--tape-vermillion)");
+  // Two-layer crossfade: gradients can't be @property-interpolated, so day and
+  // nightfall tapes stack on ::before / ::after and animate opacity instead.
+  it("consumes the day/night --tape-matcha and --tape-vermillion variant tokens", () => {
+    expect(washiTapeSource).toContain("var(--tape-matcha-day)");
+    expect(washiTapeSource).toContain("var(--tape-matcha-night)");
+    expect(washiTapeSource).toContain("var(--tape-vermillion-day)");
+    expect(washiTapeSource).toContain("var(--tape-vermillion-night)");
   });
 
   it("marks the rendered span aria-hidden", () => {
@@ -153,8 +157,9 @@ describe("WashiTape — atom contract", () => {
     expect(washiTapeSource).not.toMatch(RGB_LITERAL);
   });
 
-  it("uses the global --tape-shadow token for elevation", () => {
-    expect(washiTapeSource).toContain("var(--tape-shadow)");
+  it("uses the day/night --tape-shadow variant tokens for elevation", () => {
+    expect(washiTapeSource).toContain("var(--tape-shadow-day)");
+    expect(washiTapeSource).toContain("var(--tape-shadow-night)");
   });
 });
 

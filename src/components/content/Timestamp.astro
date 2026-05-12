@@ -31,8 +31,8 @@ function toHuman(iso: string): string {
   if (Number.isNaN(parsed.getTime())) return iso;
   return parsed.toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
-    day: "numeric",
+    month: "short",
+    day: "2-digit",
     timeZone: "UTC",
   });
 }

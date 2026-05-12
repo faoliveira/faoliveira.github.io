@@ -92,9 +92,9 @@
 		min-width: 44px;
 		min-height: 44px;
     transition:
-      color var(--motion-duration-smooth) var(--motion-easing-out),
-      filter var(--motion-duration-smooth) var(--motion-easing-out),
-      opacity var(--motion-duration-quick) var(--motion-easing-out);
+      color var(--motion-duration-smooth) var(--motion-easing-out-quart),
+      filter var(--motion-duration-smooth) var(--motion-easing-out-quart),
+      opacity var(--motion-duration-quick) var(--motion-easing-out-quart);
   }
 
   @media (hover: hover) {
@@ -114,29 +114,28 @@
     display: block;
   }
 
-  /* Day mode: glow, fill, and flame layers hidden.
-     Base transitions define EXTINGUISHING timing (nightfall → day):
-     glow/fill fade first (no delay), flame fades second. */
+  /* Day-state base. .igniting on day→nightfall plays the snap, then nightfall
+     selectors below take over (flame at ~40ms, glow at ~80ms — lantern + room
+     settle together around 300ms instead of dragging past it). */
   .inner-glow,
   .body-fill {
     opacity: 0;
-    transition: opacity 0.2s ease-in;
+    transition: opacity 140ms var(--motion-easing-out-quart);
   }
 
   .flame-group {
     opacity: 0;
-    transition: opacity 0.18s ease-in;
+    transition: opacity 120ms var(--motion-easing-out-quart);
   }
 
-  /* Nightfall mode: warm amber glow, fill, and flame visible.
-     Button filter ramps slowly to full glow over 600ms. */
+  /* Nightfall: warm amber globe, button filter settled at 10px halo. */
   :global([data-theme="nightfall"]) button {
     color: var(--flame-color);
     filter: drop-shadow(0 0 10px var(--glow-amber));
     transition:
-      color var(--motion-duration-smooth) var(--motion-easing-out),
-      filter 0.6s ease-out,
-      opacity var(--motion-duration-quick) var(--motion-easing-out);
+      color var(--motion-duration-smooth) var(--motion-easing-out-quart),
+      filter 300ms var(--motion-easing-out-expo),
+      opacity var(--motion-duration-quick) var(--motion-easing-out-quart);
   }
 
   @media (hover: hover) {
@@ -160,27 +159,42 @@
     }
   }
 
-  /* Nightfall layer LIGHTING stagger (day → nightfall):
-     flame at ~30% (180ms), glow/fill at ~50% (300ms) */
+  /* Lantern + room settle together (≈300ms total).
+     Flame: 40ms delay (near-immediate, ~200ms total).
+     Glow + body: 80ms delay (~300ms total — matches global token crossfade). */
   :global([data-theme="nightfall"]) .inner-glow {
     opacity: 0.55;
-    transition: opacity 0.3s ease-out 300ms;
+    transition: opacity 220ms var(--motion-easing-out-expo) 80ms;
   }
 
   :global([data-theme="nightfall"]) .body-fill {
     opacity: 0.25;
-    transition: opacity 0.3s ease-out 300ms;
+    transition: opacity 220ms var(--motion-easing-out-expo) 80ms;
   }
 
   :global([data-theme="nightfall"]) .flame-group {
     opacity: 1;
-    transition: opacity 0.25s ease-out 180ms;
+    transition: opacity 160ms var(--motion-easing-out-quart) 40ms;
     animation: flameFlicker 2.5s ease-in-out infinite 0.5s;
   }
 
-  /* Swing animation on click: spring-physics approximation */
+  /* Click choreography ─ swing + one-shot ignite/extinguish keyframes.
+     Triggered by JS classes; running on top of the steady-state transitions above. */
   .chochin-wrap.swinging {
-    animation: chochinSwing 600ms ease-out forwards;
+    animation: chochinSwing 560ms var(--motion-easing-out-expo) forwards;
+  }
+
+  /* Ignite: button overshoots halo (match-strike), then settles inside the
+     300ms window so the halo doesn't drag past the room dimming.
+     Forced-colors users see no filter; halo overshoot is purely decorative. */
+  button.igniting {
+    animation: chochinIgnite 300ms var(--motion-easing-out-expo) forwards;
+  }
+
+  /* Extinguish: flame contracts and snuffs ─ scale + fade, faster than ignite. */
+  .flame-group.extinguishing {
+    animation: flameSnuff 180ms var(--motion-easing-out-quart) forwards;
+    transform-origin: center 17px;
   }
 
   @keyframes flameFlicker {
@@ -190,37 +204,50 @@
 
   @keyframes chochinSwing {
     0%   { transform: rotate(0deg); }
-    15%  { transform: rotate(7deg); }
-    35%  { transform: rotate(-4.5deg); }
-    50%  { transform: rotate(2.5deg); }
-    65%  { transform: rotate(-1.5deg); }
-    80%  { transform: rotate(0.8deg); }
+    14%  { transform: rotate(8deg); }
+    32%  { transform: rotate(-5deg); }
+    50%  { transform: rotate(2.6deg); }
+    68%  { transform: rotate(-1.3deg); }
+    84%  { transform: rotate(0.6deg); }
     100% { transform: rotate(0deg); }
   }
 
-  /* Reduced motion: instant state swap — no swing, no stagger, no flicker */
+  @keyframes chochinIgnite {
+    0%   { filter: drop-shadow(0 0 0 var(--glow-amber)); }
+    35%  { filter: drop-shadow(0 0 20px var(--glow-amber-strong)); }
+    100% { filter: drop-shadow(0 0 10px var(--glow-amber)); }
+  }
+
+  @keyframes flameSnuff {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.55); }
+  }
+
+  @media (forced-colors: active) {
+    button.igniting {
+      animation: none;
+    }
+  }
+
+  /* Reduced motion: instant state swap ─ no swing, no flash, no flicker. */
   @media (prefers-reduced-motion: reduce) {
     button,
     :global([data-theme="nightfall"]) button {
       transition: none;
     }
 
-    .chochin-wrap.swinging {
-      animation: none;
-    }
-
     .inner-glow,
     .body-fill,
-    .flame-group {
-      transition: none;
-    }
-
+    .flame-group,
     :global([data-theme="nightfall"]) .inner-glow,
     :global([data-theme="nightfall"]) .body-fill,
     :global([data-theme="nightfall"]) .flame-group {
       transition: none;
     }
 
+    .chochin-wrap.swinging,
+    button.igniting,
+    .flame-group.extinguishing,
     :global([data-theme="nightfall"]) .flame-group {
       animation: none;
     }
@@ -232,6 +259,7 @@
 
   const btn = document.getElementById('nightfall-toggle');
   const chochin = btn?.querySelector('.chochin-wrap');
+  const flame = btn?.querySelector('.flame-group');
 
   function syncState() {
     if (!btn) return;
@@ -239,21 +267,31 @@
     btn.setAttribute('aria-checked', String(isNightfall));
   }
 
+  function restartAnimation(el: Element, className: string) {
+    el.classList.remove(className);
+    void (el as HTMLElement).getBoundingClientRect();
+    el.classList.add(className);
+    el.addEventListener('animationend', () => el.classList.remove(className), { once: true });
+  }
+
   syncState();
 
   btn?.addEventListener('click', () => {
     document.documentElement.classList.add('theme-animated');
+    const wasNightfall = getTheme() === 'nightfall';
     toggleTheme();
     syncState();
 
-    // Swing animation: remove first to allow restart on rapid clicks
-    if (chochin) {
-      chochin.classList.remove('swinging');
-      void chochin.getBoundingClientRect(); // force reflow to restart animation
-      chochin.classList.add('swinging');
-      chochin.addEventListener('animationend', () => {
-        chochin.classList.remove('swinging');
-      }, { once: true });
+    // Clear any in-flight ignite/extinguish from the previous click before firing the new one
+    btn?.classList.remove('igniting');
+    flame?.classList.remove('extinguishing');
+
+    if (chochin) restartAnimation(chochin, 'swinging');
+
+    if (wasNightfall) {
+      if (flame) restartAnimation(flame, 'extinguishing');
+    } else {
+      if (btn) restartAnimation(btn, 'igniting');
     }
   });
 </script>

@@ -50,7 +50,7 @@ function getExcerpt(post: Post): string {
               <span class="year-rule" aria-hidden="true"></span>
             </div>
             {yearPosts.map((post, idx) => {
-              const day = String(post.data.date.getUTCDate());
+              const day = String(post.data.date.getUTCDate()).padStart(2, "0");
               const month = new Intl.DateTimeFormat("en-US", {
                 month: "short",
                 timeZone: "UTC",

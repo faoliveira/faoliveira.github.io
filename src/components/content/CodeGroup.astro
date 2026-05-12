@@ -50,6 +50,7 @@ const groupId = `cg-${hashLabels(activeLabels)}`;
         {label}
       </button>
     ))}
+    <span class="code-group-indicator" aria-hidden="true"></span>
   </div>
 
   <div class="code-group-panels">
@@ -99,8 +100,25 @@ const groupId = `cg-${hashLabels(activeLabels)}`;
 <script>
   function initCodeGroups() {
     document.querySelectorAll<HTMLElement>('.code-group').forEach((group) => {
+      if (group.dataset.cgInit === 'on') return; // idempotent across astro:page-load
+
       const tabs = group.querySelectorAll<HTMLElement>('[role="tab"]');
       const panels = group.querySelectorAll<HTMLElement>('[role="tabpanel"]');
+      const indicator = group.querySelector<HTMLElement>('.code-group-indicator');
+
+      // ── Sliding indicator ──────────────────────────────────────────────────
+
+      function positionIndicator(index: number, animate: boolean) {
+        if (!indicator) return;
+        const tab = tabs[index];
+        if (!tab) return;
+        if (!animate) indicator.classList.add('is-snapping');
+        indicator.style.transform = `translateX(${tab.offsetLeft}px) scaleX(${tab.offsetWidth})`;
+        if (!animate) {
+          void indicator.getBoundingClientRect(); // flush layout before re-enabling transitions
+          indicator.classList.remove('is-snapping');
+        }
+      }
 
       // ── Tab switching ──────────────────────────────────────────────────────
 
@@ -117,6 +135,7 @@ const groupId = `cg-${hashLabels(activeLabels)}`;
             p.setAttribute('hidden', '');
           }
         });
+        positionIndicator(index, true);
       }
 
       tabs.forEach((tab, i) => {
@@ -132,7 +151,36 @@ const groupId = `cg-${hashLabels(activeLabels)}`;
           }
         });
       });
+
+      // Initial placement: position under the active tab without animating in.
+      const initialActive = Math.max(
+        0,
+        Array.from(tabs).findIndex((t) => t.getAttribute('aria-selected') === 'true'),
+      );
+      positionIndicator(initialActive, false);
+      group.dataset.cgInit = 'on';
+
+      // Reposition when the tabs row resizes (font load, container width change).
+      if (indicator && 'ResizeObserver' in window) {
+        const tabsRow = group.querySelector<HTMLElement>('.code-group-tabs');
+        if (tabsRow) {
+          const ro = new ResizeObserver(() => {
+            const activeIndex = Array.from(tabs).findIndex(
+              (t) => t.getAttribute('aria-selected') === 'true',
+            );
+            if (activeIndex >= 0) positionIndicator(activeIndex, false);
+          });
+          ro.observe(tabsRow);
+        }
+      }
     });
+  }
+
+  // First load: the module may evaluate after astro:page-load has fired.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCodeGroups, { once: true });
+  } else {
+    initCodeGroups();
   }
 
   // Re-initialize after each View Transition navigation
@@ -148,6 +196,7 @@ const groupId = `cg-${hashLabels(activeLabels)}`;
   }
 
   .code-group-tabs {
+    position: relative;
     display: flex;
     background: var(--color-surface-alt);
     border-bottom: 1px solid var(--color-border);
@@ -164,9 +213,7 @@ const groupId = `cg-${hashLabels(activeLabels)}`;
     font-family: var(--font-mono);
     color: var(--color-text-secondary);
     white-space: nowrap;
-    transition:
-      color var(--motion-duration-quick) var(--motion-easing-out),
-      border-color var(--motion-duration-quick) var(--motion-easing-out);
+    transition: color var(--motion-duration-quick) var(--motion-easing-out);
     margin-bottom: -1px;
   }
 
@@ -174,16 +221,52 @@ const groupId = `cg-${hashLabels(activeLabels)}`;
     color: var(--color-text-primary);
   }
 
+  /* No-JS fallback: keep the per-tab accent underline visible. */
   .code-group-tab[aria-selected="true"] {
     color: var(--color-accent);
     border-bottom-color: var(--color-accent);
     font-weight: 500;
   }
 
+  /* Once JS has placed the shared indicator, retire the per-tab underline. */
+  .code-group[data-cg-init="on"] .code-group-tab[aria-selected="true"] {
+    border-bottom-color: transparent;
+  }
+
   .code-group-tab:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: -2px;
     border-radius: 2px;
+  }
+
+  .code-group-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 1px; /* reference width; scaleX in JS sets the real pixel width */
+    height: 2px;
+    background: var(--color-accent);
+    transform-origin: left center;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      transform var(--motion-duration-smooth) var(--motion-easing-out-quart),
+      opacity var(--motion-duration-quick) var(--motion-easing-out-quart);
+  }
+
+  .code-group[data-cg-init="on"] .code-group-indicator {
+    opacity: 1;
+  }
+
+  /* Snap on first paint and on resize — no slide-from-default-position flash. */
+  .code-group-indicator.is-snapping {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .code-group-indicator {
+      transition: opacity var(--motion-duration-quick) var(--motion-easing-out);
+    }
   }
 
   /* Remove extra margin/border from EC code blocks inside panels */

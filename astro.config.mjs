@@ -14,9 +14,17 @@ export default defineConfig({
   output: "static",
   vite: {
     resolve: {
+      mainFields: ["svelte", "module", "main"],
+      conditions: ["svelte"],
       alias: {
         "@assets": fileURLToPath(new URL("./src/assets", import.meta.url)),
       },
+    },
+    ssr: {
+      noExternal: ["phosphor-svelte"],
+    },
+    optimizeDeps: {
+      include: ["phosphor-svelte"],
     },
   },
   integrations: [

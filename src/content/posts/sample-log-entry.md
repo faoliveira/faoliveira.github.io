@@ -3,7 +3,10 @@ title: "First entry"
 date: 2026-03-21
 type: log
 tags: []
+draft: true
 ---
+
+<!-- CJK: 日記 (U+65E5 U+8A18) is outside the Zen Maru Gothic subset (U+5DE5, U+623F, U+9593) and will render as tofu if published. This fixture is sealed as draft: true; never publish without expanding the font subset. -->
 
 Testing out the new log layout. Short entries go here — what I'm building, what broke, what I'm figuring out.
 

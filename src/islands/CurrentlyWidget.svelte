@@ -1,10 +1,16 @@
 <script lang="ts">
 import type { CurrentlyData } from "@modules/currently/schema";
+import FileText from "phosphor-svelte/lib/FileText";
+import PawPrint from "phosphor-svelte/lib/PawPrint";
+import Terminal from "phosphor-svelte/lib/Terminal";
+import Trash from "phosphor-svelte/lib/Trash";
+import VinylRecord from "phosphor-svelte/lib/VinylRecord";
 import { onDestroy, onMount, untrack } from "svelte";
+import { cubicOut, expoOut } from "svelte/easing";
 import { type AudioSource, type AudioState, createAudioSource } from "./lib/audio-source";
 import type { LoopHandle } from "./lib/NunotchiGame.svelte";
 import NunotchiGame from "./lib/NunotchiGame.svelte";
-import { lookupCommand } from "./lib/nuno-commands";
+import { lookupCommand, matchesKonami } from "./lib/nuno-commands";
 import {
   applyOfflineDecay,
   loadState,
@@ -25,7 +31,7 @@ interface Props {
 let { data, dev = false, compact = false }: Props = $props();
 
 type Mood = "idle" | "eat" | "play" | "walk" | "sleep";
-type WinId = "currently" | "nowplaying" | "reading" | "nunotchi" | "alert";
+type WinId = "currently" | "nowplaying" | "reading" | "nunotchi" | "terminal";
 
 interface Win {
   x: number;
@@ -33,6 +39,7 @@ interface Win {
   z: number;
   rotate?: number;
   open: boolean;
+  minimized: boolean;
 }
 
 const getStorage = (): Storage | null =>
@@ -43,14 +50,13 @@ let pet = $state<NunotchiState>({ ...PET_DEFAULTS });
 let busy = $state<Mood | null>(null);
 let msg = $state(untrack(() => data.mood));
 
-// ── Last command echo (Currently shows the latest typed command + result) ────
-let lastCommand = $state<{ q: string; reply: string } | null>(null);
+// ── Terminal history (scrollback) ────────────────────────────────────────────
+let terminalHistory = $state<Array<{ q: string; reply: string }>>([]);
 
-// ── Boot / hatch ─────────────────────────────────────────────────────────────
-let booting = $state(true);
-let hatchFrame = $state(0);
+// ── Boot / mount gate ────────────────────────────────────────────────────────
 let mounted = $state(false);
 let reduced = $state(false);
+let coarsePointer = $state(false);
 
 // ── Loop pause/resume + visibility tracking ──────────────────────────────────
 let loopHandle = $state<LoopHandle | null>(null);
@@ -58,7 +64,11 @@ let docVisible = $state(true);
 
 // ── Terminal state ───────────────────────────────────────────────────────────
 let askInput = $state("");
-let askReply = $state<string | null>(null);
+// Per-command call counter — drives reply rotation so repeated `sit` stays alive.
+const cmdCounts = new Map<string, number>();
+// Konami detector: ring buffer of the last keydowns, matched against the canonical sequence.
+const KONAMI_LEN = 10;
+let konamiBuffer: string[] = [];
 
 // ── Clock ────────────────────────────────────────────────────────────────────
 let clock = $state("—:—");
@@ -67,11 +77,11 @@ let now = $state("");
 // ── Window manager ───────────────────────────────────────────────────────────
 let topZ = $state(20);
 const initialWins: Record<WinId, Win> = {
-  currently: { x: 24, y: 28, z: 1, open: true },
-  nowplaying: { x: 380, y: 22, z: 2, open: true },
-  reading: { x: 28, y: 320, z: 3, rotate: -1.5, open: true },
-  nunotchi: { x: 410, y: 220, z: 4, open: true },
-  alert: { x: 200, y: 180, z: 10, rotate: -1, open: true },
+  currently: { x: 24, y: 28, z: 1, open: true, minimized: false },
+  nowplaying: { x: 380, y: 22, z: 2, open: true, minimized: false },
+  reading: { x: 28, y: 320, z: 3, rotate: -1.5, open: true, minimized: false },
+  nunotchi: { x: 410, y: 220, z: 4, open: true, minimized: false },
+  terminal: { x: 24, y: 420, z: 5, open: true, minimized: false },
 };
 let wins = $state<Record<WinId, Win>>(structuredClone(initialWins));
 
@@ -87,7 +97,7 @@ function focusWin(id: WinId) {
 // Drag is decorative repositioning — window position carries no information.
 // Keyboard users reach every action via close buttons, in-window controls, and the terminal.
 function startDrag(e: PointerEvent, id: WinId) {
-  if (e.button !== 0) return;
+  if (e.button !== 0 || coarsePointer) return;
   dragId = id;
   focusWin(id);
   surfaceRect = surface?.getBoundingClientRect() ?? null;
@@ -96,7 +106,7 @@ function startDrag(e: PointerEvent, id: WinId) {
   (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 }
 function onDragMove(e: PointerEvent) {
-  if (!dragId) return;
+  if (coarsePointer || !dragId) return;
   const nx = e.clientX - dragOffset.x;
   const ny = e.clientY - dragOffset.y;
   if (surfaceRect) {
@@ -108,6 +118,7 @@ function onDragMove(e: PointerEvent) {
   }
 }
 function onDragEnd() {
+  if (coarsePointer || !dragId) return;
   dragId = null;
   surfaceRect = null;
 }
@@ -115,9 +126,10 @@ function closeWin(id: WinId) {
   wins[id].open = false;
   // Redirect focus to the matching desktop icon, or the surface as fallback.
   const iconMap: Record<string, string> = {
-    nunotchi: "Nuno",
-    reading: "Reading",
+    nunotchi: "Nunotchi",
+    reading: "Reading.txt",
     nowplaying: "Music",
+    terminal: "Terminal",
   };
   const label = iconMap[id];
   if (label && surface) {
@@ -134,7 +146,43 @@ function closeWin(id: WinId) {
 }
 function toggleWin(id: WinId) {
   wins[id].open = !wins[id].open;
-  if (wins[id].open) focusWin(id);
+  if (wins[id].open) {
+    wins[id].minimized = false;
+    focusWin(id);
+  }
+}
+function minimizeWin(id: WinId) {
+  wins[id].minimized = !wins[id].minimized;
+  if (!wins[id].minimized) focusWin(id);
+}
+
+// Paper-stamp entrance: scale up from 0.94 + fade. Confident, no bounce.
+// Rotation is folded into the keyframes so it doesn't collide with the
+// inline style:transform on rotated windows (reading, alert).
+function paperOpen(
+  _node: Element,
+  { rotate = 0, reduced: r = false }: { rotate?: number; reduced?: boolean },
+) {
+  if (r) return { duration: 0 };
+  return {
+    duration: 220,
+    easing: expoOut,
+    css: (t: number) =>
+      `transform: rotate(${rotate}deg) scale(${0.94 + 0.06 * t}); opacity: ${t}; transform-origin: 50% 35%;`,
+  };
+}
+// Paper-lift exit: scale down + fade. ~73% of entrance duration.
+function paperClose(
+  _node: Element,
+  { rotate = 0, reduced: r = false }: { rotate?: number; reduced?: boolean },
+) {
+  if (r) return { duration: 0 };
+  return {
+    duration: 160,
+    easing: cubicOut,
+    css: (t: number) =>
+      `transform: rotate(${rotate}deg) scale(${0.92 + 0.08 * t}); opacity: ${t}; transform-origin: 50% 35%;`,
+  };
 }
 function resetDesktop() {
   wins = structuredClone(initialWins);
@@ -152,7 +200,7 @@ function repositionWindows() {
   wins.nowplaying = { ...wins.nowplaying, x: pad, y: 170 };
   wins.reading = { ...wins.reading, x: pad, y: 310 };
   wins.nunotchi = { ...wins.nunotchi, x: pad, y: 420 };
-  wins.alert = { ...wins.alert, x: pad + 20, y: 130 };
+  wins.terminal = { ...wins.terminal, x: pad, y: 530 };
 }
 
 // ── Game actions (also reachable from terminal commands) ─────────────────────
@@ -209,11 +257,57 @@ function ask(e: Event) {
   e.preventDefault();
   const q = askInput.trim();
   if (!q) return;
-  const { result } = lookupCommand(q);
-  runAction(result.action);
-  askReply = result.reply;
-  lastCommand = { q, reply: result.reply };
+  const key = q.toLowerCase();
+  const count = cmdCounts.get(key) ?? 0;
+  const lookup = lookupCommand(q, { count, now: new Date() });
+  if (lookup.clear) {
+    // `clear` wipes the scrollback.
+    askInput = "";
+    terminalHistory = [];
+    return;
+  }
+  cmdCounts.set(key, count + 1);
+  runAction(lookup.result.action);
+  terminalHistory = [...terminalHistory, { q, reply: lookup.result.reply }];
   askInput = "";
+}
+
+// Konami: ↑↑↓↓←→←→BA anywhere on the page while the widget is mounted.
+// Rewards curiosity with a small energy bump + walks++. Not advertised.
+function triggerKonami() {
+  pet.energy = Math.min(100, pet.energy + 25);
+  pet.hp = Math.min(4, pet.hp + 1);
+  pet.walks += 1;
+  const reply = "koubou code accepted.";
+  terminalHistory = [...terminalHistory, { q: "konami", reply }];
+  // Clear the "ba" that the user typed at the end of the sequence — the
+  // terminal-scoped listener doesn't preventDefault, so those letters land in
+  // the input. Wipe them on a successful match for a clean terminal echo.
+  askInput = "";
+  msg = "★ koubou code ★";
+  if (reduced) {
+    saveState(getStorage(), pet, Date.now());
+    return;
+  }
+  busy = "play";
+  setTimeout(() => {
+    busy = null;
+    msg = "idle · loaf";
+    saveState(getStorage(), pet, Date.now());
+  }, 1200);
+}
+
+function onKonamiKey(e: KeyboardEvent) {
+  const k = e.key;
+  if (!k) return;
+  konamiBuffer.push(k);
+  if (konamiBuffer.length > KONAMI_LEN) {
+    konamiBuffer = konamiBuffer.slice(konamiBuffer.length - KONAMI_LEN);
+  }
+  if (matchesKonami(konamiBuffer)) {
+    konamiBuffer = [];
+    triggerKonami();
+  }
 }
 
 // ── Now Playing audio adapter ────────────────────────────────────────────────
@@ -277,15 +371,22 @@ async function seekFromBar(e: PointerEvent) {
 
 // ── Lifecycle ────────────────────────────────────────────────────────────────
 let clockTimer: ReturnType<typeof setInterval>;
-let hatchTimer: ReturnType<typeof setInterval> | undefined;
 let decayTimer: ReturnType<typeof setInterval> | undefined;
 let onVisibility: (() => void) | undefined;
 let onPageHide: (() => void) | undefined;
 let resizeObserver: ResizeObserver | undefined;
+let pointerMedia: MediaQueryList | undefined;
+let onPointerChange: ((e: MediaQueryListEvent) => void) | undefined;
 
 onMount(() => {
   reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   docVisible = document.visibilityState === "visible";
+  coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+  onPointerChange = (e: MediaQueryListEvent) => {
+    coarsePointer = e.matches;
+    repositionWindows();
+  };
+  window.matchMedia("(pointer: coarse)").addEventListener("change", onPointerChange);
 
   // Persistence: hydrate pet from localStorage and apply offline decay
   // BEFORE flipping the SSR branch off, so the egg-hatch frame never paints
@@ -308,20 +409,7 @@ onMount(() => {
     now = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   };
   updateClock();
-  clockTimer = setInterval(updateClock, 30_000);
-
-  if (reduced) {
-    hatchFrame = 4;
-    booting = false;
-  } else {
-    hatchTimer = setInterval(() => {
-      hatchFrame += 1;
-      if (hatchFrame >= 4) {
-        if (hatchTimer) clearInterval(hatchTimer);
-        booting = false;
-      }
-    }, 600);
-  }
+  clockTimer = setInterval(updateClock, 60_000);
 
   onVisibility = () => {
     docVisible = document.visibilityState === "visible";
@@ -332,16 +420,33 @@ onMount(() => {
   };
   document.addEventListener("visibilitychange", onVisibility);
   window.addEventListener("pagehide", onPageHide);
+  // Konami listener is attached to the terminal input via onkeydown directly —
+  // easter eggs only fire when the user is actively typing in the widget terminal.
+
+  // DevTools signature — paper-and-matcha tag for tinkerers who open the console.
+  // Encouraged by the Currently widget being the most poked-at island.
+  console.log(
+    "%c fa.workshop %c felipeo.me · the koubou ",
+    "background:oklch(0.45 0.10 155);color:oklch(0.97 0.012 82);padding:2px 6px;font:600 11px ui-monospace,monospace;border-radius:3px;",
+    "color:oklch(0.45 0.02 60);padding:2px 6px;font:11px ui-monospace,monospace;",
+  );
+  console.log(
+    "%ctry typing help in the terminal. nuno knows more than he lets on.",
+    "color:oklch(0.40 0.04 40);font:italic 13px Caveat,cursive;",
+  );
 });
 
 onDestroy(() => {
+  // Svelte 5 SSR runs onDestroy after server render to release effect cleanups
+  // (renderer.js#close_render). Skip browser-API cleanup on the server side.
+  if (typeof window === "undefined") return;
   clearInterval(clockTimer);
-  if (hatchTimer) clearInterval(hatchTimer);
   if (decayTimer) clearInterval(decayTimer);
   if (onVisibility) document.removeEventListener("visibilitychange", onVisibility);
   if (onPageHide) window.removeEventListener("pagehide", onPageHide);
   audio?.destroy();
   resizeObserver?.disconnect();
+  if (pointerMedia && onPointerChange) pointerMedia.removeEventListener("change", onPointerChange);
 });
 
 // Poll audio position only while the tab is visible and audio is actually playing.
@@ -359,8 +464,9 @@ $effect(() => {
 // ── Pause / resume the Kontra loop + run the active-time decay tick ──────────
 $effect(() => {
   const open = wins.nunotchi.open;
+  const minimized = wins.nunotchi.minimized;
   const visible = docVisible;
-  if (!open || !visible) {
+  if (!open || minimized || !visible) {
     loopHandle?.pause();
     if (decayTimer) {
       clearInterval(decayTimer);
@@ -395,75 +501,85 @@ const playable = $derived(data.music.source.kind !== "none");
     <div class="widget-toolbar">
       <span class="widget-title">System-1 paper · widget preview</span>
       <div class="widget-toolbar-actions">
-        <button type="button" class="tb" onclick={() => { wins.alert.open = true; focusWin("alert"); }}>
-          ! alert
-        </button>
         <button type="button" class="tb" onclick={resetDesktop}>↺ reset desktop</button>
       </div>
     </div>
   {/if}
 
   <div
-    class="surface"
+		class="surface"
+		data-coarse={coarsePointer}
     bind:this={surface}
     role="region"
     aria-label="System-1 paper desktop"
 		tabindex="-1"
   >
-    {#if wins.currently.open}
-      <div
-        class="paper-win"
-        role="group"
-        aria-label="Currently"
-        style:left={`${wins.currently.x}px`}
-        style:top={`${wins.currently.y}px`}
-        style:z-index={wins.currently.z}
-        style:width="300px"
-        onpointerdown={() => focusWin("currently")}
-      >
-        <div class="title-bar" onpointerdown={(e) => startDrag(e, "currently")} role="presentation">
-          <button type="button" class="close" onpointerdown={(e) => e.stopPropagation()} onclick={() => closeWin("currently")} aria-label="Close Currently"></button>
-          <span class="title">Currently — felipeo</span>
-          <span class="zoom" aria-hidden="true"></span>
-        </div>
-        <div class="win-body curr-body">
-          <dl class="curr-fields">
-            <div><dt>mood</dt><dd>{data.mood}</dd></div>
-            <div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()}</dd></div>
-            <div><dt>music</dt><dd>{data.music.artist.toLowerCase()} · {data.music.title.toLowerCase()}</dd></div>
-            <div><dt>tabs</dt><dd>{data.tabs} (halp)</dd></div>
-            <div><dt>status</dt><dd>{data.status}</dd></div>
-            <div><dt>nuno</dt><dd>{hearts} · ⚡{pet.energy}% · {pet.walks} walks today</dd></div>
-          </dl>
-          <div class="curr-cmd" aria-live="polite">
-            {#if lastCommand}
-              <span class="cmd-prompt">$</span>
-              <span class="cmd-q">{lastCommand.q}</span>
-              <span class="cmd-arrow">→</span>
-              <span class="cmd-reply">{lastCommand.reply}</span>
-            {:else}
-              <span class="cmd-hint">type a command in the terminal below to see Nuno respond</span>
-            {/if}
-          </div>
-        </div>
-      </div>
-    {/if}
+	    {#if wins.currently.open}
+	      <div
+	        class="paper-win"
+	        role="group"
+	        aria-label="System"
+	        data-minimized={wins.currently.minimized}
+	        style:left={`${wins.currently.x}px`}
+	        style:top={`${wins.currently.y}px`}
+	        style:z-index={wins.currently.z}
+	        style:width="300px"
+	        onpointerdown={() => focusWin("currently")}
+	        in:paperOpen={{ reduced }}
+	        out:paperClose={{ reduced }}
+	      >
+	        <div class="title-bar" onpointerdown={(e) => startDrag(e, "currently")} role="presentation">
+	          <button type="button" class="close" onpointerdown={(e) => e.stopPropagation()} onclick={() => closeWin("currently")} aria-label="Close System"></button>
+	          <span class="title">System</span>
+	          <button
+	            type="button"
+	            class="zoom"
+	            class:active={wins.currently.minimized}
+	            aria-label={wins.currently.minimized ? "Expand System" : "Minimize System"}
+	            aria-expanded={!wins.currently.minimized}
+	            onpointerdown={(e) => e.stopPropagation()}
+	            onclick={() => minimizeWin("currently")}
+	          ></button>
+	        </div>
+	        <div class="win-body curr-body">
+	          <dl class="curr-fields">
+	            <div><dt>mood</dt><dd>{data.mood}</dd></div>
+	            <div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()}</dd></div>
+	            <div><dt>music</dt><dd>{data.music.artist.toLowerCase()} · {data.music.title.toLowerCase()}</dd></div>
+	            <div><dt>tabs</dt><dd>{data.tabs} (halp)</dd></div>
+	            <div><dt>status</dt><dd>{data.status}</dd></div>
+	            <div><dt>nuno</dt><dd>{hearts} · ⚡{pet.energy}% · {pet.walks} walks today</dd></div>
+	          </dl>
+	        </div>
+	      </div>
+	    {/if}
 
     {#if wins.nowplaying.open}
       <div
         class="paper-win"
         role="group"
         aria-label="Now Playing"
+        data-minimized={wins.nowplaying.minimized}
         style:left={`${wins.nowplaying.x}px`}
         style:top={`${wins.nowplaying.y}px`}
         style:z-index={wins.nowplaying.z}
         style:width="240px"
         onpointerdown={() => focusWin("nowplaying")}
+        in:paperOpen={{ reduced }}
+        out:paperClose={{ reduced }}
       >
         <div class="title-bar" onpointerdown={(e) => startDrag(e, "nowplaying")} role="presentation">
           <button type="button" class="close" onpointerdown={(e) => e.stopPropagation()} onclick={() => closeWin("nowplaying")} aria-label="Close Now Playing"></button>
           <span class="title">Now Playing</span>
-          <span class="zoom"></span>
+          <button
+            type="button"
+            class="zoom"
+            class:active={wins.nowplaying.minimized}
+            aria-label={wins.nowplaying.minimized ? "Expand Now Playing" : "Minimize Now Playing"}
+            aria-expanded={!wins.nowplaying.minimized}
+            onpointerdown={(e) => e.stopPropagation()}
+            onclick={() => minimizeWin("nowplaying")}
+          ></button>
         </div>
         <div class="win-body">
           <div class="np-controls">
@@ -524,17 +640,28 @@ const playable = $derived(data.music.source.kind !== "none");
         class="paper-win"
         role="group"
         aria-label="Reading"
+        data-minimized={wins.reading.minimized}
         style:left={`${wins.reading.x}px`}
         style:top={`${wins.reading.y}px`}
         style:z-index={wins.reading.z}
         style:width="220px"
         style:transform={`rotate(${wins.reading.rotate ?? 0}deg)`}
         onpointerdown={() => focusWin("reading")}
+        in:paperOpen={{ reduced, rotate: wins.reading.rotate ?? 0 }}
+        out:paperClose={{ reduced, rotate: wins.reading.rotate ?? 0 }}
       >
         <div class="title-bar" onpointerdown={(e) => startDrag(e, "reading")} role="presentation">
           <button type="button" class="close" onpointerdown={(e) => e.stopPropagation()} onclick={() => closeWin("reading")} aria-label="Close Reading"></button>
           <span class="title">Reading.txt</span>
-          <span class="zoom"></span>
+          <button
+            type="button"
+            class="zoom"
+            class:active={wins.reading.minimized}
+            aria-label={wins.reading.minimized ? "Expand Reading" : "Minimize Reading"}
+            aria-expanded={!wins.reading.minimized}
+            onpointerdown={(e) => e.stopPropagation()}
+            onclick={() => minimizeWin("reading")}
+          ></button>
         </div>
         <div class="win-body">
           <div class="reading-body">
@@ -549,16 +676,27 @@ const playable = $derived(data.music.source.kind !== "none");
         class="paper-win"
         role="group"
         aria-label="Nunotchi"
+        data-minimized={wins.nunotchi.minimized}
         style:left={`${wins.nunotchi.x}px`}
         style:top={`${wins.nunotchi.y}px`}
         style:z-index={wins.nunotchi.z}
         style:width="270px"
         onpointerdown={() => focusWin("nunotchi")}
+        in:paperOpen={{ reduced }}
+        out:paperClose={{ reduced }}
       >
         <div class="title-bar" onpointerdown={(e) => startDrag(e, "nunotchi")} role="presentation">
           <button type="button" class="close" onpointerdown={(e) => e.stopPropagation()} onclick={() => closeWin("nunotchi")} aria-label="Close Nunotchi"></button>
           <span class="title">Nunotchi.app</span>
-          <span class="zoom"></span>
+          <button
+            type="button"
+            class="zoom"
+            class:active={wins.nunotchi.minimized}
+            aria-label={wins.nunotchi.minimized ? "Expand Nunotchi" : "Minimize Nunotchi"}
+            aria-expanded={!wins.nunotchi.minimized}
+            onpointerdown={(e) => e.stopPropagation()}
+            onclick={() => minimizeWin("nunotchi")}
+          ></button>
         </div>
         <div class="win-body">
           <div class="lcd" data-mood={busy ?? "idle"}>
@@ -567,25 +705,13 @@ const playable = $derived(data.music.source.kind !== "none");
               <span>age {pet.age}</span>
             </div>
 
-            {#if booting}
-              <div class="lcd-boot">
-                {#if mounted}
-                  <img
-                    src="/sprites/eggs.png"
-                    alt="hatching egg"
-                    class="egg-sprite"
-                    style:--frame={hatchFrame}
-                  />
-                  <div class="boot-label">hatching · {hatchFrame}/4</div>
-                {:else}
-                  <div class="boot-label">loading…</div>
-                {/if}
-              </div>
-            {:else}
+            {#if mounted}
               <div class="lcd-stage">
                 <NunotchiGame pose={busy ?? "idle"} width={234} height={70} bind:loopHandle />
               </div>
               <div class="lcd-msg">{msg}</div>
+            {:else}
+              <div class="lcd-boot"><div class="boot-label">loading…</div></div>
             {/if}
           </div>
 
@@ -596,10 +722,10 @@ const playable = $derived(data.music.source.kind !== "none");
           </div>
 
           <div class="game-buttons">
-            <button type="button" class="paper-btn" disabled={!!busy || booting} onclick={feed}>A · feed</button>
-            <button type="button" class="paper-btn" disabled={!!busy || booting} onclick={play}>B · play</button>
-            <button type="button" class="paper-btn solid" disabled={!!busy || booting} onclick={walk}>C · walk</button>
-            <button type="button" class="paper-btn" disabled={!!busy || booting} onclick={nap} aria-label="Nap">z</button>
+            <button type="button" class="paper-btn" disabled={!!busy} onclick={feed}>A · feed</button>
+            <button type="button" class="paper-btn" disabled={!!busy} onclick={play}>B · play</button>
+            <button type="button" class="paper-btn solid" disabled={!!busy} onclick={walk}>C · walk</button>
+            <button type="button" class="paper-btn" disabled={!!busy} onclick={nap} aria-label="Nap">z</button>
           </div>
 
           <div class="game-meta">
@@ -610,76 +736,92 @@ const playable = $derived(data.music.source.kind !== "none");
       </div>
     {/if}
 
-    {#if wins.alert.open}
-      <div
-        class="paper-win alert"
-        role="group"
-        aria-label="Walk reminder"
-        style:left={`${wins.alert.x}px`}
-        style:top={`${wins.alert.y}px`}
-        style:z-index={wins.alert.z}
-        style:width="280px"
-        style:transform={`rotate(${wins.alert.rotate ?? 0}deg)`}
-        onpointerdown={() => focusWin("alert")}
-      >
-        <div class="title-bar" onpointerdown={(e) => startDrag(e, "alert")} role="presentation">
-          <span class="title">&nbsp;</span>
-        </div>
-        <div class="win-body alert-body">
-          <div class="bang" aria-hidden="true">!</div>
-          <div>
-            Nuno is asking for a walk.<br />
-            Proceed?
-            <div class="alert-actions">
-              <button type="button" class="paper-btn" onclick={() => closeWin("alert")}>Later</button>
-              <button type="button" class="paper-btn solid" onclick={() => { closeWin("alert"); walk(); }}>OK</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    {/if}
 
-    <div class="desktop-icons">
-      <button type="button" class="icon-btn" onclick={() => toggleWin("nunotchi")}>
-        <span class="icon folder" aria-hidden="true"></span>
-        <span class="icon-label">Nuno</span>
-      </button>
-      <button type="button" class="icon-btn" onclick={() => toggleWin("reading")}>
-		<span class="icon folder" aria-hidden="true"></span>
-		<span class="icon-label">Reading</span>
-      </button>
-		<button type="button" class="icon-btn" onclick={() => toggleWin("nowplaying")}>
-			<span class="icon music" aria-hidden="true"></span>
-			<span class="icon-label">Music</span>
-		</button>
-      <button type="button" class="icon-btn" aria-label="Trash (empty)" disabled>
-        <span class="icon trash" aria-hidden="true"></span>
-        <span class="icon-label">Trash</span>
-      </button>
-    </div>
 
-    <div class="ask-bar">
-      <form onsubmit={ask}>
-        <span class="prompt">$</span>
-        <input
-          bind:value={askInput}
-          placeholder="try: sit"
-          aria-label="Terminal — type a command"
-          spellcheck="false"
-          autocapitalize="off"
-          autocomplete="off"
-        />
-        <span class="enter">[↵]</span>
-      </form>
-      {#if askReply && !wins.currently.open}
-        <div class="ask-reply">→ {askReply}</div>
-      {/if}
-    </div>
+	    {#if wins.terminal.open}
+	      <div
+	        class="paper-win"
+	        role="group"
+	        aria-label="Terminal"
+	        data-minimized={wins.terminal.minimized}
+	        style:left={`${wins.terminal.x}px`}
+	        style:top={`${wins.terminal.y}px`}
+	        style:z-index={wins.terminal.z}
+	        style:width="320px"
+	        onpointerdown={() => focusWin("terminal")}
+	        in:paperOpen={{ reduced }}
+	        out:paperClose={{ reduced }}
+	      >
+	        <div class="title-bar" onpointerdown={(e) => startDrag(e, "terminal")} role="presentation">
+	          <button type="button" class="close" onpointerdown={(e) => e.stopPropagation()} onclick={() => closeWin("terminal")} aria-label="Close Terminal"></button>
+	          <span class="title">Terminal</span>
+	          <button
+	            type="button"
+	            class="zoom"
+	            class:active={wins.terminal.minimized}
+	            aria-label={wins.terminal.minimized ? "Expand Terminal" : "Minimize Terminal"}
+	            aria-expanded={!wins.terminal.minimized}
+	            onpointerdown={(e) => e.stopPropagation()}
+	            onclick={() => minimizeWin("terminal")}
+	          ></button>
+	        </div>
+	        <div class="win-body terminal-body">
+	          <div class="terminal-scroll">
+	            {#each terminalHistory as entry}
+	              <div class="terminal-line">
+	                <span class="cmd-prompt">$</span>
+	                <span class="cmd-q">{entry.q}</span>
+	              </div>
+	              <div class="terminal-line reply">
+	                <span class="cmd-arrow">→</span>
+	                <span class="cmd-reply">{entry.reply}</span>
+	              </div>
+	            {/each}
+	          </div>
+	          <form class="terminal-form" onsubmit={ask}>
+	            <span class="prompt">$</span>
+	            <input
+	              bind:value={askInput}
+	              onkeydown={onKonamiKey}
+	              placeholder="try: sit · help"
+	              aria-label="Terminal — type a command"
+	              spellcheck="false"
+	              autocapitalize="off"
+	              autocomplete="off"
+	            />
+	            <span class="enter">[↵]</span>
+	          </form>
+	        </div>
+	      </div>
+	    {/if}
 
-    <div class="menu-bar">
-      <span class="menu-items">★ File · Edit · View · Special · ask nuno</span>
-      <span class="clock">{now} · {clock}</span>
-    </div>
+	    <div class="desktop-icons">
+	      <button type="button" class="icon-btn" onclick={() => toggleWin("nunotchi")}>
+	        <PawPrint size={20} weight="regular" aria-hidden="true" />
+	        <span class="icon-label">Nunotchi</span>
+	      </button>
+	      <button type="button" class="icon-btn" onclick={() => toggleWin("reading")}>
+	        <FileText size={18} weight="regular" aria-hidden="true" />
+	        <span class="icon-label">Reading.txt</span>
+	      </button>
+	      <button type="button" class="icon-btn" onclick={() => toggleWin("nowplaying")}>
+	        <VinylRecord size={20} weight="regular" aria-hidden="true" />
+	        <span class="icon-label">Music</span>
+	      </button>
+	      <button type="button" class="icon-btn" onclick={() => toggleWin("terminal")}>
+	        <Terminal size={20} weight="regular" aria-hidden="true" />
+	        <span class="icon-label">Terminal</span>
+	      </button>
+	      <button type="button" class="icon-btn" aria-label="Trash (empty)" disabled>
+	        <Trash size={20} weight="regular" aria-hidden="true" />
+	        <span class="icon-label">Trash</span>
+	      </button>
+	    </div>
+
+	    <div class="menu-bar">
+	      <span class="menu-items">★ File · Edit · View</span>
+	      <span class="clock">{clock}</span>
+	    </div>
   </div>
 </div>
 
@@ -763,8 +905,12 @@ const playable = $derived(data.music.source.kind !== "none");
     border: 1.5px solid var(--ink);
     box-shadow: var(--winShadow);
     color: var(--ink);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    transition: grid-template-rows 200ms cubic-bezier(0.25, 1, 0.5, 1);
   }
-  .paper-win.alert .title-bar { background: repeating-linear-gradient(var(--ink) 0 1px, transparent 1px 3px); }
+  .paper-win[data-minimized="true"] { grid-template-rows: auto 0fr; }
+  .paper-win > .win-body { overflow: hidden; min-height: 0; }
 
   .title-bar {
     display: flex;
@@ -779,6 +925,10 @@ const playable = $derived(data.music.source.kind !== "none");
     touch-action: none;
   }
   .title-bar:active { cursor: grabbing; }
+	.surface[data-coarse="true"] .title-bar {
+		cursor: default;
+		touch-action: auto;
+	}
   .title {
     flex: 1;
     text-align: center;
@@ -799,18 +949,34 @@ const playable = $derived(data.music.source.kind !== "none");
     padding: 0;
     cursor: pointer;
     flex-shrink: 0;
+    position: relative;
   }
-  .close { position: relative; }
   /* Visual stays 11px to honour the System-1 chrome; hit area expands to 25×25. */
   /* Pseudo overflow into win-body is masked by later DOM siblings — no accidental closes. */
-  .close::before {
+  .close::before,
+  .zoom::before {
     content: "";
     position: absolute;
     inset: -7px;
   }
-  .close:hover { background: var(--ink); }
-  .close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
-  .zoom { cursor: default; }
+  .close:hover,
+  .zoom:hover { background: var(--ink); }
+  .close:focus-visible,
+  .zoom:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  /* Zoom shows a thin horizontal rule (System-1 minimize hint); filled when minimized. */
+  .zoom::after {
+    content: "";
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    top: 50%;
+    height: 1.5px;
+    background: var(--ink);
+    transform: translateY(-50%);
+    transition: opacity 150ms ease-out;
+  }
+  .zoom.active { background: var(--ink); }
+  .zoom.active::after { background: var(--paper); }
 
   .win-body {
     padding: 8px;
@@ -960,15 +1126,6 @@ const playable = $derived(data.music.source.kind !== "none");
     justify-content: center;
     gap: 6px;
   }
-  .egg-sprite {
-    width: 32px;
-    height: 32px;
-    object-fit: none;
-    object-position: calc(var(--frame, 0) * -32px) -28px;
-    image-rendering: pixelated;
-    transform: scale(2);
-    transform-origin: center;
-  }
   .boot-label { font-size: 11px; color: var(--ink-secondary); letter-spacing: 0.1em; }
 
   .hunger-row {
@@ -992,30 +1149,6 @@ const playable = $derived(data.music.source.kind !== "none");
     font-size: 11px;
     margin-top: 6px;
     color: var(--ink-secondary);
-  }
-
-  /* ── Alert ── */
-  .alert-body {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  .bang {
-    width: 28px;
-    height: 28px;
-    border: 1.5px solid var(--ink);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  .alert-actions {
-    display: flex;
-    gap: 6px;
-    margin-top: 8px;
-    justify-content: flex-end;
   }
 
   /* ── Paper buttons ── */
@@ -1068,112 +1201,73 @@ const playable = $derived(data.music.source.kind !== "none");
     gap: 2px;
     font-family: inherit;
   }
-  .icon-btn:hover .icon { background: color-mix(in oklch, var(--ink) 12%, var(--paper)); }
-  .icon-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-  .icon-btn[disabled] { opacity: 0.5; cursor: default; }
-  .icon {
-    width: 24px;
-    height: 18px;
-    border: 1.5px solid var(--ink);
-    background: var(--paper);
-    position: relative;
-  }
-  .icon.folder::before {
-    content: "";
-    position: absolute;
-    top: -4px;
-    left: 2px;
-    width: 8px;
-    height: 4px;
-    border: 1.5px solid var(--ink);
-    border-bottom: none;
-    background: var(--paper);
-  }
-  .icon.image {
-    background: var(--paper);
-    background-image:
-      linear-gradient(135deg, var(--ink) 25%, transparent 25%),
-      linear-gradient(225deg, var(--ink) 25%, transparent 25%);
-    background-size: 6px 6px;
-    background-position: 0 0, 3px 0;
-  }
-	.icon.music {
-		background: var(--paper);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.icon.music::before {
-		content: "";
-		width: 14px;
-		height: 14px;
-		border: 1.5px solid var(--ink);
-		border-radius: 50%;
-	}
-	.icon.music::after {
-		content: "";
-		width: 4px;
-		height: 4px;
-		background: var(--ink);
-		border-radius: 50%;
-		position: absolute;
-	}
-  .icon.trash {
-    width: 22px;
-    height: 24px;
-    border-top: none;
-  }
-  .icon.trash::before {
-    content: "";
-    position: absolute;
-    top: -3px;
-    left: -2px;
-    right: -2px;
-    height: 3px;
-    background: var(--ink);
-  }
-  .icon-label {
-    font-size: 10px;
-    color: var(--ink);
-    background: color-mix(in oklch, var(--paper) 70%, transparent);
-    padding: 0 3px;
-  }
+	  .icon-btn :global(svg) {
+	    color: var(--ink);
+	  }
+	  .icon-btn:hover :global(svg) {
+	    color: color-mix(in oklch, var(--ink) 70%, var(--color-accent));
+	  }
+	  .icon-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+	  .icon-btn[disabled] { opacity: 0.5; cursor: default; }
+	  .icon-label {
+	    font-size: 10px;
+	    color: var(--ink);
+	    background: color-mix(in oklch, var(--paper) 70%, transparent);
+	    padding: 0 3px;
+	  }
 
-  /* ── Terminal $ ask bar ── */
-  .ask-bar {
-    position: absolute;
-    bottom: 22px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(420px, calc(100% - 240px));
-    background: var(--paper);
-    border: 1.5px solid var(--ink);
-    padding: 4px 10px;
-    font-size: 11px;
-    box-shadow: var(--winShadow);
-  }
-  .ask-bar form {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .ask-bar .prompt { color: var(--color-accent); font-weight: 700; }
-  .ask-bar input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink);
-    min-width: 0;
-  }
-  .ask-bar .enter { font-size: 9px; color: var(--ink-tertiary); letter-spacing: 0.1em; }
-  .ask-reply {
-    margin-top: 4px;
-    font-size: 11px;
-    color: var(--ink-secondary);
-  }
+	  /* ── Terminal window ── */
+	  .terminal-body {
+	    display: flex;
+	    flex-direction: column;
+	    gap: 6px;
+	    padding: 8px;
+	    font-size: 11px;
+	    line-height: 1.5;
+	    background:
+	      radial-gradient(color-mix(in oklch, var(--ink) 8%, transparent) 1px, transparent 1px);
+	    background-size: 4px 4px;
+	  }
+	  .terminal-scroll {
+	    overflow-y: auto;
+	    max-height: 130px;
+	    display: flex;
+	    flex-direction: column;
+	    gap: 2px;
+	    font-family: var(--font-mono);
+	  }
+	  .terminal-scroll::-webkit-scrollbar { width: 4px; }
+	  .terminal-scroll::-webkit-scrollbar-thumb { background: var(--ink-soft); }
+	  .terminal-line {
+	    display: flex;
+	    gap: 4px;
+	    flex-wrap: wrap;
+	    align-items: baseline;
+	  }
+	  .terminal-line.reply {
+	    padding-left: 12px;
+	    opacity: 0.85;
+	  }
+	  .terminal-form {
+	    display: flex;
+	    align-items: center;
+	    gap: 6px;
+	    border-top: 1.5px solid var(--ink-soft);
+	    padding-top: 6px;
+	    margin-top: 2px;
+	  }
+	  .terminal-form .prompt { color: var(--color-accent); font-weight: 700; }
+	  .terminal-form input {
+	    flex: 1;
+	    background: transparent;
+	    border: none;
+	    outline: none;
+	    font-family: var(--font-mono);
+	    font-size: 11px;
+	    color: var(--ink);
+	    min-width: 0;
+	  }
+	  .terminal-form .enter { font-size: 9px; color: var(--ink-tertiary); letter-spacing: 0.1em; }
 
   /* ── Menu bar ── */
   .menu-bar {
@@ -1191,13 +1285,17 @@ const playable = $derived(data.music.source.kind !== "none");
     letter-spacing: 0.04em;
   }
 
-  @media (max-width: 720px) {
-	.surface { height: clamp(640px, 85vh, 800px); }
-	.ask-bar { width: calc(100% - 32px); }
-	.desktop-icons { left: 12px; gap: 12px; }
-	.paper-btn { padding: 5px 12px; font-size: 11px; }
-	.paper-btn::before { inset: -6px; }
-	.close::before { inset: -10px; }
-	.close, .zoom { width: 14px; height: 14px; }
-  }
+	  @media (prefers-reduced-motion: reduce) {
+	    .paper-win { transition: none; }
+	    .zoom::after { transition: none; }
+	  }
+
+	  @media (max-width: 720px) {
+	    .surface { height: clamp(640px, 85vh, 800px); }
+	    .desktop-icons { left: 12px; gap: 12px; }
+	    .paper-btn { padding: 5px 12px; font-size: 11px; }
+	    .paper-btn::before { inset: -6px; }
+	    .close::before { inset: -10px; }
+	    .close, .zoom { width: 14px; height: 14px; }
+	  }
 </style>

@@ -22,7 +22,7 @@ const hasNext = currentPage < totalPages;
   ) : (
     <span class="page-link disabled">← Newer</span>
   )}
-  <span class="page-count">Page {currentPage} of {totalPages}</span>
+  <span class="page-count" aria-current="page">Page {currentPage} of {totalPages}</span>
   {hasNext ? (
     <a href={pageUrl(currentPage + 1)} class="page-link" rel="next">Older →</a>
   ) : (

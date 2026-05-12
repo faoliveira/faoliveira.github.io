@@ -13,6 +13,10 @@ const nightfallSource = readFileSync(
   fileURLToPath(new URL("../../../styles/nightfall.css", import.meta.url)),
   "utf8",
 );
+const notFoundCss = readFileSync(
+  fileURLToPath(new URL("../../../styles/pages/404.css", import.meta.url)),
+  "utf8",
+);
 
 const KANJI_RANGE = /[　-〿぀-ゟ゠-ヿ一-鿿＀-￯]/;
 const HEX_LITERAL = /#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])\b/;
@@ -41,7 +45,8 @@ describe("404 page — KoubouNotFound contract (Story 1.15)", () => {
   });
 
   it("[AC #5] page renders a Caveat-script voice line", () => {
-    expect(notFoundSource).toContain("var(--font-script)");
+    // CSS extracted to src/styles/pages/404.css; verify the cascade still uses font-script.
+    expect(notFoundCss).toContain("var(--font-script)");
   });
 
   it("[AC #7] embeds <SearchBox> for recovery", () => {
@@ -102,7 +107,9 @@ describe("404 page — KoubouNotFound contract (Story 1.15)", () => {
   });
 
   it("[AC #17] the inline scroll script survives Astro ClientRouter navigation", () => {
-    expect(notFoundSource).toMatch(/\u003cscript\u003e[\s\S]*?astro:before-swap[\s\S]*?\u003c\/script\u003e/);
+    expect(notFoundSource).toMatch(
+      /\u003cscript\u003e[\s\S]*?astro:before-swap[\s\S]*?\u003c\/script\u003e/,
+    );
   });
 
   it("[NunoDoodle atom] declares a typed Props interface with size/color/tongue", () => {

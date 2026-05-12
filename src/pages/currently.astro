@@ -2,10 +2,12 @@
 import { getEntry } from "astro:content";
 import CurrentlyWidget from "@islands/CurrentlyWidget.svelte";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { toISODateString } from "@modules/content/format-date";
 
 const entry = await getEntry("currently", "now");
 if (!entry) throw new Error("Missing currently/now entry — see src/content/currently/now.json");
 const data = entry.data;
+const dataUpdated = toISODateString(data.updated);
 ---
 
 <BaseLayout
@@ -33,12 +35,47 @@ const data = entry.data;
 
     <div class="stage">
       <CurrentlyWidget data={data} dev={true} client:load />
+      <noscript>
+        <div class="kb-currently-static">
+          <p class="kb-currently-aside">The System-1 boots with JavaScript. The notes it would carry, anyway:</p>
+          <dl class="kb-currently-list">
+            <div class="kb-currently-row">
+              <dt>Playing</dt>
+              <dd>{data.music.title}, {data.music.artist}</dd>
+            </div>
+            <div class="kb-currently-row">
+              <dt>Reading</dt>
+              <dd>
+                {data.reading.title}, {data.reading.author}
+                <span class="kb-currently-page">
+                  p. {data.reading.page} of {data.reading.totalPages}
+                </span>
+              </dd>
+            </div>
+            <div class="kb-currently-row">
+              <dt>Mood</dt>
+              <dd>{data.mood}</dd>
+            </div>
+            <div class="kb-currently-row">
+              <dt>Tabs</dt>
+              <dd>{data.tabs} open</dd>
+            </div>
+            <div class="kb-currently-row">
+              <dt>Tinkering</dt>
+              <dd>{data.status}</dd>
+            </div>
+          </dl>
+          <p class="kb-currently-stamp">
+            as of <time datetime={dataUpdated}>{dataUpdated}</time>
+          </p>
+        </div>
+      </noscript>
     </div>
 
     <section class="notes">
       <h2>What's wired up</h2>
       <ul>
-        <li>Five draggable windows: Currently, Now Playing, Reading.txt, Nunotchi.app, alert dialog</li>
+	        <li>Six draggable windows: System, Now Playing, Reading.txt, Nunotchi.app, Terminal, alert dialog</li>
         <li>Terminal <code>$</code> dispatches typed commands to a Nuno pose (sit / lay / paw / walk / sleep / treat / ball / fetch / cat / good …)</li>
         <li>Nunotchi.app runs on a Kontra.js canvas + sprite atlas (Kenney 1-bit pack) — feed / play / walk / nap drive real animations</li>
         <li>Now Playing plays YouTube or Spotify behind the System-1 chrome (hidden iframe; chrome unchanged)</li>
@@ -90,6 +127,75 @@ const data = entry.data;
     font-size: inherit;
   }
   .stage { margin-block: var(--ma-broad); }
+
+  .kb-currently-static {
+    padding-block: var(--ma-base);
+    border-block: 1px solid var(--color-border);
+  }
+
+  .kb-currently-list {
+    display: grid;
+    gap: var(--ma-narrow);
+    margin: 0;
+    padding: 0;
+  }
+
+  .kb-currently-row {
+    display: grid;
+    grid-template-columns: minmax(0, 7rem) 1fr;
+    column-gap: var(--ma-base);
+    align-items: baseline;
+  }
+
+  .kb-currently-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--type-xs);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .kb-currently-row dd {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: var(--type-sm);
+    line-height: var(--leading-sm);
+  }
+
+  .kb-currently-page {
+    display: inline-block;
+    margin-inline-start: var(--ma-thin);
+    font-family: var(--font-mono);
+    font-size: var(--type-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .kb-currently-aside {
+    margin-block: 0 var(--ma-base);
+    font-family: var(--font-script);
+    font-size: var(--type-md);
+    line-height: var(--leading-md);
+    color: var(--color-margin-ink);
+    transform: rotate(-1deg);
+    transform-origin: left center;
+  }
+
+  .kb-currently-stamp {
+    margin-block: var(--ma-base) 0;
+    font-family: var(--font-mono);
+    font-size: var(--type-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  @media (max-width: 480px) {
+    .kb-currently-row {
+      grid-template-columns: 1fr;
+      row-gap: var(--ma-hair);
+    }
+  }
   .notes {
     max-width: 70ch;
     margin-block-start: var(--ma-broad);

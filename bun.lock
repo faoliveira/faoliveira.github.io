@@ -19,6 +19,8 @@
         "astro-expressive-code": "^0.41.7",
         "kontra": "^10.0.2",
         "markdown-it": "^14.1.1",
+        "phosphor-astro": "^2.1.0",
+        "phosphor-svelte": "^3.1.0",
         "remark-emoji": "^5.0.2",
         "sanitize-html": "^2.17.2",
         "satori": "^0.26.0",
@@ -1224,6 +1226,10 @@
     "pathe": ["pathe@2.0.3", "", {}, "sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w=="],
 
     "pend": ["pend@1.2.0", "", {}, "sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg=="],
+
+    "phosphor-astro": ["phosphor-astro@2.1.0", "", {}, "sha512-qyYUlxF8DbfHc+85DDGPL04ghNBwrVK75EsNsBfYOChiCeCRwAwfbHxj/qqPrrSFPMgh9cUyEvgKYjI/7bjCUA=="],
+
+    "phosphor-svelte": ["phosphor-svelte@3.1.0", "", { "dependencies": { "estree-walker": "^3.0.3", "magic-string": "^0.30.13" }, "peerDependencies": { "svelte": "^5.0.0 || ^5.0.0-next.96", "vite": ">=5" }, "optionalPeers": ["vite"] }, "sha512-nldtxx+XCgNREvrb7O5xgDsefytXpSkPTx8Rnu3f2qQCUZLDV1rLxYSd2Jcwckuo9lZB1qKMqGR17P4UDC0PrA=="],
 
     "piccolore": ["piccolore@0.1.3", "", {}, "sha512-o8bTeDWjE086iwKrROaDf31K0qC/BENdm15/uH9usSC/uZjJOKb2YGiVHfLY4GhwsERiPI1jmwI2XrA7ACOxVw=="],
 

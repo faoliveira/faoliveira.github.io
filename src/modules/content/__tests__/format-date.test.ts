@@ -9,7 +9,7 @@ describe("formatDate()", () => {
 
   it("formats January correctly", () => {
     const date = new Date("2026-01-05T00:00:00Z");
-    expect(formatDate(date)).toBe("Jan 5, 2026");
+    expect(formatDate(date)).toBe("Jan 05, 2026");
   });
 
   it("formats December correctly", () => {
@@ -20,7 +20,7 @@ describe("formatDate()", () => {
   it("uses UTC to avoid timezone shifts", () => {
     // Midnight UTC — should not shift to previous day in any timezone
     const date = new Date("2026-06-01T00:00:00Z");
-    expect(formatDate(date)).toBe("Jun 1, 2026");
+    expect(formatDate(date)).toBe("Jun 01, 2026");
   });
 
   it("does not shift date for UTC+5 offset input (real timezone boundary)", () => {
@@ -31,7 +31,7 @@ describe("formatDate()", () => {
 
   it("formats Unix epoch correctly", () => {
     const date = new Date(0); // 1970-01-01T00:00:00Z
-    expect(formatDate(date)).toBe("Jan 1, 1970");
+    expect(formatDate(date)).toBe("Jan 01, 1970");
   });
 });
 

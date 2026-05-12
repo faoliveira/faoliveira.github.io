@@ -18,11 +18,13 @@ html[data-theme="nightfall"] {
   /* Secondary text shifts to hue 70 (amber family) with chroma 0.01 → 0.035. */
   --color-text-secondary: oklch(0.68 0.035 70);
   /* text-tertiary: intentionally neutral (hue 80) — used for disabled/placeholder states
-     where warmth is inappropriate; not part of the amber warmth system */
-  --color-text-tertiary: oklch(0.55 0.01 80);
-  --color-accent: oklch(0.62 0.1 155);
-  --color-accent-hover: oklch(0.56 0.11 155);
-  --color-accent-tint: oklch(0.62 0.1 155 / 0.15);
+     where warmth is inappropriate; not part of the amber warmth system.
+     L0.66 hits 5.59:1 on surface, 4.72:1 on surface-alt — Story 1.18 bump from L0.55 (was 3.58:1). */
+  --color-text-tertiary: oklch(0.66 0.01 80);
+  /* accent L0.65 → 5.63:1 on surface, 4.75:1 on surface-alt — Story 1.18 bump from L0.62 */
+  --color-accent: oklch(0.65 0.1 155);
+  --color-accent-hover: oklch(0.6 0.11 155);
+  --color-accent-tint: oklch(0.65 0.1 155 / 0.15);
   --color-border: oklch(0.3 0.025 280);
   --color-code-surface: oklch(0.18 0.035 280);
   /* margin-ink: hue 70 keeps amber-warmth family of nightfall text-secondary; L 0.78 ≈ 7.4:1 contrast */
@@ -81,10 +83,10 @@ html[data-theme].theme-animated {
     --color-text-primary: #e6e1db;
     /* Amber-tinted secondary text (hue 70 family) */
     --color-text-secondary: #b3a98e;
-    --color-text-tertiary: #8a857e;
-    --color-accent: #4aab7e;
-    --color-accent-hover: #3c9a6e;
-    --color-accent-tint: rgb(74 171 126 / 0.15);
+    --color-text-tertiary: #95928b;
+    --color-accent: #59a174;
+    --color-accent-hover: #419363;
+    --color-accent-tint: rgb(89 161 116 / 0.15);
     --color-border: #302d42;
     --color-code-surface: #181538;
     --color-margin-ink: #c9b88a;

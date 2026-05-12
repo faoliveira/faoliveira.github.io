@@ -17,7 +17,7 @@
     "test:watch": "vitest",
     "astro": "astro",
     "knip": "knip",
-    "test:a11y": "axe --load-delay 600 http://localhost:4321/ http://localhost:4321/about/ http://localhost:4321/404/ http://localhost:4321/search/ http://localhost:4321/posts/hello-koubou/"
+    "test:a11y": "axe --load-delay 600 http://localhost:4321/ http://localhost:4321/about/ http://localhost:4321/404/ http://localhost:4321/search/ http://localhost:4321/posts/2026-03-18-hello-koubou/"
   },
   "dependencies": {
     "@astro-community/astro-embed-bluesky": "^0.1.6",
@@ -34,6 +34,8 @@
     "astro-expressive-code": "^0.41.7",
     "kontra": "^10.0.2",
     "markdown-it": "^14.1.1",
+    "phosphor-astro": "^2.1.0",
+    "phosphor-svelte": "^3.1.0",
     "remark-emoji": "^5.0.2",
     "sanitize-html": "^2.17.2",
     "satori": "^0.26.0",

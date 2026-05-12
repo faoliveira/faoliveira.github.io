@@ -16,15 +16,55 @@ const inlineStyle = `width: ${width}px; height: ${height}px; rotate: ${rotate}de
 ></span>
 
 <style>
+  /* Two-layer crossfade: gradients can't @property-interpolate, so day and
+     nightfall tapes stack and animate opacity instead of swapping instantly. */
   .washi-tape {
+    position: relative;
     display: inline-block;
-    box-shadow: 0 1px 2px var(--tape-shadow);
+    background: transparent;
     pointer-events: none;
   }
-  .washi-tape--matcha {
-    background: var(--tape-matcha);
+
+  .washi-tape::before,
+  .washi-tape::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transition: opacity var(--motion-duration-smooth) var(--motion-easing-out-quart);
   }
-  .washi-tape--vermillion {
-    background: var(--tape-vermillion);
+
+  .washi-tape--matcha::before {
+    background: var(--tape-matcha-day);
+    box-shadow: 0 1px 2px var(--tape-shadow-day);
+    opacity: 1;
+  }
+  .washi-tape--matcha::after {
+    background: var(--tape-matcha-night);
+    box-shadow: 0 1px 2px var(--tape-shadow-night);
+    opacity: 0;
+  }
+  .washi-tape--vermillion::before {
+    background: var(--tape-vermillion-day);
+    box-shadow: 0 1px 2px var(--tape-shadow-day);
+    opacity: 1;
+  }
+  .washi-tape--vermillion::after {
+    background: var(--tape-vermillion-night);
+    box-shadow: 0 1px 2px var(--tape-shadow-night);
+    opacity: 0;
+  }
+
+  :global([data-theme="nightfall"]) .washi-tape::before {
+    opacity: 0;
+  }
+  :global([data-theme="nightfall"]) .washi-tape::after {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .washi-tape::before,
+    .washi-tape::after {
+      transition: none;
+    }
   }
 </style>

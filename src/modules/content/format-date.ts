@@ -1,7 +1,7 @@
 const formatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
   month: "short",
-  day: "numeric",
+  day: "2-digit",
   timeZone: "UTC",
 });
 

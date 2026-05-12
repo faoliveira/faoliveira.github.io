@@ -109,7 +109,8 @@ const linkUrl = buildCodePenLink(safeUser, safeId);
 
         const placeholder = wrapper.querySelector(".click-to-load__placeholder");
         if (placeholder) {
-          wrapper.replaceChild(iframe, placeholder);
+		  // Append iframe alongside placeholder for crossfade transition
+		  wrapper.appendChild(iframe);
         } else {
           wrapper.appendChild(iframe);
         }
@@ -117,30 +118,36 @@ const linkUrl = buildCodePenLink(safeUser, safeId);
         // P-5: remove loading skeleton only after iframe content is ready
         iframe.addEventListener(
           "load",
-          () => {
-            wrapper.classList.remove("click-to-load--loading");
-            // Focus wrapper to signal embed loaded to AT without trapping keyboard
-            // inside a cross-origin document (WCAG 2.1.2)
-            wrapper.focus();
-          },
+			() => {
+			  wrapper.classList.remove("click-to-load--loading");
+			  wrapper.classList.add("click-to-load--loaded");
+			  // Focus wrapper to signal embed loaded to AT without trapping keyboard
+			  // inside a cross-origin document (WCAG 2.1.2)
+			  wrapper.focus();
+			  // Remove placeholder after crossfade completes (400ms + 50ms buffer)
+			  setTimeout(() => placeholder?.remove(), 450);
+			},
           { once: true },
         );
 
         // Best-effort error recovery for network-level failures
         iframe.addEventListener(
           "error",
-          () => {
-            wrapper.classList.remove("click-to-load--loading");
-            const errorDiv = document.createElement("div");
-            const link = document.createElement("a");
-            link.href = `https://codepen.io/${user}/pen/${id}`;
-            link.textContent = "View on CodePen →";
-            link.className = "click-to-load__fallback";
-            link.target = "_blank";
-            link.rel = "noopener noreferrer";
-            errorDiv.appendChild(link);
-            wrapper.replaceChild(errorDiv, iframe);
-          },
+			() => {
+			  wrapper.classList.remove("click-to-load--loading");
+			  wrapper.classList.remove("click-to-load--loaded");
+			  placeholder?.remove();
+			  iframe.remove();
+			  const errorDiv = document.createElement("div");
+			  const link = document.createElement("a");
+			  link.href = `https://codepen.io/${user}/pen/${id}`;
+			  link.textContent = "View on CodePen →";
+			  link.className = "click-to-load__fallback";
+			  link.target = "_blank";
+			  link.rel = "noopener noreferrer";
+			  errorDiv.appendChild(link);
+			  wrapper.appendChild(errorDiv);
+			},
           { once: true },
         );
       });

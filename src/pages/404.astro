@@ -3,8 +3,7 @@ import NunoDoodle from "@components/NunoDoodle.astro";
 import SearchBox from "@components/SearchBox.astro";
 import WashiTape from "@components/WashiTape.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { getPublishedPosts } from "@modules/content";
-import { formatDate, toISODateString } from "@modules/content";
+import { formatDate, getPublishedPosts, toISODateString } from "@modules/content";
 
 import "../styles/pages/404.css";
 
@@ -106,6 +105,7 @@ const recentPosts = await getPublishedPosts({ limit: 3 });
         <SearchBox autofocus={false} />
       </section>
 
+      {/* Emoji intentional: paw-print trail is Notebook-variant design DNA, aria-hidden, decorative-only. Functional notation per AC #5 (Story 1.17), tracked by voice-copy-kanji-audit.test.ts. */}
       <div class="not-found-paw" aria-hidden="true">
         <span class="not-found-paw-prints">🐾 🐾 🐾 🐾 🐾 🐾</span>
         <span class="not-found-paw-text">(he went that way)</span>

@@ -6,6 +6,7 @@ import PostList from "@components/PostList.astro";
 import CurrentlyWidget from "@islands/CurrentlyWidget.svelte";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getPublishedPosts } from "@modules/content";
+import { toISODateString } from "@modules/content/format-date";
 import { SITE_URL } from "@modules/seo";
 
 const recentPosts = await getPublishedPosts({ limit: 5 });
@@ -15,6 +16,7 @@ if (!currentlyEntry) {
   throw new Error("Missing currently/now entry — see src/content/currently/now.json");
 }
 const currently = currentlyEntry.data;
+const currentlyUpdated = toISODateString(currently.updated);
 ---
 
 <BaseLayout title="fa." image={`${SITE_URL}/og/index.png`}>
@@ -30,7 +32,39 @@ const currently = currentlyEntry.data;
     <h2 id="currently-heading" class="section-label kb-section-label">Currently ——</h2>
 		<CurrentlyWidget data={currently} compact={true} client:visible />
     <noscript>
-      <p class="kb-currently-noscript">This section uses an interactive widget that requires JavaScript.</p>
+      <div class="kb-currently-static">
+        <dl class="kb-currently-list">
+          <div class="kb-currently-row">
+            <dt>Playing</dt>
+            <dd>{currently.music.title}, {currently.music.artist}</dd>
+          </div>
+          <div class="kb-currently-row">
+            <dt>Reading</dt>
+            <dd>
+              {currently.reading.title}, {currently.reading.author}
+              <span class="kb-currently-page">
+                p. {currently.reading.page} of {currently.reading.totalPages}
+              </span>
+            </dd>
+          </div>
+          <div class="kb-currently-row">
+            <dt>Mood</dt>
+            <dd>{currently.mood}</dd>
+          </div>
+          <div class="kb-currently-row">
+            <dt>Tabs</dt>
+            <dd>{currently.tabs} open</dd>
+          </div>
+          <div class="kb-currently-row">
+            <dt>Tinkering</dt>
+            <dd>{currently.status}</dd>
+          </div>
+        </dl>
+        <p class="kb-currently-aside">The widget needs JavaScript; the notes don't.</p>
+        <p class="kb-currently-stamp">
+          as of <time datetime={currentlyUpdated}>{currentlyUpdated}</time>
+        </p>
+      </div>
     </noscript>
   </section>
 </BaseLayout>
@@ -40,9 +74,75 @@ const currently = currentlyEntry.data;
     margin-block-start: var(--ma-spacious);
   }
 
-  .kb-currently-noscript {
-    font-size: var(--type-sm);
-    color: var(--color-text-secondary);
+  .kb-currently-static {
     margin-block-start: var(--ma-base);
+    padding-block-start: var(--ma-base);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .kb-currently-list {
+    display: grid;
+    gap: var(--ma-narrow);
+    margin: 0;
+    padding: 0;
+  }
+
+  .kb-currently-row {
+    display: grid;
+    grid-template-columns: minmax(0, 7rem) 1fr;
+    column-gap: var(--ma-base);
+    align-items: baseline;
+  }
+
+  .kb-currently-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--type-xs);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .kb-currently-row dd {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: var(--type-sm);
+    line-height: var(--leading-sm);
+  }
+
+  .kb-currently-page {
+    display: inline-block;
+    margin-inline-start: var(--ma-thin);
+    font-family: var(--font-mono);
+    font-size: var(--type-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .kb-currently-aside {
+    margin-block-start: var(--ma-base);
+    margin-block-end: 0;
+    font-family: var(--font-script);
+    font-size: var(--type-md);
+    line-height: var(--leading-md);
+    color: var(--color-margin-ink);
+    transform: rotate(-1deg);
+    transform-origin: left center;
+  }
+
+  .kb-currently-stamp {
+    margin-block-start: var(--ma-narrow);
+    margin-block-end: 0;
+    font-family: var(--font-mono);
+    font-size: var(--type-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  @media (max-width: 480px) {
+    .kb-currently-row {
+      grid-template-columns: 1fr;
+      row-gap: var(--ma-hair);
+    }
   }
 </style>

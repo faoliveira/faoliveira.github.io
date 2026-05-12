@@ -1,4 +1,6 @@
 <script lang="ts">
+import ArrowsHorizontal from "phosphor-svelte/lib/ArrowsHorizontal";
+
 interface Props {
   before: string;
   after: string;
@@ -101,9 +103,7 @@ function handleKeydown(e: KeyboardEvent) {
     onkeydown={handleKeydown}
   >
     <div class="compare-handle">
-      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor">
-        <path d="M7 4l-4 6 4 6M13 4l4 6-4 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+			<ArrowsHorizontal size={20} aria-hidden="true" />
     </div>
   </div>
 </div>

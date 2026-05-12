@@ -74,19 +74,53 @@ const titleId = `featured-title-${post.id}`;
     }
   }
 
+  /* Tape is two stacked layers (day + night) that crossfade opacity on theme
+     change, because gradients can't be @property-interpolated. The container
+     holds positioning; ::before is the day tape, ::after is the nightfall tape. */
   .washi-tape {
     position: absolute;
     inset-block-start: -10px;
     z-index: 2;
     width: 90px;
     height: 18px;
-    background: var(--tape-matcha);
-    box-shadow: 0 1px 2px var(--tape-shadow);
+    background: transparent;
     pointer-events: none;
   }
 
-  .featured-card--vermillion .washi-tape {
-    background: var(--tape-vermillion);
+  .washi-tape::before,
+  .washi-tape::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transition: opacity var(--motion-duration-smooth) var(--motion-easing-out-quart);
+  }
+
+  .washi-tape::before {
+    background: var(--tape-matcha-day);
+    box-shadow: 0 1px 2px var(--tape-shadow-day);
+    opacity: 1;
+  }
+
+  .washi-tape::after {
+    background: var(--tape-matcha-night);
+    box-shadow: 0 1px 2px var(--tape-shadow-night);
+    opacity: 0;
+  }
+
+  .featured-card--vermillion .washi-tape::before {
+    background: var(--tape-vermillion-day);
+  }
+
+  .featured-card--vermillion .washi-tape::after {
+    background: var(--tape-vermillion-night);
+  }
+
+  :global([data-theme="nightfall"]) .washi-tape::before {
+    opacity: 0;
+  }
+
+  :global([data-theme="nightfall"]) .washi-tape::after {
+    opacity: 1;
   }
 
   .featured-card--tape-left .washi-tape {
@@ -97,6 +131,13 @@ const titleId = `featured-title-${post.id}`;
   .featured-card--tape-right .washi-tape {
     inset-inline-end: 60px;
     rotate: 6deg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .washi-tape::before,
+    .washi-tape::after {
+      transition: none;
+    }
   }
 
   .card-date-column,
