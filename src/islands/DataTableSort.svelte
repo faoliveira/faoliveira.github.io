@@ -45,9 +45,9 @@ $effect(() => {
   });
 
   return () => {
-    cleanups.forEach((fn) => {
+    for (const fn of cleanups) {
       fn();
-    });
+    }
   };
 });
 
@@ -77,19 +77,20 @@ function sortByColumn(table: HTMLTableElement, colIndex: number) {
     return newDir === "asc" ? cmp : -cmp;
   });
 
-  rows.forEach((row) => {
+  for (const row of rows) {
     tbody.appendChild(row);
-  });
+  }
 
   // Update ARIA sort indicators
   const headers = table.querySelectorAll("thead th");
-  headers.forEach((th, i) => {
+  for (let i = 0; i < headers.length; i++) {
+    const th = headers[i];
     if (i === colIndex) {
       th.setAttribute("aria-sort", newDir === "asc" ? "ascending" : "descending");
     } else {
       th.setAttribute("aria-sort", "none");
     }
-  });
+  }
 }
 </script>
 

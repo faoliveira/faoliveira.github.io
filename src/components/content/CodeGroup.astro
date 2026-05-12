@@ -12,6 +12,7 @@ const { labels } = Astro.props;
 const MAX_TABS = 8;
 
 if (import.meta.env.DEV && labels.length > MAX_TABS) {
+  // biome-ignore lint/suspicious/noConsole: intentional dev-only guard
   console.warn(
     `[CodeGroup] Only ${MAX_TABS} tabs are supported. Got ${labels.length} labels — extra labels will be ignored.`,
   );

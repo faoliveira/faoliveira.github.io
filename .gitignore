@@ -538,3 +538,5 @@ src/content/posts/drafts/
 dist/
 .astro/
 .impeccable/probes/*
+.tmp/*
+.impeccable/*

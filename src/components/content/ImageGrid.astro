@@ -9,6 +9,7 @@ interface Props {
 const { columns = 2, ariaLabel = "Image gallery" } = Astro.props;
 
 if (import.meta.env.DEV && columns !== 2 && columns !== 3) {
+  // biome-ignore lint/suspicious/noConsole: intentional dev-only guard
   console.warn(`[ImageGrid] Invalid columns value: ${columns}. Expected 2 or 3.`);
 }
 ---

@@ -3,6 +3,10 @@ pre-commit:
   commands:
     lint:
       run: bunx biome check --write --staged
+    knip:
+      run: bunx knip --no-exit-code
+    loc-guard:
+      run: bash scripts/loc-guard.sh
     typecheck:
       run: bunx astro sync && bun run check
     impeccable:

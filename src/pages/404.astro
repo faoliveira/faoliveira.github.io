@@ -3,6 +3,12 @@ import NunoDoodle from "@components/NunoDoodle.astro";
 import SearchBox from "@components/SearchBox.astro";
 import WashiTape from "@components/WashiTape.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { getPublishedPosts } from "@modules/content";
+import { formatDate, toISODateString } from "@modules/content";
+
+import "../styles/pages/404.css";
+
+const recentPosts = await getPublishedPosts({ limit: 3 });
 ---
 
 <BaseLayout
@@ -58,10 +64,24 @@ import BaseLayout from "@layouts/BaseLayout.astro";
       <div class="not-found-divider" aria-hidden="true"></div>
 
       <p class="not-found-section-label">Items pressed between pages ——</p>
-      <p class="not-found-pressed-note">
-        <span class="not-found-handwritten">(nothing yet. he is thinking.)</span>
-      </p>
-
+      {recentPosts.length > 0 ? (
+        <ul class="not-found-pressed-list" role="list">
+          {recentPosts.map((post) => (
+            <li>
+              <a href={`/posts/${post.id}`} class="not-found-pressed-item">
+                <span class="not-found-pressed-title">{post.data.title}</span>
+                <time datetime={toISODateString(post.data.date)} class="not-found-pressed-date">
+                  {formatDate(post.data.date)}
+                </time>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="not-found-pressed-note">
+          <span class="not-found-handwritten">(nothing yet. he is thinking.)</span>
+        </p>
+      )}
       <div class="not-found-divider" aria-hidden="true"></div>
 
       <p class="not-found-section-label">Or, while he works ——</p>
@@ -94,269 +114,29 @@ import BaseLayout from "@layouts/BaseLayout.astro";
   </section>
 </BaseLayout>
 
-<style>
-  .not-found {
-    display: grid;
-    place-items: center;
-    min-height: 60vh;
-    padding-block: var(--ma-spacious);
-  }
-
-  .not-found-insert {
-    position: relative;
-    max-width: 680px;
-    width: 100%;
-    margin-inline: auto;
-    padding: var(--ma-broad) clamp(var(--ma-base), 5vw, var(--ma-vast))
-      var(--ma-broad) clamp(var(--ma-base), 5vw, var(--ma-vast));
-    padding-inline-start: calc(
-      clamp(var(--ma-base), 5vw, var(--ma-vast)) + 28px
-    );
-    background: var(--color-surface);
-    box-shadow: var(--shadow-card-hover);
-    border-radius: 0px;
-  }
-
-  .not-found-binding {
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: 28px;
-    background: var(--color-surface-alt);
-    border-inline-end: 1px solid var(--color-border);
-    border-start-start-radius: 0px;
-    border-end-start-radius: 0px;
-  }
-
-  .not-found-tape {
-    position: absolute;
-    inset-block-start: -0.75rem;
-    inset-inline-end: 2rem;
-  }
-
-  .not-found-header {
-    display: flex;
-    align-items: baseline;
-    gap: var(--ma-narrow);
-    margin-block-end: var(--ma-thin);
-  }
-
-  .not-found-label {
-    font-family: var(--font-mono);
-    font-size: var(--type-xs);
-    color: var(--color-text-secondary);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .not-found-code {
-    font-family: var(--font-sans);
-    font-size: var(--type-3xl);
-    color: var(--color-accent);
-    line-height: 1;
-  }
-
-  .not-found-voice {
-    font-size: clamp(var(--type-2xl), 4vw, var(--type-3xl));
-    font-weight: 800;
-    color: var(--color-text-primary);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-block-end: var(--ma-narrow);
-  }
-
-  .not-found-body {
-    font-family: var(--font-sans);
-    font-size: var(--type-md);
-    color: var(--color-text-primary);
-    line-height: 1.6;
-    margin-block-end: var(--ma-broad);
-    max-width: 52ch;
-  }
-
-  .not-found-ruled {
-    position: relative;
-    min-height: 180px;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0 27px,
-      var(--color-border) 27px 28px
-    );
-    padding: 14px 20px 18px;
-    margin-block-end: var(--ma-broad);
-    border-radius: 0px;
-  }
-
-  .not-found-note-left {
-    position: absolute;
-    inset-block-start: 44px;
-    inset-inline-start: 14px;
-  }
-
-  .not-found-note-right {
-    position: absolute;
-    inset-block-start: 110px;
-    inset-inline-end: 14px;
-  }
-
-  .not-found-handwritten {
-    font-family: var(--font-script);
-    font-size: clamp(13px, 1.25vw, 17px);
-    line-height: 1.15;
-    color: var(--color-margin-ink);
-  }
-
-  .not-found-handwritten--right {
-    color: var(--color-accent);
-  }
-  .not-found-nuno-section {
-    display: flex;
-    align-items: center;
-    gap: var(--ma-wide);
-    padding: var(--ma-narrow) var(--ma-base);
-    margin-block-end: var(--ma-broad);
-    border: 1px solid var(--color-border);
-    border-radius: 0px;
-  }
-
-  .not-found-nuno-text {
-    flex: 1;
-  }
-
-  .not-found-nuno-name {
-    font-family: var(--font-script);
-    font-size: var(--type-xl);
-    color: var(--color-text-primary);
-    line-height: 1.2;
-    margin-block-end: var(--ma-hair);
-  }
-
-  .not-found-nuno-meta {
-    font-family: var(--font-mono);
-    font-size: var(--type-sm);
-    color: var(--color-text-secondary);
-    line-height: 1.4;
-  }
-
-  .not-found-divider {
-    height: 1px;
-    background: var(--color-border);
-    margin-block-end: var(--ma-wide);
-  }
-
-  .not-found-section-label {
-    font-family: var(--font-mono);
-    font-size: var(--type-sm);
-    color: var(--color-text-secondary);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-block-end: var(--ma-narrow);
-  }
-
-  .not-found-pressed-note {
-    margin-block-end: var(--ma-broad);
-  }
-
-
-  .not-found-escapes {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--ma-narrow) var(--ma-wide);
-    margin-block-end: var(--ma-broad);
-  }
-
-  .not-found-escape {
-    display: flex;
-    align-items: center;
-    gap: var(--ma-thin);
-    color: var(--color-accent);
-    font-size: var(--type-base);
-    text-decoration: none;
-    transition: color var(--motion-duration-quick) var(--motion-easing-out);
-  }
-
-  .not-found-escape-arrow {
-    color: var(--color-text-secondary);
-    transition: color var(--motion-duration-quick) var(--motion-easing-out);
-  }
-
-  @media (hover: hover) {
-    .not-found-escape:hover {
-      color: var(--color-accent-hover);
-    }
-    .not-found-escape:hover .not-found-escape-arrow {
-      color: var(--color-accent);
-    }
-  }
-
-  .not-found-recovery {
-    margin-block-end: var(--ma-broad);
-  }
-
-  .not-found-recovery :global(.search-input:hover) {
-    border-block-end-color: var(--color-accent);
-  }
-
-  .not-found-paw {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--ma-wide);
-    margin-block-start: var(--ma-wide);
-  }
-
-  .not-found-paw-prints {
-    font-size: var(--type-base);
-    color: var(--color-text-tertiary);
-    opacity: 0.5;
-    letter-spacing: var(--ma-narrow);
-  }
-
-  .not-found-paw-text {
-    font-family: var(--font-script);
-    font-size: var(--type-lg);
-    color: var(--color-text-tertiary);
-  }
-
-  @media (max-width: 1023.98px) {
-    .not-found-tape,
-    .not-found-note-left,
-    .not-found-note-right {
-      display: none;
-    }
-  }
-
-  @media (max-width: 639.98px) {
-    .not-found-nuno-section {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--ma-narrow);
-    }
-    .not-found-escapes {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .not-found-escape {
-      transition: none;
-    }
-    .not-found-escape-arrow {
-      transition: none;
-    }
-  }
-</style>
 
 <script>
   ;(() => {
-    function focusOnFinePointer() {
-      if (!matchMedia("(pointer: fine)").matches) return;
-      const input = document.getElementById(
-        "search-input",
-      ) as HTMLInputElement | null;
-      input?.focus();
-    }
-    focusOnFinePointer();
-    document.addEventListener("astro:page-load", focusOnFinePointer);
+    const resultsEl = document.getElementById("search-results");
+    if (!resultsEl) return;
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "hidden" &&
+          !resultsEl.hasAttribute("hidden")
+        ) {
+          resultsEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      }
+    });
+
+    observer.observe(resultsEl, { attributes: true });
+
+    document.addEventListener("astro:before-swap", () => observer.disconnect(), {
+      once: true,
+    });
   })();
 </script>
+

@@ -15,6 +15,7 @@ function toIso(raw: string): string {
     return parsed.toISOString().split("T")[0];
   }
   if (import.meta.env.DEV) {
+    // biome-ignore lint/suspicious/noConsole: intentional dev-only guard
     console.warn(
       `[Timestamp] Invalid date string: "${raw}". Provide an ISO 8601 date or a parseable date string.`,
     );

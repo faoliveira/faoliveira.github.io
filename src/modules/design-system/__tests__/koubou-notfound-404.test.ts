@@ -49,10 +49,9 @@ describe("404 page — KoubouNotFound contract (Story 1.15)", () => {
     expect(notFoundSource).toMatch(/<SearchBox\b/);
   });
 
-  it("[AC #8] passes autofocus={false} and gates focus on (pointer: fine)", () => {
-    expect(notFoundSource).toMatch(/<SearchBox\b[^>]*\bautofocus=\{false\}/);
-    expect(notFoundSource).toMatch(/matchMedia\(\s*['"](\(pointer: fine\))['"]\s*\)\.matches/);
-    expect(notFoundSource).not.toMatch(/\u003cSearchBox\b[^\u003e]*\bautofocus\b(?!={false\})/);
+  it("[AC #8] passes autofocus={false} to SearchBox", () => {
+    expect(notFoundSource).toMatch(/\u003cSearchBox\b[^\u003e]*\bautofocus=\{false\}/);
+    expect(notFoundSource).not.toMatch(/\u003cSearchBox\b[^\u003e]*\bautofocus\b(?!=\{false\})/);
   });
 
   it("[AC #9] links back to home", () => {
@@ -102,8 +101,8 @@ describe("404 page — KoubouNotFound contract (Story 1.15)", () => {
     }
   });
 
-  it("[AC #17] the inline focus script survives Astro ClientRouter navigation", () => {
-    expect(notFoundSource).toMatch(/<script>[\s\S]*?astro:page-load[\s\S]*?<\/script>/);
+  it("[AC #17] the inline scroll script survives Astro ClientRouter navigation", () => {
+    expect(notFoundSource).toMatch(/\u003cscript\u003e[\s\S]*?astro:before-swap[\s\S]*?\u003c\/script\u003e/);
   });
 
   it("[NunoDoodle atom] declares a typed Props interface with size/color/tongue", () => {

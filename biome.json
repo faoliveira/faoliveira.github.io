@@ -8,7 +8,15 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "error",
+        "noForEach": "warn"
+      },
+      "suspicious": {
+        "noConsole": "error",
+        "noEmptyBlockStatements": "warn"
+      }
     }
   },
   "overrides": [
