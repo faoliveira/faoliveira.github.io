@@ -10,7 +10,6 @@ import postLayoutSource from "../../../layouts/PostLayout.astro?raw";
 import formatDateSource from "../../../modules/content/format-date.ts?raw";
 import notFoundSource from "../../../pages/404.astro?raw";
 import aboutSource from "../../../pages/about.astro?raw";
-import currentlySource from "../../../pages/currently.astro?raw";
 import designSystemSource from "../../../pages/design-system.astro?raw";
 import indexSource from "../../../pages/index.astro?raw";
 import logSource from "../../../pages/log.astro?raw";
@@ -25,8 +24,8 @@ const CJK_RANGE = /[　-〿぀-ゟ゠-ヿ一-鿿＀-￯]/;
 // functional notation in CurrentlyWidget (◀▶⏸♥♡★█░, all U+2500-U+2700-ish range).
 const EMOJI_RANGE = /[\u{1F300}-\u{1F9FF}\u{1FA00}-\u{1FAFF}]/u;
 
-// Pages that ship to the public, indexed surface. design-system.astro and currently.astro
-// are noindex+nopagefind developer references and are scanned separately.
+// Pages that ship to the public, indexed surface. design-system.astro is a
+// noindex+nopagefind developer reference and is scanned separately.
 const PRODUCTION_PAGES = [
   ["index.astro", indexSource],
   ["about.astro", aboutSource],
@@ -57,10 +56,6 @@ describe("Voice & copy + kanji audit (Story 1.17)", () => {
     expect(designSystemSource).toMatch(/CJK intentional/);
   });
 
-  it("[CJK] currently.astro is sealed noindex + nopagefind (dev-only preview surface)", () => {
-    expect(currentlySource).toMatch(/noindex=\{true\}/);
-    expect(currentlySource).toMatch(/nopagefind=\{true\}/);
-  });
 
   it("[AI-tells] site-config descriptions avoid banned phrases (AC #1, #2, #3)", () => {
     const lower = siteConfigSource.toLowerCase();

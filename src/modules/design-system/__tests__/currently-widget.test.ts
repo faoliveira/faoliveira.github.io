@@ -1,6 +1,5 @@
 // @vitest-environment node
 import widgetSource from "../../../islands/CurrentlyWidget.svelte?raw";
-import currentlySource from "../../../pages/currently.astro?raw";
 import indexSource from "../../../pages/index.astro?raw";
 
 const CJK_RANGE = /[\u{4E00}-\u{9FFF}\u{3040}-\u{309F}\u{30A0}-\u{30FF}\u{FF00}-\u{FFEF}]/u;
@@ -74,8 +73,44 @@ describe("CurrentlyWidget island contract (Story 1.20)", () => {
     expect(matches).toBeNull();
   });
 
-  it("index.astro hydrates client:visible, currently.astro hydrates client:load", () => {
+  it("index.astro hydrates client:visible, no client:load in pages", () => {
     expect(indexSource).toContain("client:visible");
-    expect(currentlySource).toContain("client:load");
+    // After AC4 (delete /currently/), no page should use client:load.
+    expect(indexSource).not.toContain("client:load");
+  });
+  it("compact mode gates reading window to 3 windows", () => {
+    expect(widgetSource).toContain("wins.reading.open && !compact");
+    expect(widgetSource).toContain("{#if !compact}");
+  });
+
+  it("cyberdeck markup exists for mobile/coarse pointer", () => {
+    expect(widgetSource).toContain(".cyberdeck");
+    expect(widgetSource).toContain(".cyberdeck-stack");
+    expect(widgetSource).toContain(".cyberdeck-card");
+    expect(widgetSource).toContain(".cyberdeck-brand");
+  });
+
+  it("reduced-motion disables marquee animation", () => {
+    expect(widgetSource).toContain(".np-track-scroll { animation: none; }");
+  });
+
+  it("clock placeholder is empty string not em-dash colon", () => {
+    expect(widgetSource).toContain('let clock = $state("");');
+    expect(widgetSource).toContain('{clock || "—"}');
+    expect(widgetSource).not.toContain('let clock = $state("—:—")');
+  });
+
+  it("repositionWindows function removed", () => {
+    expect(widgetSource).not.toContain("function repositionWindows");
+  });
+
+  it("compact surface uses min-height not height", () => {
+    expect(widgetSource).toContain("min-height: clamp");
+  });
+
+  it("TabId type added for cyberdeck tabs", () => {
+    expect(widgetSource).toContain(
+      'type TabId = "currently" | "nowplaying" | "nunotchi" | "terminal"',
+    );
   });
 });

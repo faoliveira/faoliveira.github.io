@@ -61,25 +61,25 @@ describe("Homepage — Story 1.6 Currently widget integration", () => {
   });
 });
 
-describe("Homepage — Story 1.6 two-route import audit", () => {
-  it("@islands/CurrentlyWidget.svelte appears in exactly two src/pages/*.astro files", () => {
-    const pages = listAstroFiles("src/pages");
-    const matching = pages
-      .filter((f) => readFileSync(f, "utf8").includes(ISLAND_IMPORT_PATH))
-      .map((f) => path.basename(f))
-      .sort();
+describe("Homepage — Story 1.6 single-import audit", () => {
+	it("@islands/CurrentlyWidget.svelte appears in exactly one src/pages/*.astro file", () => {
+		const pages = listAstroFiles("src/pages");
+		const matching = pages
+			.filter((f) => readFileSync(f, "utf8").includes(ISLAND_IMPORT_PATH))
+			.map((f) => path.basename(f))
+			.sort();
 
-    expect(matching).toEqual(["currently.astro", "index.astro"]);
-  });
+		expect(matching).toEqual(["index.astro"]);
+	});
 
-  it("@islands/CurrentlyWidget.svelte is not imported from src/components or src/layouts", () => {
-    for (const dir of ["src/components", "src/layouts"]) {
-      const files = walk(path.join(PROJECT_ROOT, dir));
-      const offenders = files.filter((f) => {
-        if (!f.endsWith(".astro") && !f.endsWith(".ts") && !f.endsWith(".svelte")) return false;
-        return readFileSync(f, "utf8").includes(ISLAND_IMPORT_PATH);
-      });
-      expect(offenders).toEqual([]);
-    }
-  });
+	it("@islands/CurrentlyWidget.svelte is not imported from src/components or src/layouts", () => {
+		for (const dir of ["src/components", "src/layouts"]) {
+			const files = walk(path.join(PROJECT_ROOT, dir));
+			const offenders = files.filter((f) => {
+				if (!f.endsWith(".astro") && !f.endsWith(".ts") && !f.endsWith(".svelte")) return false;
+				return readFileSync(f, "utf8").includes(ISLAND_IMPORT_PATH);
+			});
+			expect(offenders).toEqual([]);
+		}
+	});
 });

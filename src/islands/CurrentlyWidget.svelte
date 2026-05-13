@@ -32,7 +32,7 @@ let { data, dev = false, compact = false }: Props = $props();
 
 type Mood = "idle" | "eat" | "play" | "walk" | "sleep";
 type WinId = "currently" | "nowplaying" | "reading" | "nunotchi" | "terminal";
-
+type TabId = "currently" | "nowplaying" | "nunotchi" | "terminal";
 interface Win {
   x: number;
   y: number;
@@ -57,7 +57,8 @@ let terminalHistory = $state<Array<{ q: string; reply: string }>>([]);
 let mounted = $state(false);
 let reduced = $state(false);
 let coarsePointer = $state(false);
-
+let activeTab = $state<TabId>("currently");
+let surfaceWidth = $state(Infinity);
 // ── Loop pause/resume + visibility tracking ──────────────────────────────────
 let loopHandle = $state<LoopHandle | null>(null);
 let docVisible = $state(true);
@@ -71,7 +72,7 @@ const KONAMI_LEN = 10;
 let konamiBuffer: string[] = [];
 
 // ── Clock ────────────────────────────────────────────────────────────────────
-let clock = $state("—:—");
+let clock = $state("");
 let now = $state("");
 
 // ── Window manager ───────────────────────────────────────────────────────────
@@ -81,14 +82,15 @@ const initialWins: Record<WinId, Win> = {
   nowplaying: { x: 380, y: 22, z: 2, open: true, minimized: false },
   reading: { x: 28, y: 320, z: 3, rotate: -1.5, open: true, minimized: false },
   nunotchi: { x: 410, y: 220, z: 4, open: true, minimized: false },
-  terminal: { x: 24, y: 420, z: 5, open: true, minimized: false },
+  terminal: { x: 24, y: 260, z: 5, open: true, minimized: false },
 };
 let wins = $state<Record<WinId, Win>>(structuredClone(initialWins));
 
 let dragId: WinId | null = null;
 let dragOffset = { x: 0, y: 0 };
 let surfaceRect: DOMRect | null = null;
-let surface: HTMLDivElement;
+let surface = $state<HTMLDivElement | undefined>(undefined);
+let frame = $state<HTMLDivElement | undefined>(undefined);
 
 function focusWin(id: WinId) {
   topZ += 1;
@@ -183,24 +185,6 @@ function paperClose(
     css: (t: number) =>
       `transform: rotate(${rotate}deg) scale(${0.92 + 0.08 * t}); opacity: ${t}; transform-origin: 50% 35%;`,
   };
-}
-function resetDesktop() {
-  wins = structuredClone(initialWins);
-  topZ = 20;
-  repositionWindows();
-}
-
-function repositionWindows() {
-  if (!surface) return;
-  const sw = surface.getBoundingClientRect().width;
-  if (sw >= 680) return;
-
-  const pad = 10;
-  wins.currently = { ...wins.currently, x: pad, y: 12 };
-  wins.nowplaying = { ...wins.nowplaying, x: pad, y: 170 };
-  wins.reading = { ...wins.reading, x: pad, y: 310 };
-  wins.nunotchi = { ...wins.nunotchi, x: pad, y: 420 };
-  wins.terminal = { ...wins.terminal, x: pad, y: 530 };
 }
 
 // ── Game actions (also reachable from terminal commands) ─────────────────────
@@ -384,7 +368,6 @@ onMount(() => {
   coarsePointer = window.matchMedia("(pointer: coarse)").matches;
   onPointerChange = (e: MediaQueryListEvent) => {
     coarsePointer = e.matches;
-    repositionWindows();
   };
   window.matchMedia("(pointer: coarse)").addEventListener("change", onPointerChange);
 
@@ -394,10 +377,16 @@ onMount(() => {
   const loaded = loadState(getStorage());
   pet = applyOfflineDecay(loaded.state, Date.now());
   mounted = true;
-  repositionWindows();
 
-  resizeObserver = new ResizeObserver(() => repositionWindows());
-  if (surface) resizeObserver.observe(surface);
+  resizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      surfaceWidth = entry.contentRect.width;
+    }
+  });
+  if (frame) {
+    surfaceWidth = frame.getBoundingClientRect().width;
+    resizeObserver.observe(frame);
+  }
 
   const updateClock = () => {
     const d = new Date();
@@ -425,11 +414,13 @@ onMount(() => {
 
   // DevTools signature — paper-and-matcha tag for tinkerers who open the console.
   // Encouraged by the Currently widget being the most poked-at island.
+  // biome-ignore lint/suspicious/noConsole: intentional DevTools signature
   console.log(
     "%c fa.workshop %c felipeo.me · the koubou ",
     "background:oklch(0.45 0.10 155);color:oklch(0.97 0.012 82);padding:2px 6px;font:600 11px ui-monospace,monospace;border-radius:3px;",
     "color:oklch(0.45 0.02 60);padding:2px 6px;font:11px ui-monospace,monospace;",
   );
+  // biome-ignore lint/suspicious/noConsole: intentional DevTools signature
   console.log(
     "%ctry typing help in the terminal. nuno knows more than he lets on.",
     "color:oklch(0.40 0.04 40);font:italic 13px Caveat,cursive;",
@@ -463,10 +454,10 @@ $effect(() => {
 
 // ── Pause / resume the Kontra loop + run the active-time decay tick ──────────
 $effect(() => {
-  const open = wins.nunotchi.open;
-  const minimized = wins.nunotchi.minimized;
+  const isCyberdeck = coarsePointer || surfaceWidth < 720;
+  const open = isCyberdeck ? true : wins.nunotchi.open && !wins.nunotchi.minimized;
   const visible = docVisible;
-  if (!open || minimized || !visible) {
+  if (!open || !visible) {
     loopHandle?.pause();
     if (decayTimer) {
       clearInterval(decayTimer);
@@ -496,24 +487,173 @@ const playable = $derived(data.music.source.kind !== "none");
 
 <svelte:window onpointermove={onDragMove} onpointerup={onDragEnd} />
 
-<div class="widget-frame" data-busy={busy} data-compact={compact}>
+<div class="widget-frame" data-busy={busy} data-compact={compact} bind:this={frame}>
   {#if dev}
     <div class="widget-toolbar">
       <span class="widget-title">System-1 paper · widget preview</span>
-      <div class="widget-toolbar-actions">
-        <button type="button" class="tb" onclick={resetDesktop}>↺ reset desktop</button>
-      </div>
+		<div class="widget-toolbar-actions">
+			<button type="button" class="tb" onclick={() => { wins = structuredClone(initialWins); topZ = 20; }}>↺ reset desktop</button>
+		</div>
     </div>
   {/if}
+	{#if mounted && (coarsePointer || 720 > surfaceWidth)}
+		<!-- Cyberdeck layout (Palm-style) -->
+		<!-- Cyberdeck layout (Palm-style) -->
+		<div class="cyberdeck">
+			<div class="cyberdeck-top">
+				<span class="cyberdeck-brand">★ {now} · {clock}</span>
+			</div>
+			<div class="cyberdeck-stack">
+				<!-- Currently card -->
+				<div class="paper-win cyberdeck-card">
+					<div class="title-bar" role="presentation">
+						<span class="title">System</span>
+					</div>
+					<div class="win-body curr-body">
+						<dl class="curr-fields">
+							<div><dt>mood</dt><dd>{data.mood}</dd></div>
+							<div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()} · p.{data.reading.page}</dd></div>
+							<div><dt>music</dt><dd>{data.music.artist.toLowerCase()} · {data.music.title.toLowerCase()}</dd></div>
+							<div><dt>tabs</dt><dd>{data.tabs} (halp)</dd></div>
+							<div><dt>status</dt><dd>{data.status}</dd></div>
+							<div><dt>nuno</dt><dd>{hearts} · ⚡{pet.energy}% · {pet.walks} walks today</dd></div>
+						</dl>
+					</div>
+				</div>
 
-  <div
-		class="surface"
-		data-coarse={coarsePointer}
-    bind:this={surface}
-    role="region"
-    aria-label="System-1 paper desktop"
-		tabindex="-1"
-  >
+				<!-- Now Playing card -->
+				<div class="paper-win cyberdeck-card">
+					<div class="title-bar" role="presentation">
+						<span class="title">Now Playing</span>
+					</div>
+					<div class="win-body">
+						<div class="np-controls">
+							<button type="button" class="paper-btn" aria-label="Restart" disabled={!playable} onclick={() => audio?.seek(0)}>◀◀</button>
+							<button
+								type="button"
+								class="paper-btn solid"
+								aria-label={audioState.playing ? "Pause" : "Play"}
+								disabled={!playable}
+								onclick={togglePlay}
+							>
+								{audioState.playing ? "⏸" : "▶"}
+							</button>
+							<button type="button" class="paper-btn" aria-label="Skip" disabled={!playable} onclick={() => audio?.seek(audioDuration - 1)}>▶▶</button>
+							<span class="np-track" title={trackLine}>
+								<span class="np-track-scroll">
+									<span>{trackLine}</span>
+									<span aria-hidden="true">{trackLine}</span>
+								</span>
+							</span>
+						</div>
+						<div
+							class="np-progress"
+							class:seekable={playable}
+							role="slider"
+							aria-label="Seek"
+							aria-valuemin={0}
+							aria-valuemax={Math.max(1, Math.round(audioDuration))}
+							aria-valuenow={Math.round(audioPos)}
+							aria-valuetext={`${fmtSpoken(audioPos)} of ${fmtSpoken(audioDuration)}`}
+							tabindex={playable ? 0 : -1}
+							onpointerdown={seekFromBar}
+							onkeydown={(e) => {
+								if (!playable || !audio) return;
+								if (e.key === "ArrowRight") audio.seek((audioPos || 0) + 5);
+								else if (e.key === "ArrowLeft") audio.seek(Math.max(0, (audioPos || 0) - 5));
+								else return;
+								e.preventDefault();
+								audioState = audio.getState();
+							}}
+						>
+							<div style:transform={`scaleX(${audioRatio})`}></div>
+						</div>
+						<div class="np-times">
+							<span>{audioMounted ? fmtTime(audioPos) : "0:00"}</span>
+							<span>
+								{audioMounted ? fmtTime(audioDuration) : data.music.duration}
+								{#if audioState.preview}<span class="preview-tag"> · preview</span>{/if}
+							</span>
+						</div>
+						<div class="audio-host" bind:this={audioHost} aria-hidden="true"></div>
+					</div>
+				</div>
+
+				<!-- Nunotchi card -->
+				<div class="paper-win cyberdeck-card">
+					<div class="title-bar" role="presentation">
+						<span class="title">Nunotchi.app</span>
+					</div>
+					<div class="win-body">
+						<div class="lcd" data-mood={busy ?? "idle"}>
+							<div class="lcd-status">
+								<span aria-label="happiness">{hearts}</span>
+								<span>age {pet.age}</span>
+							</div>
+							{#if mounted}
+								<div class="lcd-stage">
+									<NunotchiGame pose={busy ?? "idle"} width={234} height={70} bind:loopHandle />
+								</div>
+								<div class="lcd-msg">{msg}</div>
+							{:else}
+								<div class="lcd-boot"><div class="boot-label">loading…</div></div>
+							{/if}
+						</div>
+						<div class="hunger-row">
+							<span class="muted">fed</span>
+							<span class="bar">{hungerBar}</span>
+							<span class="muted">hungry</span>
+						</div>
+						<div class="game-buttons">
+							<button type="button" class="paper-btn" disabled={!!busy} onclick={feed}>A · feed</button>
+							<button type="button" class="paper-btn" disabled={!!busy} onclick={play}>B · play</button>
+							<button type="button" class="paper-btn solid" disabled={!!busy} onclick={walk}>C · walk</button>
+							<button type="button" class="paper-btn" disabled={!!busy} onclick={nap} aria-label="Nap">z</button>
+						</div>
+						<div class="game-meta">
+							<span>walks today: <b>{pet.walks}</b></span>
+							<span>energy: <b>{pet.energy}%</b></span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Terminal card -->
+				<div class="paper-win cyberdeck-card">
+					<div class="title-bar" role="presentation">
+						<span class="title">Terminal</span>
+					</div>
+					<div class="win-body terminal-body">
+						<div class="terminal-scroll">
+							{#each terminalHistory as entry}
+								<div class="terminal-line">
+									<span class="cmd-prompt">$</span>
+									<span class="cmd-q">{entry.q}</span>
+								</div>
+								<div class="terminal-line reply">
+									<span class="cmd-arrow">→</span>
+									<span class="cmd-reply">{entry.reply}</span>
+								</div>
+							{/each}
+						</div>
+						<form class="terminal-form" onsubmit={ask}>
+							<span class="prompt">$</span>
+							<input
+								bind:value={askInput}
+								onkeydown={onKonamiKey}
+								placeholder="try: sit · help"
+								aria-label="Terminal — type a command"
+								spellcheck="false"
+								autocapitalize="off"
+								autocomplete="off"
+							/>
+							<span class="enter">[↵]</span>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	{:else}
+		<div class="surface" data-coarse={coarsePointer} bind:this={surface} role="region" aria-label="System-1 paper desktop" tabindex="-1">
 	    {#if wins.currently.open}
 	      <div
 	        class="paper-win"
@@ -544,7 +684,7 @@ const playable = $derived(data.music.source.kind !== "none");
 	        <div class="win-body curr-body">
 	          <dl class="curr-fields">
 	            <div><dt>mood</dt><dd>{data.mood}</dd></div>
-	            <div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()}</dd></div>
+				<div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()} · p.{data.reading.page}</dd></div>
 	            <div><dt>music</dt><dd>{data.music.artist.toLowerCase()} · {data.music.title.toLowerCase()}</dd></div>
 	            <div><dt>tabs</dt><dd>{data.tabs} (halp)</dd></div>
 	            <div><dt>status</dt><dd>{data.status}</dd></div>
@@ -635,7 +775,7 @@ const playable = $derived(data.music.source.kind !== "none");
       </div>
     {/if}
 
-    {#if wins.reading.open}
+		{#if wins.reading.open && !compact}
       <div
         class="paper-win"
         role="group"
@@ -738,7 +878,7 @@ const playable = $derived(data.music.source.kind !== "none");
 
 
 
-	    {#if wins.terminal.open}
+		{#if wins.terminal.open}
 	      <div
 	        class="paper-win"
 	        role="group"
@@ -800,10 +940,12 @@ const playable = $derived(data.music.source.kind !== "none");
 	        <PawPrint size={20} weight="regular" aria-hidden="true" />
 	        <span class="icon-label">Nunotchi</span>
 	      </button>
-	      <button type="button" class="icon-btn" onclick={() => toggleWin("reading")}>
-	        <FileText size={18} weight="regular" aria-hidden="true" />
-	        <span class="icon-label">Reading.txt</span>
-	      </button>
+				{#if !compact}
+					<button type="button" class="icon-btn" onclick={() => toggleWin("reading")}>
+						<FileText size={18} weight="regular" aria-hidden="true" />
+						<span class="icon-label">Reading.txt</span>
+					</button>
+				{/if}
 	      <button type="button" class="icon-btn" onclick={() => toggleWin("nowplaying")}>
 	        <VinylRecord size={20} weight="regular" aria-hidden="true" />
 	        <span class="icon-label">Music</span>
@@ -818,11 +960,12 @@ const playable = $derived(data.music.source.kind !== "none");
 	      </button>
 	    </div>
 
-	    <div class="menu-bar">
-	      <span class="menu-items">★ File · Edit · View</span>
-	      <span class="clock">{clock}</span>
-	    </div>
-  </div>
+		<div class="menu-bar">
+			<span class="menu-items">★ File · Edit · View</span>
+			<span class="clock">{clock || "—"}</span>
+		</div>
+	</div>
+	{/if}
 </div>
 
 <style>
@@ -840,7 +983,19 @@ const playable = $derived(data.music.source.kind !== "none");
     border: 1.5px solid var(--ink);
     background: color-mix(in oklch, var(--paper) 92%, var(--ink));
     box-shadow: var(--shadow-card-hover);
-  }
+	}
+	.widget-frame[data-compact="true"] {
+		padding: 16px;
+		background: var(--paper);
+		border: 1.5px solid var(--ink);
+		box-shadow: 4px 4px 0 var(--ink);
+		border-radius: 2px;
+		max-inline-size: min(760px, 100%);
+		margin-inline: auto;
+	}
+	:global(html[data-theme="nightfall"]) .widget-frame[data-compact="true"] {
+		box-shadow: 4px 4px 0 var(--ink);
+	}
   :global(html[data-theme="nightfall"]) .widget-frame {
     --ink: oklch(0.92 0.02 80);
     --paper: oklch(0.22 0.035 280);
@@ -896,7 +1051,7 @@ const playable = $derived(data.music.source.kind !== "none");
     touch-action: pan-y;
   }
 	.widget-frame[data-compact="true"] .surface {
-		height: clamp(480px, 55vh, 580px);
+		min-height: clamp(360px, 42vh, 460px);
 	}
 
   .paper-win {
@@ -1283,11 +1438,12 @@ const playable = $derived(data.music.source.kind !== "none");
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.04em;
-  }
+	}
 
 	  @media (prefers-reduced-motion: reduce) {
 	    .paper-win { transition: none; }
 	    .zoom::after { transition: none; }
+	    .np-track-scroll { animation: none; }
 	  }
 
 	  @media (max-width: 720px) {
@@ -1298,4 +1454,113 @@ const playable = $derived(data.music.source.kind !== "none");
 	    .close::before { inset: -10px; }
 	    .close, .zoom { width: 14px; height: 14px; }
 	  }
+
+	  /* ── Cyberdeck (mobile / coarse pointer) ─────────────────────────────── */
+	  .cyberdeck {
+	    display: flex;
+	    flex-direction: column;
+	    gap: 8px;
+	    font-family: var(--font-mono);
+	    color: var(--ink);
+	  }
+	  .cyberdeck-top {
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    gap: 8px;
+	    padding: 6px 10px;
+	    border: 2px solid var(--ink);
+	    background: var(--paper);
+	    box-shadow: 3px 3px 0 var(--ink);
+	  }
+	  .cyberdeck-brand {
+	    font-size: 11px;
+	    font-weight: 700;
+	    letter-spacing: 0.04em;
+	    white-space: nowrap;
+	  }
+	  .cyberdeck-stack {
+	    display: flex;
+	    flex-direction: column;
+	    gap: 12px;
+	    padding: 8px;
+	    background: var(--paper);
+	    background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
+	    background-size: 4px 4px;
+	    border: 2px solid var(--ink);
+	    box-shadow: 3px 3px 0 var(--ink);
+	    overflow-y: auto;
+	    max-height: 70vh;
+	    touch-action: pan-y;
+	  }
+	  .cyberdeck-card {
+	    border: 2px solid var(--ink);
+	    box-shadow: 3px 3px 0 var(--ink);
+	    background: var(--paper);
+	    position: relative;
+	  }
+	  .cyberdeck-card::before,
+	  .cyberdeck-card::after {
+	    content: "";
+	    position: absolute;
+	    width: 6px;
+	    height: 6px;
+	    border: 1.5px solid var(--ink);
+	    background: var(--paper);
+	    z-index: 1;
+	  }
+	  .cyberdeck-card::before {
+	    top: -4px;
+	    left: -4px;
+	  }
+	  .cyberdeck-card::after {
+	    bottom: -4px;
+	    right: -4px;
+	  }
+	  .cyberdeck-card .title-bar {
+	    border-bottom: 2px solid var(--ink);
+	    padding: 4px 8px;
+	    font-size: 10px;
+	    font-weight: 700;
+	    letter-spacing: 0.06em;
+	    text-transform: uppercase;
+	    background: var(--ink);
+	    color: var(--paper);
+	    display: flex;
+	    align-items: center;
+	    gap: 4px;
+	  }
+	.cyberdeck-card .title {
+		background: transparent;
+		padding: 0;
+	}
+	  .cyberdeck-card .title-bar::before {
+	    content: "◆";
+	    font-size: 8px;
+	  }
+	  .cyberdeck-card .win-body {
+	    padding: 10px;
+	  }
+	  .cyberdeck-bottom {
+	    display: flex;
+	    gap: 6px;
+	    justify-content: center;
+	    padding: 8px;
+	    border: 2px solid var(--ink);
+	    background: var(--paper);
+	    box-shadow: 3px 3px 0 var(--ink);
+	  }
+	  .cyberdeck-bottom .paper-btn {
+	    flex: 1;
+	    text-align: center;
+	    font-size: 11px;
+	    padding: 6px 8px;
+	    border: 2px solid var(--ink);
+	    box-shadow: 2px 2px 0 var(--ink);
+	  }
+	  .cyberdeck-bottom .paper-btn:active {
+	    transform: translate(2px, 2px);
+	    box-shadow: none;
+	  }
+
 </style>

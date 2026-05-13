@@ -15,7 +15,7 @@ export default defineConfig({
   vite: {
     resolve: {
       mainFields: ["svelte", "module", "main"],
-      conditions: ["svelte"],
+		  conditions: ["svelte", "browser"],
       alias: {
         "@assets": fileURLToPath(new URL("./src/assets", import.meta.url)),
       },
@@ -52,10 +52,9 @@ export default defineConfig({
     }),
     mdx(),
     sitemap({
-      filter: (page) =>
-        page !== "https://felipeo.me/404/" &&
-        page !== "https://felipeo.me/currently/" &&
-        !page.startsWith("https://felipeo.me/design-system/"),
+		  filter: (page) =>
+		    page !== "https://felipeo.me/404/" &&
+		    !page.startsWith("https://felipeo.me/design-system/"),
     }),
     svelte(),
   ],

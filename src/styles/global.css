@@ -94,6 +94,9 @@ body {
   padding-block-end: var(--ma-breath);
 }
 
+/* ── Astro Islands: ensure client:visible works ── */
+astro-island { display: block !important; }
+
 /* ── Print Styles ── */
 @media print {
   /* Hide layout chrome */

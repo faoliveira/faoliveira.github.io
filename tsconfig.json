@@ -11,5 +11,5 @@
       "@assets/*": ["src/assets/*"]
     }
   },
-  "exclude": ["docs", "dist", "node_modules"]
+  "exclude": ["docs", "dist", "node_modules", "**/__tests__"]
 }
