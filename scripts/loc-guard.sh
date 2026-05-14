@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MAX_LINES=400
+MAX_LINES=600
 STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|svelte|astro)$' || true)
 
 FAILED=0

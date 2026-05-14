@@ -1425,9 +1425,16 @@ const playable = $derived(data.music.source.kind !== "none");
 	    padding: 8px;
 	    font-size: 11px;
 	    line-height: 1.5;
-	    background:
-	      radial-gradient(color-mix(in oklch, var(--ink) 8%, transparent) 1px, transparent 1px);
-	    background-size: 4px 4px;
+	    background: var(--ink);
+	    color: var(--paper);
+	    /* Subtle horizontal scanlines — 1-bit, ink + paper only. */
+	    background-image: repeating-linear-gradient(
+	      0deg,
+	      transparent,
+	      transparent 2px,
+	      color-mix(in oklch, var(--paper) 5%, transparent) 2px,
+	      color-mix(in oklch, var(--paper) 5%, transparent) 3px
+	    );
 	  }
 	  .terminal-scroll {
 	    overflow-y: auto;
@@ -1438,7 +1445,7 @@ const playable = $derived(data.music.source.kind !== "none");
 	    font-family: var(--font-mono);
 	  }
 	  .terminal-scroll::-webkit-scrollbar { width: 4px; }
-	  .terminal-scroll::-webkit-scrollbar-thumb { background: var(--ink-soft); }
+	  .terminal-scroll::-webkit-scrollbar-thumb { background: var(--paper); }
 	  .terminal-line {
 	    display: flex;
 	    gap: 4px;
@@ -1447,17 +1454,16 @@ const playable = $derived(data.music.source.kind !== "none");
 	  }
 	  .terminal-line.reply {
 	    padding-left: 12px;
-	    opacity: 0.85;
 	  }
 	  .terminal-form {
 	    display: flex;
 	    align-items: center;
 	    gap: 6px;
-	    border-top: 1.5px solid var(--ink-soft);
+	    border-top: 1.5px solid var(--paper);
 	    padding-top: 6px;
 	    margin-top: 2px;
 	  }
-	  .terminal-form .prompt { color: var(--color-accent); font-weight: 700; }
+	  .terminal-form .prompt { color: var(--paper); font-weight: 400; }
 	  .terminal-form input {
 	    flex: 1;
 	    background: transparent;
@@ -1465,10 +1471,16 @@ const playable = $derived(data.music.source.kind !== "none");
 	    outline: none;
 	    font-family: var(--font-mono);
 	    font-size: 11px;
-	    color: var(--ink);
+	    color: var(--paper);
+	    caret-color: var(--paper);
 	    min-width: 0;
 	  }
-	  .terminal-form .enter { font-size: 9px; color: var(--ink-tertiary); letter-spacing: 0.1em; }
+	  .terminal-form .enter { font-size: 9px; color: var(--paper); letter-spacing: 0.1em; }
+	  /* 1-bit overrides: terminal uses only ink + paper, no accent or mixed tones. */
+	  .terminal-body .cmd-prompt { color: var(--paper); font-weight: 400; }
+	  .terminal-body .cmd-q     { color: var(--paper); font-weight: 400; }
+	  .terminal-body .cmd-arrow { color: var(--paper); }
+	  .terminal-body .cmd-reply { color: var(--paper); }
 
   /* ── Menu bar ── */
   .menu-bar {
