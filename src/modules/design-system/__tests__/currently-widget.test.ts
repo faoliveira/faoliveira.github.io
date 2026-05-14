@@ -108,9 +108,43 @@ describe("CurrentlyWidget island contract (Story 1.20)", () => {
     expect(widgetSource).toContain("min-height: clamp");
   });
 
-  it("TabId type added for cyberdeck tabs", () => {
-    expect(widgetSource).toContain(
-      'type TabId = "currently" | "nowplaying" | "nunotchi" | "terminal"',
-    );
+  it("AC8 frame chrome treatment A (deckle) is applied to the compact frame", () => {
+    expect(widgetSource).toContain('.widget-frame[data-compact="true"]');
+    expect(widgetSource).toContain("box-shadow: 4px 4px 0 var(--ink)");
+    expect(widgetSource).toContain("max-inline-size: min(760px, 100%)");
+  });
+
+  it("AC11 cyberdeck has a labeled region and per-card group roles (G-AMENDED)", () => {
+    expect(widgetSource).toContain('class="cyberdeck" role="region" aria-label="Cyberdeck"');
+    expect(widgetSource).toContain('role="group" aria-label="System"');
+    expect(widgetSource).toContain('role="group" aria-label="Now Playing"');
+    expect(widgetSource).toContain('role="group" aria-label="Nunotchi"');
+    expect(widgetSource).toContain('role="group" aria-label="Terminal"');
+  });
+
+  it("AC15 interaction wiring is regression-locked (drag, NP controls, Nunotchi)", () => {
+    expect(widgetSource).toContain("onpointerdown={(e) => startDrag(e,");
+    expect(widgetSource).toContain("onclick={togglePlay}");
+    expect(widgetSource).toContain("onclick={feed}");
+    expect(widgetSource).toContain("onclick={play}");
+    expect(widgetSource).toContain("onclick={walk}");
+    expect(widgetSource).toContain("onclick={nap}");
+  });
+
+  it("cyberdeck honors nunotchi minimized state — pet loop pauses on mobile", () => {
+    expect(widgetSource).toContain("wins.nunotchi.open && !wins.nunotchi.minimized");
+    expect(widgetSource).toContain("{#if !wins.nunotchi.minimized}");
+    expect(widgetSource).toContain('aria-label={wins.nunotchi.minimized ? "Expand Nunotchi"');
+  });
+
+  it("cyberdeck stack does not trap touch scroll (no max-height/overflow-y)", () => {
+    expect(widgetSource).not.toMatch(/\.cyberdeck-stack\s*{[^}]*overflow-y:\s*auto/);
+    expect(widgetSource).not.toMatch(/\.cyberdeck-stack\s*{[^}]*max-height:\s*70vh/);
+    expect(widgetSource).toContain("touch-action: auto");
+  });
+
+  it("reading.page is guarded when the schema field is absent", () => {
+    expect(widgetSource).toContain("{#if data.reading.page} · p.{data.reading.page}{/if}");
+    expect(widgetSource).not.toContain(" · p.{data.reading.page}</dd>");
   });
 });

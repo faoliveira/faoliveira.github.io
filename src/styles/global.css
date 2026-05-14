@@ -94,7 +94,12 @@ body {
   padding-block-end: var(--ma-breath);
 }
 
-/* ── Astro Islands: ensure client:visible works ── */
+/* ── Astro Islands ──
+   `<astro-island>` is inline by default; `client:visible` uses an
+   IntersectionObserver that measures zero-height boxes as never-visible,
+   so the Currently widget would not hydrate on mobile. Forcing block
+   display (Story 1.22 AC15 hydration fix) keeps the observer honest.
+   `!important` overrides component-level inline display rules. */
 astro-island { display: block !important; }
 
 /* ── Print Styles ── */

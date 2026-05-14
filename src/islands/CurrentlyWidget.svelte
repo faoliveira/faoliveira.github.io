@@ -32,7 +32,6 @@ let { data, dev = false, compact = false }: Props = $props();
 
 type Mood = "idle" | "eat" | "play" | "walk" | "sleep";
 type WinId = "currently" | "nowplaying" | "reading" | "nunotchi" | "terminal";
-type TabId = "currently" | "nowplaying" | "nunotchi" | "terminal";
 interface Win {
   x: number;
   y: number;
@@ -57,8 +56,10 @@ let terminalHistory = $state<Array<{ q: string; reply: string }>>([]);
 let mounted = $state(false);
 let reduced = $state(false);
 let coarsePointer = $state(false);
-let activeTab = $state<TabId>("currently");
-let surfaceWidth = $state(Infinity);
+// Initial value 0 ensures the cyberdeck branch wins on hydration until the
+// ResizeObserver reports a real width. With Infinity, mobile hydrated to the
+// desktop layout for one frame before swapping.
+let surfaceWidth = $state(0);
 // ── Loop pause/resume + visibility tracking ──────────────────────────────────
 let loopHandle = $state<LoopHandle | null>(null);
 let docVisible = $state(true);
@@ -365,11 +366,12 @@ let onPointerChange: ((e: MediaQueryListEvent) => void) | undefined;
 onMount(() => {
   reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   docVisible = document.visibilityState === "visible";
-  coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+  pointerMedia = window.matchMedia("(pointer: coarse)");
+  coarsePointer = pointerMedia.matches;
   onPointerChange = (e: MediaQueryListEvent) => {
     coarsePointer = e.matches;
   };
-  window.matchMedia("(pointer: coarse)").addEventListener("change", onPointerChange);
+  pointerMedia.addEventListener("change", onPointerChange);
 
   // Persistence: hydrate pet from localStorage and apply offline decay
   // BEFORE flipping the SSR branch off, so the egg-hatch frame never paints
@@ -384,7 +386,8 @@ onMount(() => {
     }
   });
   if (frame) {
-    surfaceWidth = frame.getBoundingClientRect().width;
+    // clientWidth matches contentRect (padding-excluded) so both readings agree.
+    surfaceWidth = frame.clientWidth;
     resizeObserver.observe(frame);
   }
 
@@ -453,9 +456,10 @@ $effect(() => {
 });
 
 // ── Pause / resume the Kontra loop + run the active-time decay tick ──────────
+// `wins.nunotchi.minimized` is honored in both layouts — on cyberdeck the
+// minimize control collapses the card body and stops the loop too.
 $effect(() => {
-  const isCyberdeck = coarsePointer || surfaceWidth < 720;
-  const open = isCyberdeck ? true : wins.nunotchi.open && !wins.nunotchi.minimized;
+  const open = wins.nunotchi.open && !wins.nunotchi.minimized;
   const visible = docVisible;
   if (!open || !visible) {
     loopHandle?.pause();
@@ -471,6 +475,28 @@ $effect(() => {
       pet = tickDecay(pet, 60_000);
       saveState(getStorage(), pet, Date.now());
     }, 60_000);
+  }
+});
+
+// ── Branch swap cleanup ──────────────────────────────────────────────────────
+// When the layout flips between desktop and cyberdeck (viewport resize across
+// 720px, rotation, hardware pointer attach/detach on iPadOS), `bind:this`
+// targets in the unmounting branch detach. Active drag pointer-capture and the
+// mounted audio iframe would otherwise survive on stale nodes. Reset both so
+// the next interaction re-attaches cleanly.
+let _lastIsCyberdeck = false;
+$effect(() => {
+  if (!mounted) return;
+  const isCyberdeck = coarsePointer || surfaceWidth < 720;
+  if (isCyberdeck === _lastIsCyberdeck) return;
+  _lastIsCyberdeck = isCyberdeck;
+  dragId = null;
+  surfaceRect = null;
+  if (audioMounted) {
+    audio?.destroy();
+    audio = null;
+    audioMounted = false;
+    audioState = { playing: false, position: 0, duration: 0 };
   }
 });
 
@@ -492,27 +518,37 @@ const playable = $derived(data.music.source.kind !== "none");
     <div class="widget-toolbar">
       <span class="widget-title">System-1 paper · widget preview</span>
 		<div class="widget-toolbar-actions">
-			<button type="button" class="tb" onclick={() => { wins = structuredClone(initialWins); topZ = 20; }}>↺ reset desktop</button>
+			<button type="button" class="tb" onclick={() => {
+				const fresh = structuredClone(initialWins);
+				const innerW = frame?.clientWidth ?? 0;
+				if (innerW > 0) {
+					// Clamp default x so windows don't reset off-screen on narrower frames.
+					for (const k of Object.keys(fresh) as WinId[]) {
+						fresh[k].x = Math.min(fresh[k].x, Math.max(8, innerW - 100));
+					}
+				}
+				wins = fresh;
+				topZ = 20;
+			}}>↺ reset desktop</button>
 		</div>
     </div>
   {/if}
 	{#if mounted && (coarsePointer || 720 > surfaceWidth)}
-		<!-- Cyberdeck layout (Palm-style) -->
-		<!-- Cyberdeck layout (Palm-style) -->
-		<div class="cyberdeck">
+		<!-- Cyberdeck layout (vertical stack — AC3=G-AMENDED 2026-05-14) -->
+		<div class="cyberdeck" role="region" aria-label="Cyberdeck">
 			<div class="cyberdeck-top">
 				<span class="cyberdeck-brand">★ {now} · {clock}</span>
 			</div>
 			<div class="cyberdeck-stack">
 				<!-- Currently card -->
-				<div class="paper-win cyberdeck-card">
+				<div class="paper-win cyberdeck-card" role="group" aria-label="System">
 					<div class="title-bar" role="presentation">
 						<span class="title">System</span>
 					</div>
 					<div class="win-body curr-body">
 						<dl class="curr-fields">
 							<div><dt>mood</dt><dd>{data.mood}</dd></div>
-							<div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()} · p.{data.reading.page}</dd></div>
+							<div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()}{#if data.reading.page} · p.{data.reading.page}{/if}</dd></div>
 							<div><dt>music</dt><dd>{data.music.artist.toLowerCase()} · {data.music.title.toLowerCase()}</dd></div>
 							<div><dt>tabs</dt><dd>{data.tabs} (halp)</dd></div>
 							<div><dt>status</dt><dd>{data.status}</dd></div>
@@ -522,7 +558,7 @@ const playable = $derived(data.music.source.kind !== "none");
 				</div>
 
 				<!-- Now Playing card -->
-				<div class="paper-win cyberdeck-card">
+				<div class="paper-win cyberdeck-card" role="group" aria-label="Now Playing">
 					<div class="title-bar" role="presentation">
 						<span class="title">Now Playing</span>
 					</div>
@@ -538,7 +574,7 @@ const playable = $derived(data.music.source.kind !== "none");
 							>
 								{audioState.playing ? "⏸" : "▶"}
 							</button>
-							<button type="button" class="paper-btn" aria-label="Skip" disabled={!playable} onclick={() => audio?.seek(audioDuration - 1)}>▶▶</button>
+							<button type="button" class="paper-btn" aria-label="Skip" disabled={!playable} onclick={async () => { await ensureAudio(); audio?.seek(Math.max(0, audioDuration - 1)); }}>▶▶</button>
 							<span class="np-track" title={trackLine}>
 								<span class="np-track-scroll">
 									<span>{trackLine}</span>
@@ -554,7 +590,7 @@ const playable = $derived(data.music.source.kind !== "none");
 							aria-valuemin={0}
 							aria-valuemax={Math.max(1, Math.round(audioDuration))}
 							aria-valuenow={Math.round(audioPos)}
-							aria-valuetext={`${fmtSpoken(audioPos)} of ${fmtSpoken(audioDuration)}`}
+							aria-valuetext={audioMounted ? `${fmtSpoken(audioPos)} of ${fmtSpoken(audioDuration)}` : "audio not loaded"}
 							tabindex={playable ? 0 : -1}
 							onpointerdown={seekFromBar}
 							onkeydown={(e) => {
@@ -580,51 +616,61 @@ const playable = $derived(data.music.source.kind !== "none");
 				</div>
 
 				<!-- Nunotchi card -->
-				<div class="paper-win cyberdeck-card">
-					<div class="title-bar" role="presentation">
+				<div class="paper-win cyberdeck-card" role="group" aria-label="Nunotchi" data-minimized={wins.nunotchi.minimized}>
+					<div class="title-bar cyberdeck-title-bar" role="presentation">
 						<span class="title">Nunotchi.app</span>
+						<button
+							type="button"
+							class="cyberdeck-zoom"
+							class:active={wins.nunotchi.minimized}
+							aria-label={wins.nunotchi.minimized ? "Expand Nunotchi" : "Minimize Nunotchi"}
+							aria-expanded={!wins.nunotchi.minimized}
+							onclick={() => minimizeWin("nunotchi")}
+						>—</button>
 					</div>
-					<div class="win-body">
-						<div class="lcd" data-mood={busy ?? "idle"}>
-							<div class="lcd-status">
-								<span aria-label="happiness">{hearts}</span>
-								<span>age {pet.age}</span>
-							</div>
-							{#if mounted}
-								<div class="lcd-stage">
-									<NunotchiGame pose={busy ?? "idle"} width={234} height={70} bind:loopHandle />
+					{#if !wins.nunotchi.minimized}
+						<div class="win-body">
+							<div class="lcd" data-mood={busy ?? "idle"}>
+								<div class="lcd-status">
+									<span aria-label="happiness">{hearts}</span>
+									<span>age {pet.age}</span>
 								</div>
-								<div class="lcd-msg">{msg}</div>
-							{:else}
-								<div class="lcd-boot"><div class="boot-label">loading…</div></div>
-							{/if}
+								{#if mounted}
+									<div class="lcd-stage">
+										<NunotchiGame pose={busy ?? "idle"} width={234} height={70} bind:loopHandle />
+									</div>
+									<div class="lcd-msg">{msg}</div>
+								{:else}
+									<div class="lcd-boot"><div class="boot-label">loading…</div></div>
+								{/if}
+							</div>
+							<div class="hunger-row">
+								<span class="muted">fed</span>
+								<span class="bar">{hungerBar}</span>
+								<span class="muted">hungry</span>
+							</div>
+							<div class="game-buttons">
+								<button type="button" class="paper-btn" disabled={!!busy} onclick={feed}>A · feed</button>
+								<button type="button" class="paper-btn" disabled={!!busy} onclick={play}>B · play</button>
+								<button type="button" class="paper-btn solid" disabled={!!busy} onclick={walk}>C · walk</button>
+								<button type="button" class="paper-btn" disabled={!!busy} onclick={nap} aria-label="Nap">z</button>
+							</div>
+							<div class="game-meta">
+								<span>walks today: <b>{pet.walks}</b></span>
+								<span>energy: <b>{pet.energy}%</b></span>
+							</div>
 						</div>
-						<div class="hunger-row">
-							<span class="muted">fed</span>
-							<span class="bar">{hungerBar}</span>
-							<span class="muted">hungry</span>
-						</div>
-						<div class="game-buttons">
-							<button type="button" class="paper-btn" disabled={!!busy} onclick={feed}>A · feed</button>
-							<button type="button" class="paper-btn" disabled={!!busy} onclick={play}>B · play</button>
-							<button type="button" class="paper-btn solid" disabled={!!busy} onclick={walk}>C · walk</button>
-							<button type="button" class="paper-btn" disabled={!!busy} onclick={nap} aria-label="Nap">z</button>
-						</div>
-						<div class="game-meta">
-							<span>walks today: <b>{pet.walks}</b></span>
-							<span>energy: <b>{pet.energy}%</b></span>
-						</div>
-					</div>
+					{/if}
 				</div>
 
 				<!-- Terminal card -->
-				<div class="paper-win cyberdeck-card">
+				<div class="paper-win cyberdeck-card" role="group" aria-label="Terminal">
 					<div class="title-bar" role="presentation">
 						<span class="title">Terminal</span>
 					</div>
 					<div class="win-body terminal-body">
 						<div class="terminal-scroll">
-							{#each terminalHistory as entry}
+							{#each terminalHistory as entry, i (`${i}:${entry.q}`)}
 								<div class="terminal-line">
 									<span class="cmd-prompt">$</span>
 									<span class="cmd-q">{entry.q}</span>
@@ -684,7 +730,7 @@ const playable = $derived(data.music.source.kind !== "none");
 	        <div class="win-body curr-body">
 	          <dl class="curr-fields">
 	            <div><dt>mood</dt><dd>{data.mood}</dd></div>
-				<div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()} · p.{data.reading.page}</dd></div>
+				<div><dt>reading</dt><dd><i>{data.reading.title.toLowerCase()}</i> — {data.reading.author.toLowerCase()}{#if data.reading.page} · p.{data.reading.page}{/if}</dd></div>
 	            <div><dt>music</dt><dd>{data.music.artist.toLowerCase()} · {data.music.title.toLowerCase()}</dd></div>
 	            <div><dt>tabs</dt><dd>{data.tabs} (halp)</dd></div>
 	            <div><dt>status</dt><dd>{data.status}</dd></div>
@@ -733,7 +779,7 @@ const playable = $derived(data.music.source.kind !== "none");
             >
               {audioState.playing ? "⏸" : "▶"}
             </button>
-            <button type="button" class="paper-btn" aria-label="Skip" disabled={!playable} onclick={() => audio?.seek(audioDuration - 1)}>▶▶</button>
+            <button type="button" class="paper-btn" aria-label="Skip" disabled={!playable} onclick={async () => { await ensureAudio(); audio?.seek(Math.max(0, audioDuration - 1)); }}>▶▶</button>
 				<span class="np-track" title={trackLine}>
 					<span class="np-track-scroll">
 						<span>{trackLine}</span>
@@ -749,7 +795,7 @@ const playable = $derived(data.music.source.kind !== "none");
             aria-valuemin={0}
             aria-valuemax={Math.max(1, Math.round(audioDuration))}
             aria-valuenow={Math.round(audioPos)}
-            aria-valuetext={`${fmtSpoken(audioPos)} of ${fmtSpoken(audioDuration)}`}
+            aria-valuetext={audioMounted ? `${fmtSpoken(audioPos)} of ${fmtSpoken(audioDuration)}` : "audio not loaded"}
             tabindex={playable ? 0 : -1}
             onpointerdown={seekFromBar}
             onkeydown={(e) => {
@@ -907,7 +953,7 @@ const playable = $derived(data.music.source.kind !== "none");
 	        </div>
 	        <div class="win-body terminal-body">
 	          <div class="terminal-scroll">
-	            {#each terminalHistory as entry}
+	            {#each terminalHistory as entry, i (`${i}:${entry.q}`)}
 	              <div class="terminal-line">
 	                <span class="cmd-prompt">$</span>
 	                <span class="cmd-q">{entry.q}</span>
@@ -1447,12 +1493,18 @@ const playable = $derived(data.music.source.kind !== "none");
 	  }
 
 	  @media (max-width: 720px) {
-	    .surface { height: clamp(640px, 85vh, 800px); }
+	    /* Surface itself is replaced by the cyberdeck branch at this width — no .surface rule needed. */
 	    .desktop-icons { left: 12px; gap: 12px; }
 	    .paper-btn { padding: 5px 12px; font-size: 11px; }
 	    .paper-btn::before { inset: -6px; }
 	    .close::before { inset: -10px; }
 	    .close, .zoom { width: 14px; height: 14px; }
+	    .cyberdeck-card .np-progress { height: 10px; }
+	    .cyberdeck-card .np-progress::before {
+	      content: "";
+	      position: absolute;
+	      inset: -17px 0;
+	    }
 	  }
 
 	  /* ── Cyberdeck (mobile / coarse pointer) ─────────────────────────────── */
@@ -1489,9 +1541,6 @@ const playable = $derived(data.music.source.kind !== "none");
 	    background-size: 4px 4px;
 	    border: 2px solid var(--ink);
 	    box-shadow: 3px 3px 0 var(--ink);
-	    overflow-y: auto;
-	    max-height: 70vh;
-	    touch-action: pan-y;
 	  }
 	  .cyberdeck-card {
 	    border: 2px solid var(--ink);
@@ -1529,6 +1578,11 @@ const playable = $derived(data.music.source.kind !== "none");
 	    display: flex;
 	    align-items: center;
 	    gap: 4px;
+	    /* Cyberdeck cards are not draggable. Cancel the desktop title-bar's
+	       grab cursor + touch-action: none so vertical page scroll engages
+	       even when the finger lands on a card header. */
+	    cursor: default;
+	    touch-action: auto;
 	  }
 	.cyberdeck-card .title {
 		background: transparent;
@@ -1541,26 +1595,26 @@ const playable = $derived(data.music.source.kind !== "none");
 	  .cyberdeck-card .win-body {
 	    padding: 10px;
 	  }
-	  .cyberdeck-bottom {
-	    display: flex;
-	    gap: 6px;
-	    justify-content: center;
-	    padding: 8px;
-	    border: 2px solid var(--ink);
-	    background: var(--paper);
-	    box-shadow: 3px 3px 0 var(--ink);
-	  }
-	  .cyberdeck-bottom .paper-btn {
-	    flex: 1;
-	    text-align: center;
+	  .cyberdeck-zoom {
+	    margin-left: auto;
+	    width: 22px;
+	    min-height: 22px;
+	    background: transparent;
+	    border: 1.5px solid var(--paper);
+	    color: var(--paper);
+	    font-family: var(--font-mono);
 	    font-size: 11px;
-	    padding: 6px 8px;
-	    border: 2px solid var(--ink);
-	    box-shadow: 2px 2px 0 var(--ink);
+	    line-height: 1;
+	    cursor: pointer;
+	    border-radius: 2px;
+	    position: relative;
 	  }
-	  .cyberdeck-bottom .paper-btn:active {
-	    transform: translate(2px, 2px);
-	    box-shadow: none;
+	  .cyberdeck-zoom::before {
+	    content: "";
+	    position: absolute;
+	    inset: -11px;
 	  }
+	  .cyberdeck-zoom:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+	  .cyberdeck-zoom.active { background: var(--paper); color: var(--ink); }
 
 </style>
