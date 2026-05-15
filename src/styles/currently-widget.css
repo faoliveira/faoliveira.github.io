@@ -1,0 +1,616 @@
+/* ── CurrentlyWidget — System-1 paper desktop styles ──
+ * Class-anchored to .widget-frame so descendant selectors stay scoped without
+ * the Svelte :global() escape hatch. All custom props (--ink, --paper, etc.)
+ * are defined on .widget-frame and inherited by every child node.
+ */
+
+.widget-frame {
+  --ink: oklch(0.18 0.02 80);
+  --paper: oklch(0.97 0.012 82);
+  --dot: color-mix(in oklch, var(--ink) 16%, transparent);
+  --ink-soft: color-mix(in oklch, var(--ink) 25%, transparent);
+  /* Opaque text tones over --paper. WCAG-checkable: no opacity composite. */
+  --ink-secondary: color-mix(in oklch, var(--ink) 70%, var(--paper));
+  --ink-tertiary: color-mix(in oklch, var(--ink) 70%, var(--paper));
+  --winShadow: 3px 3px 0 var(--ink);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  border: 1.5px solid var(--ink);
+  background: color-mix(in oklch, var(--paper) 92%, var(--ink));
+  box-shadow: var(--shadow-card-hover);
+}
+.widget-frame[data-compact="true"] {
+  padding: 16px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  border-radius: 2px;
+  max-inline-size: min(760px, 100%);
+  margin-inline: auto;
+}
+html[data-theme="nightfall"] .widget-frame[data-compact="true"] {
+  box-shadow: 4px 4px 0 var(--ink);
+}
+html[data-theme="nightfall"] .widget-frame {
+  --ink: oklch(0.92 0.02 80);
+  --paper: oklch(0.22 0.035 280);
+  --dot: color-mix(in oklch, var(--ink) 18%, transparent);
+  --ink-soft: color-mix(in oklch, var(--ink) 30%, transparent);
+}
+
+.widget-frame .widget-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ma-narrow);
+  padding: var(--ma-narrow) var(--ma-base);
+  border-bottom: 1.5px solid var(--ink);
+  background: var(--paper);
+  font-size: var(--type-xs);
+  letter-spacing: 0.06em;
+}
+.widget-frame .widget-title { text-transform: uppercase; color: var(--color-text-secondary); }
+.widget-frame .widget-toolbar-actions { display: flex; gap: 6px; }
+.widget-frame .tb {
+  position: relative;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+/* Visual stays small; hit area expands vertically to clear WCAG 2.5.8 (24px). */
+.widget-frame .tb::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -4px;
+  bottom: -4px;
+}
+.widget-frame .tb:hover { background: var(--ink); color: var(--paper); }
+.widget-frame .tb:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.widget-frame .surface {
+  position: relative;
+  height: clamp(560px, 75vh, 720px);
+  background: var(--paper);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
+  background-size: 4px 4px;
+  overflow: hidden;
+  /* Allow vertical page scroll over the surface; title-bars own their own
+     drag pointer-capture and set touch-action: none locally. */
+  touch-action: pan-y;
+}
+.widget-frame[data-compact="true"] .surface {
+  min-height: clamp(360px, 42vh, 460px);
+}
+
+.widget-frame .paper-win {
+  position: absolute;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  box-shadow: var(--winShadow);
+  color: var(--ink);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  transition: grid-template-rows 200ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+.widget-frame .paper-win[data-minimized="true"] { grid-template-rows: auto 0fr; }
+.widget-frame .paper-win > .win-body { overflow: hidden; min-height: 0; }
+
+.widget-frame .title-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  height: 18px;
+  background: repeating-linear-gradient(var(--ink) 0 1px, transparent 1px 3px);
+  border-bottom: 1.5px solid var(--ink);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.widget-frame .title-bar:active { cursor: grabbing; }
+.widget-frame .surface[data-coarse="true"] .title-bar {
+  cursor: default;
+  touch-action: auto;
+}
+.widget-frame .title {
+  flex: 1;
+  text-align: center;
+  background: var(--paper);
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.widget-frame .close,
+.widget-frame .zoom {
+  width: 11px;
+  height: 11px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+}
+/* Visual stays 11px to honour the System-1 chrome; hit area expands to 25×25.
+   Pseudo overflow into win-body is masked by later DOM siblings. */
+.widget-frame .close::before,
+.widget-frame .zoom::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+}
+.widget-frame .close:hover,
+.widget-frame .zoom:hover { background: var(--ink); }
+.widget-frame .close:focus-visible,
+.widget-frame .zoom:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+/* Zoom shows a thin horizontal rule (System-1 minimize hint); filled when minimized. */
+.widget-frame .zoom::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: 50%;
+  height: 1.5px;
+  background: var(--ink);
+  transform: translateY(-50%);
+  transition: opacity 150ms ease-out;
+}
+.widget-frame .zoom.active { background: var(--ink); }
+.widget-frame .zoom.active::after { background: var(--paper); }
+
+.widget-frame .win-body {
+  padding: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* ── Currently ── */
+.widget-frame .curr-body { font-size: 11px; }
+.widget-frame .curr-fields {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+  line-height: 1.4;
+}
+.widget-frame .curr-fields > div { display: grid; grid-template-columns: 72px 1fr; gap: 8px; }
+.widget-frame .curr-fields dt {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-tertiary);
+  align-self: center;
+}
+.widget-frame .curr-fields dd { margin: 0; word-break: break-word; }
+.widget-frame .curr-cmd {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--ink-soft);
+  font-size: 11px;
+  line-height: 1.4;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: baseline;
+}
+.widget-frame .cmd-prompt { color: var(--color-accent); font-weight: 700; }
+.widget-frame .cmd-q { font-weight: 600; }
+.widget-frame .cmd-arrow { color: var(--ink-tertiary); }
+.widget-frame .cmd-reply { color: var(--ink-secondary); }
+.widget-frame .cmd-hint { color: var(--ink-tertiary); font-style: italic; }
+
+/* ── Now Playing ── */
+.widget-frame .np-controls { display: flex; gap: 6px; align-items: center; font-size: 11px; }
+.widget-frame .np-track {
+  margin-left: 4px;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+}
+.widget-frame .np-track-scroll {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee-scroll 12s linear infinite;
+}
+.widget-frame .np-track-scroll span {
+  padding-right: 2em;
+}
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.widget-frame .np-progress {
+  margin-top: 8px;
+  height: 10px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  position: relative;
+  cursor: default;
+}
+.widget-frame .np-progress.seekable { cursor: pointer; }
+.widget-frame .np-progress.seekable:hover > div { background: var(--color-accent); }
+.widget-frame .np-progress:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.widget-frame .np-progress > div {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform-origin: left center;
+  transition: transform 0.4s linear;
+}
+.widget-frame .np-times {
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+.widget-frame .preview-tag { color: var(--ink-tertiary); font-style: italic; }
+.widget-frame .audio-host {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  left: -9999px;
+  top: 0;
+}
+
+/* ── Reading ── */
+.widget-frame .reading-body { font-size: 11px; line-height: 1.5; }
+.widget-frame .muted { color: var(--ink-secondary); }
+
+/* ── Nunotchi ── */
+.widget-frame .lcd {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  background-image: radial-gradient(color-mix(in oklch, var(--ink) 14%, transparent) 0.5px, transparent 0.7px);
+  background-size: 3px 3px;
+  height: 110px;
+  position: relative;
+  overflow: hidden;
+}
+.widget-frame .lcd-status {
+  position: absolute;
+  inset: 4px 6px auto 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  line-height: 1;
+  z-index: 2;
+}
+.widget-frame .lcd-stage {
+  position: absolute;
+  inset: 20px 0 16px 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.widget-frame .lcd-msg {
+  position: absolute;
+  bottom: 3px;
+  left: 6px;
+  right: 6px;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+.widget-frame .lcd-boot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.widget-frame .boot-label { font-size: 11px; color: var(--ink-secondary); letter-spacing: 0.1em; }
+
+.widget-frame .hunger-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 11px;
+}
+.widget-frame .hunger-row .bar { letter-spacing: 1px; font-family: var(--font-mono); }
+
+.widget-frame .game-buttons {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.widget-frame .game-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-top: 6px;
+  color: var(--ink-secondary);
+}
+
+/* ── Paper buttons ── */
+.widget-frame .paper-btn {
+  position: relative;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 2px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 8px;
+}
+/* Vertical-only expansion: horizontal would steal taps from siblings in 4–6px gaps. */
+.widget-frame .paper-btn::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -5px;
+  bottom: -5px;
+}
+.widget-frame .paper-btn.solid { background: var(--ink); color: var(--paper); }
+.widget-frame .paper-btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+.widget-frame .paper-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.widget-frame .paper-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Desktop icons ── */
+.widget-frame .desktop-icons {
+  position: absolute;
+  bottom: 36px;
+  left: 24px;
+  display: flex;
+  gap: 18px;
+  color: var(--ink);
+}
+.widget-frame .icon-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: inherit;
+}
+.widget-frame .icon-btn svg { color: var(--ink); }
+.widget-frame .icon-btn:hover svg {
+  color: color-mix(in oklch, var(--ink) 70%, var(--color-accent));
+}
+.widget-frame .icon-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.widget-frame .icon-btn[disabled] { opacity: 0.5; cursor: default; }
+.widget-frame .icon-label {
+  font-size: 10px;
+  color: var(--ink);
+  background: color-mix(in oklch, var(--paper) 70%, transparent);
+  padding: 0 3px;
+}
+
+/* ── Terminal window ── */
+.widget-frame .terminal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  background: var(--ink);
+  color: var(--paper);
+  /* Subtle horizontal scanlines — 1-bit, ink + paper only. */
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    color-mix(in oklch, var(--paper) 5%, transparent) 2px,
+    color-mix(in oklch, var(--paper) 5%, transparent) 3px
+  );
+}
+.widget-frame .terminal-scroll {
+  overflow-y: auto;
+  max-height: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-mono);
+}
+.widget-frame .terminal-scroll::-webkit-scrollbar { width: 4px; }
+.widget-frame .terminal-scroll::-webkit-scrollbar-thumb { background: var(--paper); }
+.widget-frame .terminal-line {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.widget-frame .terminal-line.reply { padding-left: 12px; }
+.widget-frame .terminal-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-top: 1.5px solid var(--paper);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+.widget-frame .terminal-form .prompt { color: var(--paper); font-weight: 400; }
+.widget-frame .terminal-form input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--paper);
+  caret-color: var(--paper);
+  min-width: 0;
+}
+.widget-frame .terminal-form .enter { font-size: 9px; color: var(--paper); letter-spacing: 0.1em; }
+/* 1-bit overrides: terminal uses only ink + paper, no accent or mixed tones. */
+.widget-frame .terminal-body .cmd-prompt { color: var(--paper); font-weight: 400; }
+.widget-frame .terminal-body .cmd-q     { color: var(--paper); font-weight: 400; }
+.widget-frame .terminal-body .cmd-arrow { color: var(--paper); }
+.widget-frame .terminal-body .cmd-reply { color: var(--paper); }
+
+/* ── Menu bar ── */
+.widget-frame .menu-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 4px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .widget-frame .paper-win { transition: none; }
+  .widget-frame .zoom::after { transition: none; }
+  .widget-frame .np-track-scroll { animation: none; }
+}
+
+@media (max-width: 720px) {
+  /* Surface itself is replaced by the cyberdeck branch at this width — no .surface rule needed. */
+  .widget-frame .desktop-icons { left: 12px; gap: 12px; }
+  .widget-frame .paper-btn { padding: 5px 12px; font-size: 11px; }
+  .widget-frame .paper-btn::before { inset: -6px; }
+  .widget-frame .close::before { inset: -10px; }
+  .widget-frame .close,
+  .widget-frame .zoom { width: 14px; height: 14px; }
+  .widget-frame .cyberdeck-card .np-progress { height: 10px; }
+  .widget-frame .cyberdeck-card .np-progress::before {
+    content: "";
+    position: absolute;
+    inset: -17px 0;
+  }
+}
+
+/* ── Cyberdeck (mobile / coarse pointer) ─────────────────────────────── */
+.widget-frame .cyberdeck {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+.widget-frame .cyberdeck-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.widget-frame .cyberdeck-brand {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.widget-frame .cyberdeck-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px;
+  background: var(--paper);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
+  background-size: 4px 4px;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.widget-frame .cyberdeck-card {
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  background: var(--paper);
+  position: relative;
+}
+.widget-frame .cyberdeck-card::before,
+.widget-frame .cyberdeck-card::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  z-index: 1;
+}
+.widget-frame .cyberdeck-card::before {
+  top: -4px;
+  left: -4px;
+}
+.widget-frame .cyberdeck-card::after {
+  bottom: -4px;
+  right: -4px;
+}
+.widget-frame .cyberdeck-card .title-bar {
+  border-bottom: 2px solid var(--ink);
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* Cyberdeck cards are not draggable. Cancel the desktop title-bar's
+     grab cursor + touch-action: none so vertical page scroll engages
+     even when the finger lands on a card header. */
+  cursor: default;
+  touch-action: auto;
+}
+.widget-frame .cyberdeck-card .title {
+  background: transparent;
+  padding: 0;
+}
+.widget-frame .cyberdeck-card .title-bar::before {
+  content: "◆";
+  font-size: 8px;
+}
+.widget-frame .cyberdeck-card .win-body {
+  padding: 10px;
+}
+.widget-frame .cyberdeck-zoom {
+  margin-left: auto;
+  width: 22px;
+  min-height: 22px;
+  background: transparent;
+  border: 1.5px solid var(--paper);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 2px;
+  position: relative;
+}
+.widget-frame .cyberdeck-zoom::before {
+  content: "";
+  position: absolute;
+  inset: -11px;
+}
+.widget-frame .cyberdeck-zoom:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.widget-frame .cyberdeck-zoom.active { background: var(--paper); color: var(--ink); }

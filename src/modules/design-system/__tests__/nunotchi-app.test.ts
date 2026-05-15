@@ -4,10 +4,11 @@ import pkg from "../../../../package.json";
 import licensesSource from "../../../../public/sprites/LICENSES.md?raw";
 import widgetSource from "../../../islands/CurrentlyWidget.svelte?raw";
 import gameSource from "../../../islands/lib/NunotchiGame.svelte?raw";
+import nunotchiCardSource from "../../../islands/lib/NunotchiCard.svelte?raw";
 import atlasSource from "../../../islands/lib/nuno-atlas.ts?raw";
 import stateSource from "../../../islands/lib/nunotchi-state.ts?raw";
 
-const COMBINED_GAMES = widgetSource + gameSource;
+const COMBINED_GAMES = widgetSource + gameSource + nunotchiCardSource;
 
 const PHASER_RE = /from\s+["'](phaser|pixi\.js|three)["']/;
 
@@ -45,10 +46,10 @@ describe("Nunotchi.app contract (Story 1.21)", () => {
   });
 
   it("AC3 — Four action buttons + correct stat math", () => {
-    expect(widgetSource).toContain("A · feed");
-    expect(widgetSource).toContain("B · play");
-    expect(widgetSource).toContain("C · walk");
-    expect(widgetSource).toContain('aria-label="Nap"');
+    expect(nunotchiCardSource).toContain("A · feed");
+    expect(nunotchiCardSource).toContain("B · play");
+    expect(nunotchiCardSource).toContain("C · walk");
+    expect(nunotchiCardSource).toContain('aria-label="Nap"');
     expect(widgetSource).toContain("pet.hunger = Math.max(0, pet.hunger - 1)");
     expect(widgetSource).toContain("pet.energy = Math.max(0, pet.energy - 12)");
     expect(widgetSource).toContain("pet.walks += 1");
@@ -85,12 +86,12 @@ describe("Nunotchi.app contract (Story 1.21)", () => {
   });
 
   it("AC8 — SSR loading fallback, no egg-hatch artifacts", () => {
-    expect(widgetSource).toContain("loading…");
-    expect(widgetSource).toContain('<NunotchiGame pose={busy ?? "idle"}');
-    expect(widgetSource).not.toContain("booting");
-    expect(widgetSource).not.toContain("hatchFrame");
-    expect(widgetSource).not.toContain("hatchTimer");
-    expect(widgetSource).not.toContain('"/sprites/eggs.png"');
+    expect(nunotchiCardSource).toContain("loading…");
+    expect(nunotchiCardSource).toContain('<NunotchiGame pose={busy ?? "idle"}');
+    expect(COMBINED_GAMES).not.toContain("booting");
+    expect(COMBINED_GAMES).not.toContain("hatchFrame");
+    expect(COMBINED_GAMES).not.toContain("hatchTimer");
+    expect(COMBINED_GAMES).not.toContain('"/sprites/eggs.png"');
   });
 
   it("AC9 — No alert window", () => {
