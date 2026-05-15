@@ -356,13 +356,20 @@ $effect(() => {
 // targets in the unmounting branch detach. Active drag pointer-capture and the
 // mounted audio iframe would otherwise survive on stale nodes. Reset both so
 // the next interaction re-attaches cleanly.
+// `_firstSwap` distinguishes the initial-mount transition from a true resize.
+// We always normalize the wins state on entry (mount or resize) so the pocket
+// layout's single-window invariant holds.
 let _lastIsCyberdeck = false;
+let _firstSwap = true;
 $effect(() => {
   if (!mounted) return;
   const isCyberdeck = coarsePointer || surfaceWidth < 720;
-  if (isCyberdeck === _lastIsCyberdeck) return;
+  if (!_firstSwap && isCyberdeck === _lastIsCyberdeck) return;
   _lastIsCyberdeck = isCyberdeck;
+  _firstSwap = false;
   winState.resetDragState();
+  if (isCyberdeck) winState.enterCyberdeck();
+  else winState.enterDesktop();
   if (audioMounted) {
     audio?.destroy();
     audio = null;
@@ -401,8 +408,10 @@ const isCyberdeck = $derived(mounted && (coarsePointer || 720 > surfaceWidth));
       {busy}
       {msg}
       {mounted}
+      {compact}
       {clock}
       {now}
+      {readingLine}
       {trackLine}
       {playable}
       {audioState}

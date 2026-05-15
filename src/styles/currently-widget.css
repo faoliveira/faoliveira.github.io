@@ -649,11 +649,15 @@ html[data-theme="nightfall"] .widget-frame {
   }
 }
 
-/* ── Cyberdeck (mobile / coarse pointer) ─────────────────────────────── */
+/* ── Cyberdeck (mobile / coarse pointer) ─────────────────────────────── *
+ * Pocket-organizer layout. Status bar (top) + single-window screen (middle)
+ * + hardware-key dock (bottom). Same paper-and-ink palette as the desktop
+ * branch — no neon, no glass, no chrome. Modern device, felt past.
+ */
 .widget-frame .cyberdeck {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   font-family: var(--font-mono);
   color: var(--ink);
 }
@@ -663,9 +667,9 @@ html[data-theme="nightfall"] .widget-frame {
   justify-content: space-between;
   gap: 8px;
   padding: 6px 10px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--ink);
   background: var(--paper);
-  box-shadow: 3px 3px 0 var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
 }
 .widget-frame .cyberdeck-brand {
   font-size: 11px;
@@ -673,43 +677,48 @@ html[data-theme="nightfall"] .widget-frame {
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
+.widget-frame .cyberdeck-status-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 2px 6px;
+  background: var(--ink);
+  color: var(--paper);
+  white-space: nowrap;
+}
 .widget-frame .cyberdeck-stack {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 8px;
+  min-height: 240px;
+  padding: 10px;
   background: var(--paper);
   background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
   background-size: 4px 4px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  /* Preserve vertical page scroll over the panel — no overflow trap. */
+  touch-action: auto;
+}
+
+/* Terminal pane — pinned above the dock when open, parallel to the main screen.
+ * The user can keep Nunotchi visible and still type commands at the prompt. */
+.widget-frame .cyberdeck-terminal-pane {
   box-shadow: 3px 3px 0 var(--ink);
 }
+.widget-frame .cyberdeck-terminal-pane .win-body {
+  padding: 8px;
+}
+.widget-frame .cyberdeck-terminal-pane .terminal-scroll {
+  max-height: 110px;
+}
 .widget-frame .cyberdeck-card {
-  border: 2px solid var(--ink);
-  box-shadow: 3px 3px 0 var(--ink);
+  border: 1.5px solid var(--ink);
   background: var(--paper);
   position: relative;
 }
-.widget-frame .cyberdeck-card::before,
-.widget-frame .cyberdeck-card::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border: 1.5px solid var(--ink);
-  background: var(--paper);
-  z-index: 1;
-}
-.widget-frame .cyberdeck-card::before {
-  top: -4px;
-  left: -4px;
-}
-.widget-frame .cyberdeck-card::after {
-  bottom: -4px;
-  right: -4px;
-}
 .widget-frame .cyberdeck-card .title-bar {
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
   padding: 4px 8px;
   font-size: 10px;
   font-weight: 700;
@@ -720,9 +729,8 @@ html[data-theme="nightfall"] .widget-frame {
   display: flex;
   align-items: center;
   gap: 4px;
-  /* Cyberdeck cards are not draggable. Cancel the desktop title-bar's
-     grab cursor + touch-action: none so vertical page scroll engages
-     even when the finger lands on a card header. */
+  /* Cyberdeck cards are not draggable. Cancel the desktop grab cursor and
+     touch-action: none so vertical page scroll engages on header taps. */
   cursor: default;
   touch-action: auto;
 }
@@ -737,30 +745,132 @@ html[data-theme="nightfall"] .widget-frame {
 .widget-frame .cyberdeck-card .win-body {
   padding: 10px;
 }
-.widget-frame .cyberdeck-zoom {
-  margin-left: auto;
+.widget-frame .cyberdeck-zoom,
+.widget-frame .cyberdeck-close {
   width: 22px;
   min-height: 22px;
+  padding: 0;
   background: transparent;
   border: 1.5px solid var(--paper);
   color: var(--paper);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   cursor: pointer;
   border-radius: 2px;
   position: relative;
+  flex-shrink: 0;
 }
-.widget-frame .cyberdeck-zoom::before {
+.widget-frame .cyberdeck-zoom::before,
+.widget-frame .cyberdeck-close::before {
   content: "";
   position: absolute;
   inset: -11px;
 }
-.widget-frame .cyberdeck-zoom:focus-visible {
+.widget-frame .cyberdeck-zoom:hover,
+.widget-frame .cyberdeck-close:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+.widget-frame .cyberdeck-zoom:focus-visible,
+.widget-frame .cyberdeck-close:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 1px;
 }
 .widget-frame .cyberdeck-zoom.active {
   background: var(--paper);
   color: var(--ink);
+}
+
+/* Empty home — the dock is the affordance; the screen breathes. */
+.widget-frame .cyberdeck-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 180px;
+  color: var(--ink-secondary);
+}
+.widget-frame .cyberdeck-empty-glyph {
+  font-size: 28px;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+.widget-frame .cyberdeck-empty-hint {
+  font-family: "Caveat", "Bradley Hand", cursive;
+  font-size: 18px;
+  letter-spacing: 0;
+  transform: rotate(-2deg);
+}
+
+/* Dock — hardware-key row pressed into the device chassis. */
+.widget-frame .cyberdeck-dock {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 8px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 2px 2px 0 var(--ink);
+  /* The top edge reads recessed — a thin ink line where the dock meets the chassis. */
+  background-image: linear-gradient(to bottom, var(--ink-soft) 0, transparent 3px);
+}
+.widget-frame .cyberdeck-key {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 2px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  /* iOS taps shouldn't paint their own gray; the active state handles feedback. */
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 80ms ease-out;
+}
+.widget-frame .cyberdeck-key svg {
+  color: var(--ink);
+}
+.widget-frame .cyberdeck-key-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.widget-frame .cyberdeck-key[data-active="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.widget-frame .cyberdeck-key[data-active="true"] svg {
+  color: var(--paper);
+}
+.widget-frame .cyberdeck-key:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.widget-frame .cyberdeck-key:active:not(:disabled) {
+  transform: translate(0, 1px);
+}
+.widget-frame .cyberdeck-key:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .widget-frame .cyberdeck-key {
+    transition: none;
+  }
 }

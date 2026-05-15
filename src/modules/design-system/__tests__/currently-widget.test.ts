@@ -124,7 +124,11 @@ describe("CurrentlyWidget island contract (Story 1.20)", () => {
   });
 
   it("reduced-motion disables marquee animation", () => {
-    expect(widgetCssSource).toContain(".widget-frame .np-track-scroll { animation: none; }");
+    // Match across line breaks — biome formats the extracted stylesheet
+    // multi-line, so the rule body sits below the selector instead of inline.
+    expect(widgetCssSource).toMatch(
+      /\.widget-frame \.np-track-scroll\s*{\s*animation:\s*none;\s*}/,
+    );
   });
 
   it("clock placeholder is empty string not em-dash colon", () => {
