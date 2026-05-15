@@ -1,6 +1,6 @@
 <script lang="ts">
-import type { AudioState } from "./audio-source";
 import { fmtSpoken, fmtTime } from "./audio-format";
+import type { AudioState } from "./audio-source";
 
 interface Props {
   trackLine: string;
