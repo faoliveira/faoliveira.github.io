@@ -1,11 +1,6 @@
 import { SEARCH_CONFIG } from "../index";
 import { loadPagefind } from "./pagefind-client";
-import {
-  itemsHtml,
-  noResultsHtml,
-  resultsLabel,
-  unavailableHtml,
-} from "./render";
+import { itemsHtml, noResultsHtml, resultsLabel, unavailableHtml } from "./render";
 import { hasSubstantialMatch } from "./sanitize";
 import {
   createNunoController,
@@ -81,11 +76,7 @@ export function initWorkshopSearch(els: WorkshopSearchElements): () => void {
       return;
     }
 
-    const search = await pf.debouncedSearch(
-      trimmed,
-      {},
-      SEARCH_CONFIG.debounceMs,
-    );
+    const search = await pf.debouncedSearch(trimmed, {}, SEARCH_CONFIG.debounceMs);
     if (search === null) return;
 
     if (search.results.length === 0) {
@@ -97,9 +88,7 @@ export function initWorkshopSearch(els: WorkshopSearchElements): () => void {
     const items = await Promise.all(
       search.results.slice(0, SEARCH_CONFIG.maxResults).map((r) => r.data()),
     );
-    const substantial = items.filter((item) =>
-      hasSubstantialMatch(item.excerpt, trimmed),
-    );
+    const substantial = items.filter((item) => hasSubstantialMatch(item.excerpt, trimmed));
     if (substantial.length === 0) {
       renderNoResults(trimmed);
       setHint("try fewer words");
@@ -138,9 +127,7 @@ export function initWorkshopSearch(els: WorkshopSearchElements): () => void {
     const target = e.target as HTMLElement | null;
     const isTyping =
       !!target &&
-      (target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable);
+      (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
     if (
       (e.key === "/" || e.code === "Slash") &&
       !isTyping &&
@@ -157,9 +144,7 @@ export function initWorkshopSearch(els: WorkshopSearchElements): () => void {
   input.addEventListener("input", onInput);
   input.addEventListener("keydown", onInputKeydown);
   clearBtn?.addEventListener("click", onClear);
-  const chips = Array.from(
-    document.querySelectorAll<HTMLElement>(".suggestion-chip"),
-  );
+  const chips = Array.from(document.querySelectorAll<HTMLElement>(".suggestion-chip"));
   for (const btn of chips) {
     btn.addEventListener("click", onSuggestionClick);
   }

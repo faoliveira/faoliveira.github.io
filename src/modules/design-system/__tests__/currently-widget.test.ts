@@ -2,14 +2,14 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import widgetSource from "../../../islands/CurrentlyWidget.svelte?raw";
+import currentlyCardSource from "../../../islands/lib/CurrentlyCard.svelte?raw";
 import cyberdeckSource from "../../../islands/lib/CyberdeckLayout.svelte?raw";
+import typesSource from "../../../islands/lib/currently-types.ts?raw";
 import desktopSource from "../../../islands/lib/DesktopLayout.svelte?raw";
 import nowPlayingSource from "../../../islands/lib/NowPlayingCard.svelte?raw";
 import nunotchiCardSource from "../../../islands/lib/NunotchiCard.svelte?raw";
-import currentlyCardSource from "../../../islands/lib/CurrentlyCard.svelte?raw";
 import readingCardSource from "../../../islands/lib/ReadingCard.svelte?raw";
 import terminalCardSource from "../../../islands/lib/TerminalCard.svelte?raw";
-import typesSource from "../../../islands/lib/currently-types.ts?raw";
 import windowStateSource from "../../../islands/lib/window-state.svelte.ts?raw";
 import indexSource from "../../../pages/index.astro?raw";
 
@@ -165,7 +165,9 @@ describe("CurrentlyWidget island contract (Story 1.20)", () => {
   });
 
   it("cyberdeck honors nunotchi minimized state — pet loop pauses on mobile", () => {
-    expect(widgetSource).toContain("winState.wins.nunotchi.open && !winState.wins.nunotchi.minimized");
+    expect(widgetSource).toContain(
+      "winState.wins.nunotchi.open && !winState.wins.nunotchi.minimized",
+    );
     expect(cyberdeckSource).toContain("{#if !wins.nunotchi.minimized}");
     expect(cyberdeckSource).toContain('aria-label={wins.nunotchi.minimized ? "Expand Nunotchi"');
   });
@@ -177,9 +179,7 @@ describe("CurrentlyWidget island contract (Story 1.20)", () => {
   });
 
   it("reading.page is guarded when the schema field is absent", () => {
-    expect(currentlyCardSource).toContain(
-      "{#if data.reading.page} · p.{data.reading.page}{/if}",
-    );
+    expect(currentlyCardSource).toContain("{#if data.reading.page} · p.{data.reading.page}{/if}");
     expect(allSource).not.toContain(" · p.{data.reading.page}</dd>");
   });
 });

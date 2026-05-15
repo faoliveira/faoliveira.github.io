@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import pkg from "../../../../package.json";
 import licensesSource from "../../../../public/sprites/LICENSES.md?raw";
 import widgetSource from "../../../islands/CurrentlyWidget.svelte?raw";
-import gameSource from "../../../islands/lib/NunotchiGame.svelte?raw";
 import nunotchiCardSource from "../../../islands/lib/NunotchiCard.svelte?raw";
+import gameSource from "../../../islands/lib/NunotchiGame.svelte?raw";
 import atlasSource from "../../../islands/lib/nuno-atlas.ts?raw";
 import stateSource from "../../../islands/lib/nunotchi-state.ts?raw";
 

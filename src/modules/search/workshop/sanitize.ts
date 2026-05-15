@@ -10,8 +10,7 @@ export function escapeHtml(s: string): string {
 export function sanitizeExcerpt(html: string): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
   const walk = (node: Node): string => {
-    if (node.nodeType === Node.TEXT_NODE)
-      return escapeHtml(node.textContent ?? "");
+    if (node.nodeType === Node.TEXT_NODE) return escapeHtml(node.textContent ?? "");
     if (node.nodeType === Node.ELEMENT_NODE) {
       const el = node as Element;
       const children = Array.from(el.childNodes).map(walk).join("");

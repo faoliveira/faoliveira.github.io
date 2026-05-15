@@ -1,5 +1,5 @@
-import { escapeHtml, isSafeUrl, sanitizeExcerpt } from "./sanitize";
 import type { ResultData } from "./pagefind-client";
+import { escapeHtml, isSafeUrl, sanitizeExcerpt } from "./sanitize";
 
 const FALLBACK_LINKS = `
   <div class="no-results-links">
