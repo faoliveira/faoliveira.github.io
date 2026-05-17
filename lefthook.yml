@@ -2,6 +2,7 @@ pre-commit:
   parallel: false
   commands:
     lint:
+      glob: "*.{js,jsx,ts,tsx,mjs,cjs,svelte,astro,json,jsonc,css}"
       run: bunx biome check --write --staged
     knip:
       run: bunx knip --no-exit-code
