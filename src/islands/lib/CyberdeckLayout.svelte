@@ -1,9 +1,9 @@
 <script lang="ts">
 import type { Post } from "@modules/content";
 import type { CurrentlyData } from "@modules/currently/schema";
-import Notepad from "phosphor-svelte/lib/Notepad";
 import Desktop from "phosphor-svelte/lib/Desktop";
 import FileText from "phosphor-svelte/lib/FileText";
+import Notepad from "phosphor-svelte/lib/Notepad";
 import PawPrint from "phosphor-svelte/lib/PawPrint";
 import SpeakerSimpleHigh from "phosphor-svelte/lib/SpeakerSimpleHigh";
 import SpeakerSimpleX from "phosphor-svelte/lib/SpeakerSimpleX";
