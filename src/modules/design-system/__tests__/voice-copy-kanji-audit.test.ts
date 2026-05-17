@@ -56,7 +56,6 @@ describe("Voice & copy + kanji audit (Story 1.17)", () => {
     expect(designSystemSource).toMatch(/CJK intentional/);
   });
 
-
   it("[AI-tells] site-config descriptions avoid banned phrases (AC #1, #2, #3)", () => {
     const lower = siteConfigSource.toLowerCase();
     expect(lower).not.toMatch(/welcome to my blog/);

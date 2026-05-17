@@ -1,5 +1,5 @@
 export type Mood = "idle" | "eat" | "play" | "walk" | "sleep";
-export type WinId = "currently" | "nowplaying" | "reading" | "nunotchi" | "terminal";
+export type WinId = "currently" | "nowplaying" | "reading" | "nunotchi" | "terminal" | "posts";
 
 export interface Win {
   x: number;

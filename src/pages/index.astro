@@ -10,6 +10,7 @@ import { toISODateString } from "@modules/content/format-date";
 import { SITE_URL } from "@modules/seo";
 
 const recentPosts = await getPublishedPosts({ limit: 5 });
+const allPosts = await getPublishedPosts();
 
 const currentlyEntry = await getEntry("currently", "now");
 if (!currentlyEntry) {
@@ -30,7 +31,7 @@ const currentlyUpdated = toISODateString(currently.updated);
   />
   <section class="kb-currently" aria-labelledby="currently-heading">
     <h2 id="currently-heading" class="section-label kb-section-label">Currently ——</h2>
-		<CurrentlyWidget data={currently} compact={true} client:visible />
+		<CurrentlyWidget data={currently} compact={true} posts={allPosts} client:visible />
     <noscript>
       <div class="kb-currently-static">
         <dl class="kb-currently-list">

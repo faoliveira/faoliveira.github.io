@@ -1,8 +1,12 @@
 <script lang="ts">
+import type { Post } from "@modules/content";
 import type { CurrentlyData } from "@modules/currently/schema";
+import Notepad from "phosphor-svelte/lib/Notepad";
 import Desktop from "phosphor-svelte/lib/Desktop";
 import FileText from "phosphor-svelte/lib/FileText";
 import PawPrint from "phosphor-svelte/lib/PawPrint";
+import SpeakerSimpleHigh from "phosphor-svelte/lib/SpeakerSimpleHigh";
+import SpeakerSimpleX from "phosphor-svelte/lib/SpeakerSimpleX";
 import TerminalIcon from "phosphor-svelte/lib/Terminal";
 import Trash from "phosphor-svelte/lib/Trash";
 import VinylRecord from "phosphor-svelte/lib/VinylRecord";
@@ -13,6 +17,7 @@ import NowPlayingCard from "./NowPlayingCard.svelte";
 import NunotchiCard from "./NunotchiCard.svelte";
 import type { LoopHandle } from "./NunotchiGame.svelte";
 import type { NunotchiState } from "./nunotchi-state";
+import PostsCard from "./PostsCard.svelte";
 import ReadingCard from "./ReadingCard.svelte";
 import TerminalCard from "./TerminalCard.svelte";
 import type { WindowState } from "./window-state.svelte";
@@ -52,6 +57,10 @@ interface Props {
   onTogglePlay: () => void | Promise<void>;
   onSeekBar: (e: PointerEvent) => void | Promise<void>;
   onSeekArrow: (deltaSec: number) => void;
+  soundMuted: boolean;
+  onToggleMute: () => void;
+  posts?: Post[];
+  coarsePointer: boolean;
 }
 
 let {
@@ -89,6 +98,10 @@ let {
   onTogglePlay,
   onSeekBar,
   onSeekArrow,
+  soundMuted,
+  onToggleMute,
+  posts = [],
+  coarsePointer,
 }: Props = $props();
 
 const wins = $derived(winState.wins);
@@ -99,7 +112,13 @@ const wins = $derived(winState.wins);
 // main window. Main windows still hold a single-active invariant among
 // themselves; tapping a main key swaps the main slot without touching the
 // terminal slot.
-const MAIN_IDS: readonly WinId[] = ["currently", "nunotchi", "reading", "nowplaying"] as const;
+const MAIN_IDS: readonly WinId[] = [
+  "currently",
+  "nunotchi",
+  "reading",
+  "nowplaying",
+  "posts",
+] as const;
 const mainActiveId = $derived.by(() => {
   for (const id of MAIN_IDS) {
     if (wins[id].open) return id;
@@ -114,6 +133,7 @@ const KEY_LABELS: Record<WinId, string> = {
   reading: "Reading",
   nowplaying: "Music",
   terminal: "Terminal",
+  posts: "WordCraft",
 };
 
 let dock = $state<HTMLDivElement | undefined>(undefined);
@@ -164,7 +184,21 @@ const statusTag = $derived.by(() => {
 
 <div class="cyberdeck" role="region" aria-label="Cyberdeck">
   <div class="cyberdeck-top">
-    <span class="cyberdeck-brand">★ {now} · {clock}</span>
+    <span class="cyberdeck-top-left">
+      <button
+        type="button"
+        class="sound-toggle"
+        aria-label={soundMuted ? "Unmute audio" : "Mute audio"}
+        onclick={onToggleMute}
+      >
+        {#if soundMuted}
+          <SpeakerSimpleX size={14} weight="regular" aria-hidden="true" />
+        {:else}
+          <SpeakerSimpleHigh size={14} weight="regular" aria-hidden="true" />
+        {/if}
+      </button>
+      <span class="cyberdeck-brand">★ {now} · {clock}</span>
+    </span>
     <span class="cyberdeck-status-tag" aria-live="polite">{statusTag}</span>
   </div>
 
@@ -234,6 +268,16 @@ const statusTag = $derived.by(() => {
           />
         </div>
       </div>
+    {:else if mainActiveId === "posts"}
+      <div class="paper-win cyberdeck-card" role="group" aria-label="WordCraft">
+        <div class="title-bar" role="presentation">
+          <span class="title">WordCraft</span>
+          <button type="button" class="cyberdeck-close" aria-label="Close WordCraft" onclick={closeMain}>×</button>
+        </div>
+        <div class="win-body">
+          <PostsCard {posts} autoFocus={!coarsePointer} />
+        </div>
+      </div>
     {:else}
       <div class="cyberdeck-empty" aria-live="polite">
         <span class="cyberdeck-empty-glyph" aria-hidden="true">◆</span>
@@ -300,6 +344,17 @@ const statusTag = $derived.by(() => {
     >
       <VinylRecord size={18} weight="regular" aria-hidden="true" />
       <span class="cyberdeck-key-label">Music</span>
+    </button>
+    <button
+      type="button"
+      class="cyberdeck-key"
+      data-key-id="posts"
+      data-active={mainActiveId === "posts"}
+      aria-pressed={mainActiveId === "posts"}
+      onclick={() => tapMain("posts")}
+    >
+      <Notepad size={18} weight="regular" aria-hidden="true" />
+      <span class="cyberdeck-key-label">WordCraft</span>
     </button>
     <button
       type="button"

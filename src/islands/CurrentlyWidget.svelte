@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { Post } from "@modules/content";
 import type { CurrentlyData } from "@modules/currently/schema";
 import { onDestroy, onMount, untrack } from "svelte";
 import { type AudioSource, type AudioState, createAudioSource } from "./lib/audio-source";
@@ -23,12 +24,16 @@ interface Props {
   dev?: boolean;
   /** Compact mode for homepage — smaller surface, tighter layout. */
   compact?: boolean;
+  /** Posts data for Posts.app */
+  posts?: Post[];
 }
 
-let { data, dev = false, compact = false }: Props = $props();
+let { data, dev = false, compact = false, posts = [] }: Props = $props();
 
 const getStorage = (): Storage | null =>
-  typeof localStorage !== "undefined" ? localStorage : null;
+  typeof globalThis !== "undefined" && "localStorage" in globalThis
+    ? globalThis.localStorage
+    : null;
 
 // ── Game state ───────────────────────────────────────────────────────────────
 let pet = $state<NunotchiState>({ ...PET_DEFAULTS });
@@ -43,9 +48,9 @@ let mounted = $state(false);
 let reduced = $state(false);
 let coarsePointer = $state(false);
 // Initial value 0 ensures the cyberdeck branch wins on hydration until the
-// ResizeObserver reports a real width. With Infinity, mobile hydrated to the
+// resize listener reports a real width. With Infinity, mobile hydrated to the
 // desktop layout for one frame before swapping.
-let surfaceWidth = $state(0);
+let viewportWidth = $state(0);
 
 // ── Loop pause/resume + visibility tracking ──────────────────────────────────
 let loopHandle = $state<LoopHandle | null>(null);
@@ -59,6 +64,17 @@ const KONAMI_LEN = 10;
 let konamiBuffer: string[] = [];
 
 // ── Clock ────────────────────────────────────────────────────────────────────
+
+// ── Sound state ────────────────────────────────────────────────────────────
+let soundMuted = $state(false);
+const STORAGE_KEY_MUTE = "nunotchi:v1:mute";
+function onToggleMute() {
+  soundMuted = !soundMuted;
+  const storage = getStorage();
+  if (storage) {
+    storage.setItem(STORAGE_KEY_MUTE, JSON.stringify(soundMuted));
+  }
+}
 let clock = $state("");
 let now = $state("");
 
@@ -66,7 +82,6 @@ let now = $state("");
 const winState = createWindowState({ coarsePointer: () => coarsePointer });
 
 let surface = $state<HTMLDivElement | undefined>(undefined);
-let frame = $state<HTMLDivElement | undefined>(undefined);
 
 // ── Game actions (also reachable from terminal commands) ─────────────────────
 function animate(label: Mood, after?: () => void) {
@@ -195,10 +210,12 @@ async function ensureAudio() {
 }
 
 async function togglePlay() {
+  if (soundMuted) {
+    soundMuted = false;
+  }
   await ensureAudio();
   if (!audio || audio.kind === "none") return;
   audio.toggle();
-  audioState = audio.getState();
 }
 
 async function seekFromBar(e: PointerEvent) {
@@ -213,7 +230,6 @@ async function seekFromBar(e: PointerEvent) {
   const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
   const dur = audio.getState().duration || 0;
   if (dur > 0) audio.seek(ratio * dur);
-  audioState = audio.getState();
 }
 
 function restartAudio() {
@@ -227,7 +243,6 @@ function seekArrow(deltaSec: number) {
   if (!audio) return;
   const next = Math.max(0, (audioPos || 0) + deltaSec);
   audio.seek(next);
-  audioState = audio.getState();
 }
 
 // ── Lifecycle ────────────────────────────────────────────────────────────────
@@ -235,7 +250,7 @@ let clockTimer: ReturnType<typeof setInterval>;
 let decayTimer: ReturnType<typeof setInterval> | undefined;
 let onVisibility: (() => void) | undefined;
 let onPageHide: (() => void) | undefined;
-let resizeObserver: ResizeObserver | undefined;
+let onViewportResize: (() => void) | undefined;
 let pointerMedia: MediaQueryList | undefined;
 let onPointerChange: ((e: MediaQueryListEvent) => void) | undefined;
 
@@ -256,15 +271,13 @@ onMount(() => {
   pet = applyOfflineDecay(loaded.state, Date.now());
   mounted = true;
 
-  resizeObserver = new ResizeObserver((entries) => {
-    for (const entry of entries) {
-      surfaceWidth = entry.contentRect.width;
-    }
-  });
-  if (frame) {
-    surfaceWidth = frame.clientWidth;
-    resizeObserver.observe(frame);
-  }
+  const storedMute = getStorage()?.getItem(STORAGE_KEY_MUTE);
+  soundMuted = storedMute ? JSON.parse(storedMute) : false;
+  viewportWidth = window.innerWidth;
+  onViewportResize = () => {
+    viewportWidth = window.innerWidth;
+  };
+  window.addEventListener("resize", onViewportResize, { passive: true });
 
   const updateClock = () => {
     const d = new Date();
@@ -311,7 +324,7 @@ onDestroy(() => {
   if (onVisibility) document.removeEventListener("visibilitychange", onVisibility);
   if (onPageHide) window.removeEventListener("pagehide", onPageHide);
   audio?.destroy();
-  resizeObserver?.disconnect();
+  if (onViewportResize) window.removeEventListener("resize", onViewportResize);
   if (pointerMedia && onPointerChange) pointerMedia.removeEventListener("change", onPointerChange);
 });
 
@@ -325,6 +338,13 @@ $effect(() => {
     audioState = src.getState();
   }, 1000);
   return () => clearInterval(id);
+});
+
+// ── Pause/resume audio on mute toggle ──────────────────────────────────────
+$effect(() => {
+  if (soundMuted && audioState.playing && audio) {
+    audio.pause();
+  }
 });
 
 // ── Pause / resume the Kontra loop + run the active-time decay tick ──────────
@@ -363,7 +383,7 @@ let _lastIsCyberdeck = false;
 let _firstSwap = true;
 $effect(() => {
   if (!mounted) return;
-  const isCyberdeck = coarsePointer || surfaceWidth < 720;
+  const isCyberdeck = coarsePointer || viewportWidth < 720;
   if (!_firstSwap && isCyberdeck === _lastIsCyberdeck) return;
   _lastIsCyberdeck = isCyberdeck;
   _firstSwap = false;
@@ -387,15 +407,15 @@ const audioDuration = $derived(audioState.duration || 0);
 const audioPos = $derived(audioState.position || 0);
 const audioRatio = $derived(audioDuration > 0 ? Math.min(1, audioPos / audioDuration) : 0);
 const playable = $derived(data.music.source.kind !== "none");
-const isCyberdeck = $derived(mounted && (coarsePointer || 720 > surfaceWidth));
+const isCyberdeck = $derived(mounted && (coarsePointer || viewportWidth < 720));
 </script>
 
-<div class="widget-frame" data-busy={busy} data-compact={compact} bind:this={frame}>
+<div class="widget-frame" data-busy={busy} data-compact={compact}>
   {#if dev}
     <div class="widget-toolbar">
       <span class="widget-title">System-1 paper · widget preview</span>
       <div class="widget-toolbar-actions">
-        <button type="button" class="tb" onclick={() => winState.resetDesktop(frame?.clientWidth ?? 0)}>↺ reset desktop</button>
+        <button type="button" class="tb" onclick={() => winState.resetDesktop(window.innerWidth)}>↺ reset desktop</button>
       </div>
     </div>
   {/if}
@@ -435,6 +455,10 @@ const isCyberdeck = $derived(mounted && (coarsePointer || 720 > surfaceWidth));
       onTogglePlay={togglePlay}
       onSeekBar={seekFromBar}
       onSeekArrow={seekArrow}
+      onToggleMute={onToggleMute}
+      {soundMuted}
+      {posts}
+      {coarsePointer}
     />
   {:else}
     <DesktopLayout
@@ -474,6 +498,9 @@ const isCyberdeck = $derived(mounted && (coarsePointer || 720 > surfaceWidth));
       onTogglePlay={togglePlay}
       onSeekBar={seekFromBar}
       onSeekArrow={seekArrow}
+      onToggleMute={onToggleMute}
+      {soundMuted}
+      {posts}
     />
   {/if}
 </div>

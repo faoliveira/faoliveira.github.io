@@ -6,6 +6,7 @@ const INITIAL_WINS: Record<WinId, Win> = {
   reading: { x: 28, y: 320, z: 3, rotate: -1.5, open: true, minimized: false },
   nunotchi: { x: 410, y: 220, z: 4, open: true, minimized: false },
   terminal: { x: 24, y: 260, z: 5, open: true, minimized: false },
+  posts: { x: 200, y: 160, z: 6, open: false, minimized: false },
 };
 
 const ICON_LABELS: Partial<Record<WinId, string>> = {
@@ -13,6 +14,7 @@ const ICON_LABELS: Partial<Record<WinId, string>> = {
   reading: "Reading.txt",
   nowplaying: "Music",
   terminal: "Terminal",
+  posts: "WordCraft",
 };
 
 function focusIcon(surface: HTMLElement | null | undefined, label: string) {
@@ -190,8 +192,9 @@ export function createWindowState(opts: { coarsePointer: () => boolean }): Windo
   }
 
   function enterDesktop() {
+    // Restore each window's initial open state (most are open, posts is closed).
     for (const k of Object.keys(wins) as WinId[]) {
-      wins[k].open = true;
+      wins[k].open = INITIAL_WINS[k].open;
     }
   }
 

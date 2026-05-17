@@ -1,7 +1,11 @@
 <script lang="ts">
+import type { Post } from "@modules/content";
 import type { CurrentlyData } from "@modules/currently/schema";
+import Notepad from "phosphor-svelte/lib/Notepad";
 import FileText from "phosphor-svelte/lib/FileText";
 import PawPrint from "phosphor-svelte/lib/PawPrint";
+import SpeakerSimpleHigh from "phosphor-svelte/lib/SpeakerSimpleHigh";
+import SpeakerSimpleX from "phosphor-svelte/lib/SpeakerSimpleX";
 import Terminal from "phosphor-svelte/lib/Terminal";
 import Trash from "phosphor-svelte/lib/Trash";
 import VinylRecord from "phosphor-svelte/lib/VinylRecord";
@@ -12,6 +16,7 @@ import NowPlayingCard from "./NowPlayingCard.svelte";
 import NunotchiCard from "./NunotchiCard.svelte";
 import type { LoopHandle } from "./NunotchiGame.svelte";
 import type { NunotchiState } from "./nunotchi-state";
+import PostsCard from "./PostsCard.svelte";
 import { paperClose, paperOpen } from "./paper-anim";
 import ReadingCard from "./ReadingCard.svelte";
 import TerminalCard from "./TerminalCard.svelte";
@@ -54,6 +59,9 @@ interface Props {
   onTogglePlay: () => void | Promise<void>;
   onSeekBar: (e: PointerEvent) => void | Promise<void>;
   onSeekArrow: (deltaSec: number) => void;
+  soundMuted: boolean;
+  onToggleMute: () => void;
+  posts?: Post[];
 }
 
 let {
@@ -93,6 +101,9 @@ let {
   onTogglePlay,
   onSeekBar,
   onSeekArrow,
+  soundMuted,
+  onToggleMute,
+  posts = [],
 }: Props = $props();
 
 const wins = $derived(winState.wins);
@@ -279,6 +290,38 @@ const wins = $derived(winState.wins);
       </div>
     </div>
   {/if}
+  {#if wins.posts.open}
+    <div
+      class="paper-win"
+      role="group"
+      aria-label="WordCraft"
+      data-minimized={wins.posts.minimized}
+      style:left={`${wins.posts.x}px`}
+      style:top={`${wins.posts.y}px`}
+      style:z-index={wins.posts.z}
+      style:width="280px"
+      onpointerdown={() => winState.focusWin("posts")}
+      in:paperOpen={{ reduced }}
+      out:paperClose={{ reduced }}
+    >
+      <div class="title-bar" onpointerdown={(e) => winState.startDrag(e, "posts", surface)} role="presentation">
+        <button type="button" class="close" onpointerdown={(e) => e.stopPropagation()} onclick={() => winState.closeWin("posts", surface)} aria-label="Close WordCraft"></button>
+        <span class="title">WordCraft</span>
+        <button
+          type="button"
+          class="zoom"
+          class:active={wins.posts.minimized}
+          aria-label={wins.posts.minimized ? "Expand WordCraft" : "Minimize WordCraft"}
+          aria-expanded={!wins.posts.minimized}
+          onpointerdown={(e) => e.stopPropagation()}
+          onclick={() => winState.minimizeWin("posts")}
+        ></button>
+      </div>
+      <div class="win-body">
+        <PostsCard {posts} />
+      </div>
+    </div>
+  {/if}
 
   <div class="desktop-icons">
     <button type="button" class="icon-btn" onclick={() => winState.toggleWin("nunotchi")}>
@@ -299,6 +342,10 @@ const wins = $derived(winState.wins);
       <Terminal size={20} weight="regular" aria-hidden="true" />
       <span class="icon-label">Terminal</span>
     </button>
+    <button type="button" class="icon-btn" onclick={() => winState.toggleWin("posts")}>
+      <Notepad size={20} weight="regular" aria-hidden="true" />
+      <span class="icon-label">WordCraft</span>
+    </button>
     <button type="button" class="icon-btn" aria-label="Trash (empty)" disabled>
       <Trash size={20} weight="regular" aria-hidden="true" />
       <span class="icon-label">Trash</span>
@@ -307,6 +354,20 @@ const wins = $derived(winState.wins);
 
   <div class="menu-bar">
     <span class="menu-items">★ File · Edit · View</span>
-    <span class="clock">{clock || "—"}</span>
+    <span class="menu-right">
+      <button
+        type="button"
+        class="sound-toggle"
+        aria-label={soundMuted ? "Unmute audio" : "Mute audio"}
+        onclick={onToggleMute}
+      >
+        {#if soundMuted}
+          <SpeakerSimpleX size={14} weight="regular" aria-hidden="true" />
+        {:else}
+          <SpeakerSimpleHigh size={14} weight="regular" aria-hidden="true" />
+        {/if}
+      </button>
+      <span class="clock">{clock || "—"}</span>
+    </span>
   </div>
 </div>
