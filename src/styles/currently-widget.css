@@ -627,7 +627,6 @@ html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
   color: var(--ink);
 }
 
-
 /* ── WordCraft ── */
 .widget-frame .wc-toolbar {
   display: flex;
@@ -636,17 +635,26 @@ html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--ink-secondary);
   border-bottom: 1px solid var(--ink-soft);
   margin-bottom: var(--ma-narrow);
 }
-.widget-frame .wc-toolbar > span {
-  cursor: default;
+.widget-frame .wc-menu-item {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
 }
-.widget-frame .wc-toolbar > span:hover {
+.widget-frame .wc-menu-item:hover {
   color: var(--ink);
   background: var(--paper-hover);
+}
+.widget-frame .wc-menu-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .widget-frame .wc-cmdline {
@@ -655,6 +663,7 @@ html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
   gap: 6px;
 }
 .widget-frame .wc-prompt {
+  font-family: var(--font-mono);
   font-size: var(--type-xs);
   font-weight: 700;
   color: var(--color-accent);
@@ -664,8 +673,8 @@ html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
 .widget-frame .posts-search {
   flex: 1;
   padding: var(--ma-narrow) 0;
+  font-family: var(--font-mono);
   font-size: var(--type-xs);
-  font-family: inherit;
   color: var(--ink);
   background: transparent;
   border: none;
@@ -677,6 +686,7 @@ html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
     padding-bottom 120ms ease;
 }
 .widget-frame .posts-search::placeholder {
+  font-family: var(--font-mono);
   color: var(--ink-tertiary);
 }
 .widget-frame .posts-search::-webkit-search-cancel-button {
@@ -691,19 +701,19 @@ html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
 .widget-frame .wc-ruler {
   margin: var(--ma-thin) 0;
   height: 1px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--ink-soft) 0 2px,
-    transparent 2px 6px
-  );
+  background: repeating-linear-gradient(90deg, var(--ink-soft) 0 2px, transparent 2px 6px);
 }
 
 .widget-frame .posts-status {
   margin: var(--ma-thin) 0 0;
+  font-family: var(--font-mono);
   font-size: var(--type-2xs);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-tertiary);
+}
+.widget-frame .posts-status-help {
+  color: var(--ink-secondary);
 }
 
 .widget-frame .posts-list {
@@ -743,6 +753,7 @@ html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
   text-overflow: ellipsis;
 }
 .widget-frame .posts-meta {
+  font-family: var(--font-mono);
   font-size: var(--type-2xs);
   color: var(--ink-secondary);
   white-space: nowrap;
@@ -752,8 +763,9 @@ html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
   margin-top: var(--ma-thin);
   padding: 2px 4px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;

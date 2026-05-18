@@ -295,6 +295,7 @@ const wins = $derived(winState.wins);
       class="paper-win"
       role="group"
       aria-label="WordCraft"
+      data-win="wordcraft"
       data-minimized={wins.posts.minimized}
       style:left={`${wins.posts.x}px`}
       style:top={`${wins.posts.y}px`}

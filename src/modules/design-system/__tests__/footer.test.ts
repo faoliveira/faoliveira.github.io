@@ -20,10 +20,10 @@ describe("Footer — FA's rules", () => {
     expect(lower).not.toContain("cookies free");
   });
 
-  it("keeps the 'built with' colophon and coffee SVG", () => {
+  it("keeps the 'built with' colophon and coffee icon", () => {
     expect(footerSource).toContain("built with");
-    // Discriminating segment of the coffee-cup outline (Rule 1 KEEP)
-    expect(footerSource).toContain("M18 8h1a4 4");
+    // Coffee icon is now a phosphor-astro component, not inline SVG.
+    expect(footerSource).toContain("phosphor-astro/Coffee");
   });
 
   it("does not ship SVG glyphs for the three social links", () => {

@@ -13,13 +13,18 @@ let { posts, autoFocus = false }: Props = $props();
 let query = $state("");
 let timeoutId: ReturnType<typeof setTimeout> | null = null;
 let debouncedQuery = $state("");
+let searching = $state(false);
 let searchEl = $state<HTMLInputElement | undefined>(undefined);
+let helpVisible = $state(false);
+let helpTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function onInput(e: Event) {
   query = (e.target as HTMLInputElement).value;
+  searching = true;
   if (timeoutId) clearTimeout(timeoutId);
   timeoutId = setTimeout(() => {
     debouncedQuery = query;
+    searching = false;
   }, 300);
 }
 
@@ -36,10 +41,10 @@ const filtered = $derived.by(() => {
 const isFiltering = $derived(debouncedQuery.trim().length > 0);
 const statusMessage = $derived(
   posts.length === 0
-    ? "No posts yet."
+    ? "No texts yet."
     : filtered.length === 0
       ? "No matches."
-      : `${filtered.length} ${filtered.length === 1 ? "post" : "posts"}.`,
+      : `${filtered.length} ${filtered.length === 1 ? "text" : "texts"}.`,
 );
 
 function toDate(d: Date | string | undefined): Date | null {
@@ -48,34 +53,88 @@ function toDate(d: Date | string | undefined): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function focusSearch() {
+  searchEl?.focus();
+}
+
+function clearSearch() {
+  query = "";
+  debouncedQuery = "";
+  searchEl?.focus();
+}
+
+function showHelp() {
+  helpVisible = true;
+  if (helpTimeout) clearTimeout(helpTimeout);
+  helpTimeout = setTimeout(() => {
+    helpVisible = false;
+  }, 3000);
+}
+
+function onKeyDown(e: KeyboardEvent) {
+  if (e.key === "/" && document.activeElement !== searchEl) {
+    e.preventDefault();
+    focusSearch();
+  }
+  if (e.key === "Escape" && document.activeElement === searchEl) {
+    if (query) {
+      clearSearch();
+    } else {
+      searchEl?.blur();
+    }
+  }
+}
+
 onMount(() => {
   if (autoFocus) searchEl?.focus();
 });
 
 onDestroy(() => {
   if (timeoutId) clearTimeout(timeoutId);
+  if (helpTimeout) clearTimeout(helpTimeout);
 });
 </script>
 
+<svelte:window onkeydown={onKeyDown} />
+
 <div class="posts-card">
-  <input
-    bind:this={searchEl}
-    type="search"
-    class="posts-search"
-    placeholder="search…"
-    aria-label="Search posts"
-    autocomplete="off"
-    spellcheck="false"
-    value={query}
-    oninput={onInput}
-  />
-  <p class="posts-status" role="status" aria-live="polite">{statusMessage}</p>
-  <ul class="posts-list" aria-label="Posts">
+  <div class="wc-toolbar" role="toolbar" aria-label="WordCraft menu">
+    <a href="/posts/" class="wc-menu-item">File</a>
+    <button type="button" class="wc-menu-item" onclick={focusSearch}>Search</button>
+    <button type="button" class="wc-menu-item" onclick={showHelp}>Help</button>
+  </div>
+
+  <div class="wc-cmdline">
+    <span class="wc-prompt" aria-hidden="true">&gt;</span>
+    <input
+      bind:this={searchEl}
+      type="search"
+      class="posts-search"
+      placeholder="search documents…"
+      aria-label="Search posts"
+      autocomplete="off"
+      spellcheck="false"
+      value={query}
+      oninput={onInput}
+    />
+  </div>
+
+  <div class="wc-ruler" aria-hidden="true"></div>
+
+  <p class="posts-status" role="status" aria-live="polite" aria-busy={searching}>
+    {#if helpVisible}
+      <span class="posts-status-help">Type to filter. Click a title to open.</span>
+    {:else}
+      {statusMessage}
+    {/if}
+  </p>
+
+  <ul class="posts-list" aria-label="Posts" aria-busy={searching}>
     {#if filtered.length === 0}
       <li class="posts-empty">
         <span class="posts-empty-mark" aria-hidden="true">∅</span>
         <span class="posts-empty-text">
-          {isFiltering ? "No matches for that search." : "No posts yet."}
+          {isFiltering ? "No matches for that search." : "No texts yet."}
         </span>
       </li>
     {:else}
@@ -94,4 +153,8 @@ onDestroy(() => {
       {/each}
     {/if}
   </ul>
+
+  <div class="wc-statusbar" role="status" aria-label="Editor status">
+    <span class="wc-status-right">{filtered.length}/{posts.length} texts</span>
+  </div>
 </div>

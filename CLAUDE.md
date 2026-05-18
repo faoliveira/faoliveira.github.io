@@ -1,4 +1,4 @@
-# CLAUDE.md
+# CLAUDE.md — felipeo.me
 
 Personal blog (felipeo.me) — Astro 6, TypeScript strict, Bun, Vitest. Hosted on GitHub Pages.
 
@@ -29,24 +29,54 @@ Follow Deep Modules (John Ousterhout): small public APIs, complexity hidden insi
 - TypeScript strict, no `any`.
 - Prefer fewer dependencies — check if Astro/TS already solves it.
 - Test transforms, schemas, and critical paths. Don't over-test static markup.
+- Use OKLCH for colors; follow the token system in `src/styles/tokens.css`.
+- Respect the Ma (間) spacing system — no arbitrary pixel values.
 
-## Working Style
+## Harness Rules
 
-- **Plan first.** For any non-trivial task (3+ steps or architectural decisions), enter plan mode before coding. If something goes sideways, stop and re-plan — don't keep pushing.
-- **Use subagents.** Offload research, exploration, and parallel analysis to subagents to keep the main context clean. One focused task per subagent.
+- **Plan first.** For any non-trivial task (3+ steps or architectural decisions), enter plan mode before coding. If something goes sideways, stop and re-plan.
+- **Use subagents.** Offload research, exploration, and parallel analysis to subagents. One focused task per subagent.
 - **Verify before done.** Never mark a task complete without proving it works. Run tests, check logs, ask "would a staff engineer approve this?"
-- **Demand elegance.** For non-trivial changes, pause and ask "is there a more elegant way?" Skip for simple, obvious fixes.
-- **Fix bugs autonomously.** When given a bug report: fix it. Point at logs, errors, failing tests — then resolve them. Zero hand-holding needed.
-- **Capture lessons.** After any correction from the user, update `_bmad-output/project_knowledge/lessons.md` with the pattern to prevent repeating it.
+- **Demand elegance.** For non-trivial changes, pause and ask "is there a more elegant way?"
+- **Fix bugs autonomously.** When given a bug report: fix it. Point at logs, errors, failing tests — then resolve them.
 - **Simplicity first.** Make every change as simple as possible. Impact minimal code. Find root causes — no temporary fixes.
+
+## Quality Gates (run before committing)
+
+```bash
+bun run check    # type check — zero errors
+bun run test     # vitest — all pass
+bun run build    # production build succeeds
+```
+
+## Documentation Contract
+
+**When you change anything in this repo that affects how the site works, you MUST update the corresponding documentation in `~/Documents/1_Projects/personal_website/koubou_docs/`.**
+
+Examples:
+- New component or embed → update `site/autoria.md`
+- New terminal command or Nunotchi mechanic → update `nunotchi/terminal.md` or `nunotchi/gameplay.md`
+- New sprite/sound asset → update `nunotchi/production.md`
+- New deploy step or infra change → update `nunotchi/deploy.md`
+- Design token or layout change → update `project/design-system.md`
+
+The docs live outside this repo at `~/Documents/1_Projects/personal_website/koubou_docs/`. Do not create a `docs/` folder inside this repo.
 
 ## Boundaries
 
 **Always:**
-- Respect `.gitignore` — never commit or push ignored files (including `_bmad-output/`, `_bmad/`, `docs/`, `.claude/`, `.agent/`).
-- Read `_bmad-output/project-context.md` for full architectural rules when making structural decisions.
+- Respect `.gitignore` — never commit or push ignored files.
+- Read `koubou_docs/` for full documentation before making structural decisions.
 
 **Never:**
 - Introduce enterprise patterns without concrete need.
 - Add SSR, sessions, cron jobs, or background workers.
 - Commit secrets, `.env` files, or AI tool configs.
+- Touch folders outside this repo (`../gds_loom/`, `../old_images_generator/`, etc.) unless explicitly asked.
+
+## Project Context
+
+BMAD workflow artifacts (stories, sprint-status, etc.) live outside this repo at:
+`~/Documents/1_Projects/personal_website/_bmad-output/` (outputs) and
+`~/Documents/1_Projects/personal_website/_bmad/` (inputs).
+This repo contains only the site source code that ships to production.

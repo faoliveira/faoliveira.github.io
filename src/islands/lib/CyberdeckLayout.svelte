@@ -269,7 +269,7 @@ const statusTag = $derived.by(() => {
         </div>
       </div>
     {:else if mainActiveId === "posts"}
-      <div class="paper-win cyberdeck-card" role="group" aria-label="WordCraft">
+      <div class="paper-win cyberdeck-card" role="group" aria-label="WordCraft" data-win="wordcraft">
         <div class="title-bar" role="presentation">
           <span class="title">WordCraft</span>
           <button type="button" class="cyberdeck-close" aria-label="Close WordCraft" onclick={closeMain}>×</button>

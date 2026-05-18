@@ -525,8 +525,6 @@ uv.lock
 
 
 docs/
-_bmad-output/
-_bmad/
 .agent/
 .agents/
 .opencode/
