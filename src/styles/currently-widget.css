@@ -11,8 +11,8 @@
   --ink-soft: color-mix(in oklch, var(--ink) 25%, transparent);
   --paper-hover: color-mix(in oklch, var(--ink) 8%, var(--paper));
   /* Opaque text tones over --paper. WCAG-checkable: no opacity composite. */
-  --ink-secondary: color-mix(in oklch, var(--ink) 70%, var(--paper));
-  --ink-tertiary: color-mix(in oklch, var(--ink) 70%, var(--paper));
+  --ink-secondary: color-mix(in oklch, var(--ink) 55%, var(--paper));
+  --ink-tertiary: color-mix(in oklch, var(--ink) 35%, var(--paper));
   --winShadow: 3px 3px 0 var(--ink);
   color: var(--ink);
   font-family: var(--font-mono);
@@ -118,6 +118,21 @@ html[data-theme="nightfall"] .widget-frame {
 .widget-frame .paper-win > .win-body {
   overflow: hidden;
   min-height: 0;
+}
+
+/* WordCraft window height constraint */
+.widget-frame .paper-win[data-win="wordcraft"] {
+  max-height: min(480px, 62vh);
+}
+.widget-frame .paper-win[data-win="wordcraft"] > .win-body {
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.widget-frame .paper-win[data-win="wordcraft"] > .win-body::-webkit-scrollbar {
+  width: 6px;
+}
+.widget-frame .paper-win[data-win="wordcraft"] > .win-body::-webkit-scrollbar-thumb {
+  background: var(--ink-soft);
 }
 
 .widget-frame .title-bar {
@@ -591,9 +606,63 @@ html[data-theme="nightfall"] .widget-frame {
   color: var(--paper);
 }
 
-/* ── WordPad ── */
+/* Nightfall: terminal re-inverts so it stays dark-surface, light-text. */
+html[data-theme="nightfall"] .widget-frame .terminal-body {
+  background: var(--paper);
+  color: var(--ink);
+}
+html[data-theme="nightfall"] .widget-frame .terminal-scroll::-webkit-scrollbar-thumb {
+  background: var(--ink);
+}
+html[data-theme="nightfall"] .widget-frame .terminal-form {
+  border-top-color: var(--ink);
+}
+html[data-theme="nightfall"] .widget-frame .terminal-body .cmd-prompt,
+html[data-theme="nightfall"] .widget-frame .terminal-body .cmd-q,
+html[data-theme="nightfall"] .widget-frame .terminal-body .cmd-arrow,
+html[data-theme="nightfall"] .widget-frame .terminal-body .cmd-reply,
+html[data-theme="nightfall"] .widget-frame .terminal-form .prompt,
+html[data-theme="nightfall"] .widget-frame .terminal-form input,
+html[data-theme="nightfall"] .widget-frame .terminal-form .enter {
+  color: var(--ink);
+}
+
+
+/* ── WordCraft ── */
+.widget-frame .wc-toolbar {
+  display: flex;
+  gap: 12px;
+  padding: 2px 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  border-bottom: 1px solid var(--ink-soft);
+  margin-bottom: var(--ma-narrow);
+}
+.widget-frame .wc-toolbar > span {
+  cursor: default;
+}
+.widget-frame .wc-toolbar > span:hover {
+  color: var(--ink);
+  background: var(--paper-hover);
+}
+
+.widget-frame .wc-cmdline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.widget-frame .wc-prompt {
+  font-size: var(--type-xs);
+  font-weight: 700;
+  color: var(--color-accent);
+  user-select: none;
+}
+
 .widget-frame .posts-search {
-  width: 100%;
+  flex: 1;
   padding: var(--ma-narrow) 0;
   font-size: var(--type-xs);
   font-family: inherit;
@@ -618,6 +687,17 @@ html[data-theme="nightfall"] .widget-frame {
   border-color: var(--ink);
   padding-bottom: 7px;
 }
+
+.widget-frame .wc-ruler {
+  margin: var(--ma-thin) 0;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink-soft) 0 2px,
+    transparent 2px 6px
+  );
+}
+
 .widget-frame .posts-status {
   margin: var(--ma-thin) 0 0;
   font-size: var(--type-2xs);
@@ -625,6 +705,7 @@ html[data-theme="nightfall"] .widget-frame {
   text-transform: uppercase;
   color: var(--ink-tertiary);
 }
+
 .widget-frame .posts-list {
   list-style: none;
   margin: var(--ma-thin) 0 0;
@@ -633,12 +714,19 @@ html[data-theme="nightfall"] .widget-frame {
   flex-direction: column;
 }
 .widget-frame .posts-row {
-  display: block;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
   padding: var(--ma-narrow) var(--ma-thin);
   text-decoration: none;
   color: inherit;
   min-height: 44px;
   transition: background 120ms ease;
+  border-bottom: 1px solid var(--ink-soft);
+}
+.widget-frame .posts-row:last-child {
+  border-bottom: none;
 }
 .widget-frame .posts-row:hover {
   background: var(--paper-hover);
@@ -649,18 +737,31 @@ html[data-theme="nightfall"] .widget-frame {
   background: var(--paper-hover);
 }
 .widget-frame .posts-title {
-  display: block;
   font-size: var(--type-xs);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .widget-frame .posts-meta {
-  display: block;
   font-size: var(--type-2xs);
   color: var(--ink-secondary);
-  margin-top: var(--ma-hair);
+  white-space: nowrap;
 }
+
+.widget-frame .wc-statusbar {
+  margin-top: var(--ma-thin);
+  padding: 2px 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  background: var(--paper-hover);
+  border-top: 1.5px solid var(--ink-soft);
+}
+
 .widget-frame .posts-empty {
   display: flex;
   flex-direction: column;

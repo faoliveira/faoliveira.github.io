@@ -38,8 +38,6 @@
       "!dist",
       "!.astro",
       "!node_modules",
-      "!_bmad-output",
-      "!_bmad",
       "!.claude",
       "!.agent",
       "!.agents",
